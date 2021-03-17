@@ -72,14 +72,7 @@ class ListItem extends StatelessWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  List<Song> _items = [
-    Song("288ef611-5f1e-475c-beb0-573618e9be93", "Bądź mi litościw", "3.9"),
-    Song("ad822725-2459-4f58-bfce-556331b1f6f6", "Krzyż jest źródłem", "3.11"),
-    Song("824162c3-58f3-44cc-8c90-908d23ab9394", "Chrystus Pan karmi nas",
-        "6.16"),
-    Song("e2208656-289a-4ca1-8736-37edbfe68136", "Ukaż mi Panie swą twarz", ""),
-    Song("bf4baad1-d607-4d9f-b738-29ae875b58a8", "O, matko miłościwa", ""),
-  ];
+  List<Song> _items = [];
 
   void _reorderItems(int oldIndex, int newIndex) {
     setState(() {
@@ -94,6 +87,12 @@ class _MyHomePageState extends State<MyHomePage> {
   void _removeItem(int index) {
     setState(() {
       _items.removeAt(index);
+    });
+  }
+
+  void _addItem(Song item) {
+    setState(() {
+      _items.add(item);
     });
   }
 
@@ -112,7 +111,7 @@ class _MyHomePageState extends State<MyHomePage> {
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) {
-                  return SearchPage();
+                  return SearchPage(onSelect: _addItem);
                 }),
               );
             },
