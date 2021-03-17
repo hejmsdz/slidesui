@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:slidesui/search.dart';
 import './strings.dart';
 import './model.dart';
 
@@ -101,6 +102,22 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
+        actions: [
+          IconButton(
+            icon: Icon(
+              Icons.search,
+              color: Colors.white,
+            ),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) {
+                  return SearchPage();
+                }),
+              );
+            },
+          ),
+        ],
       ),
       body: ReorderableListView.builder(
         itemCount: _items.length,
