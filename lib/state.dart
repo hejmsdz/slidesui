@@ -20,6 +20,13 @@ class SlidesModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  removeItemById(String id) {
+    final index = _items.indexWhere((item) => item.id == id);
+    if (index >= 0) {
+      removeItem(index);
+    }
+  }
+
   undoRemoveItem() {
     if (_lastRemovedIndex == null || _lastRemovedItem == null) {
       return;
@@ -38,5 +45,9 @@ class SlidesModel extends ChangeNotifier {
     final item = _items.removeAt(oldIndex);
     _items.insert(newIndex, item);
     notifyListeners();
+  }
+
+  containsSong(String id) {
+    return _items.any((item) => item.id == id);
   }
 }

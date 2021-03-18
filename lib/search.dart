@@ -11,17 +11,20 @@ class SearchPage extends StatefulWidget {
 }
 
 class SearchListItem extends StatelessWidget {
-  SearchListItem({Key key, this.title, this.number, this.onTap})
-      : super(key: key);
+  SearchListItem({this.id, this.title, this.number, this.isChecked, this.onTap})
+      : super(key: ValueKey(id));
 
+  final String id;
   final String title;
   final String number;
+  final bool isChecked;
   final Function onTap;
 
   @override
   Widget build(BuildContext context) {
     return ListTile(
       title: Text(title),
+      leading: this.isChecked ? Icon(Icons.check) : Icon(null),
       trailing: Text(
         number,
         style: Theme.of(context).textTheme.caption,
@@ -59,34 +62,41 @@ class _SearchPageState extends State<SearchPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: TextField(
-          controller: controller,
-          autofocus: true,
-          decoration: InputDecoration(
-            hintText: strings['searchSongs'],
-            border: InputBorder.none,
-            hintStyle: TextStyle(color: Colors.white30),
+        appBar: AppBar(
+          title: TextField(
+            controller: controller,
+            autofocus: true,
+            decoration: InputDecoration(
+              hintText: strings['searchSongs'],
+              border: InputBorder.none,
+              hintStyle: TextStyle(color: Colors.white30),
+            ),
+            style: TextStyle(color: Colors.white, fontSize: 16.0),
+            onChanged: updateQuery,
           ),
-          style: TextStyle(color: Colors.white, fontSize: 16.0),
-          onChanged: updateQuery,
         ),
-      ),
-      body: ListView.builder(
-        itemCount: _items.length,
-        itemBuilder: (BuildContext context, int index) {
-          final song = _items[index];
-          return SearchListItem(
-            key: ValueKey(song.id),
-            title: song.title,
-            number: song.number,
-            onTap: () {
-              Provider.of<SlidesModel>(context, listen: false).addItem(song);
-              Navigator.pop(context);
+        body: Consumer<SlidesModel>(
+          builder: (context, state, child) => ListView.builder(
+            itemCount: _items.length,
+            itemBuilder: (BuildContext context, int index) {
+              final song = _items[index];
+              final isAdded = state.containsSong(song.id);
+              return SearchListItem(
+                id: song.id,
+                title: song.title,
+                number: song.number,
+                isChecked: isAdded,
+                onTap: () {
+                  print("Pressed ${song.title}, is added = $isAdded");
+                  if (!isAdded) {
+                    state.addItem(song);
+                  } else {
+                    state.removeItemById(song.id);
+                  }
+                },
+              );
             },
-          );
-        },
-      ),
-    );
+          ),
+        ));
   }
 }
