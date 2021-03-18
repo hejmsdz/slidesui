@@ -49,7 +49,7 @@ slugify(String text) {
       .replaceAll('ś', 's')
       .replaceAll('ź', 'z')
       .replaceAll('ż', 'z')
-      .replaceAll(RegExp('[^a-zA-Z0-9 ]+'), '');
+      .replaceAll(RegExp('[^a-zA-Z0-9\. ]+'), '');
 }
 
 class _SearchPageState extends State<SearchPage> {
@@ -89,6 +89,15 @@ class _SearchPageState extends State<SearchPage> {
     });
   }
 
+  void resetQuery() {
+    setState(() {
+      _query = "";
+      _prefilteredItems = [];
+      _items = [];
+    });
+    controller.clear();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -104,6 +113,15 @@ class _SearchPageState extends State<SearchPage> {
             style: TextStyle(color: Colors.white, fontSize: 16.0),
             onChanged: updateQuery,
           ),
+          actions: [
+            IconButton(
+              icon: Icon(
+                Icons.clear,
+                color: Colors.white,
+              ),
+              onPressed: resetQuery,
+            ),
+          ],
         ),
         body: Consumer<SlidesModel>(
           builder: (context, state, child) => ListView.builder(
