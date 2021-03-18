@@ -2,13 +2,15 @@ class Song {
   final String id;
   final String title;
   final String number;
+  final String slug;
 
-  Song(this.id, this.title, this.number);
+  Song(this.id, this.title, this.number, this.slug);
 
   Song.fromJson(Map<String, dynamic> json)
       : id = json['id'],
         title = json['title'],
-        number = json['number'];
+        number = json['number'],
+        slug = json['slug'];
 }
 
 class DeckRequest {

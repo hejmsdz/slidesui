@@ -35,27 +35,57 @@ class SearchListItem extends StatelessWidget {
   }
 }
 
+const queryPrefixLength = 3;
+
+slugify(String text) {
+  return text
+      .toLowerCase()
+      .replaceAll('ą', 'a')
+      .replaceAll('ć', 'c')
+      .replaceAll('ę', 'e')
+      .replaceAll('ł', 'l')
+      .replaceAll('ń', 'n')
+      .replaceAll('ó', 'o')
+      .replaceAll('ś', 's')
+      .replaceAll('ź', 'z')
+      .replaceAll('ż', 'z')
+      .replaceAll(RegExp('[^a-zA-Z0-9 ]+'), '');
+}
+
 class _SearchPageState extends State<SearchPage> {
   TextEditingController controller = TextEditingController();
   String _query = "";
+  List<Song> _prefilteredItems = [];
   List<Song> _items = [];
 
-  void updateQuery(query) async {
+  void updateQuery(String query) async {
+    final previousQuery = _query;
     setState(() {
       _query = query;
     });
 
-    if (_query.length < 3) {
+    if (_query.length < queryPrefixLength) {
       setState(() {
         _items = [];
       });
       return;
     }
 
-    final items = await getSongs(_query);
+    final queryPrefixChanged = previousQuery.length < queryPrefixLength ||
+        query.substring(0, queryPrefixLength) !=
+            previousQuery.substring(0, queryPrefixLength);
+
+    final querySlug = slugify(query);
+
+    if (queryPrefixChanged) {
+      _prefilteredItems =
+          await getSongs(_query.substring(0, queryPrefixLength));
+    }
 
     setState(() {
-      _items = items;
+      _items = _prefilteredItems
+          .where((item) => item.slug.contains(querySlug))
+          .toList();
     });
   }
 
@@ -87,7 +117,6 @@ class _SearchPageState extends State<SearchPage> {
                 number: song.number,
                 isChecked: isAdded,
                 onTap: () {
-                  print("Pressed ${song.title}, is added = $isAdded");
                   if (!isAdded) {
                     state.addItem(song);
                   } else {
