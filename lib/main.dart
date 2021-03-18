@@ -102,6 +102,15 @@ class _MyHomePageState extends State<MyHomePage> {
                     number: song.number,
                     onRemoved: () {
                       state.removeItem(index);
+                      final snackBar = SnackBar(
+                        content: Text(strings['itemRemoved']),
+                        action: SnackBarAction(
+                          label: strings['undo'],
+                          onPressed: state.undoRemoveItem,
+                        ),
+                      );
+
+                      ScaffoldMessenger.of(context).showSnackBar(snackBar);
                     },
                   );
                 },
