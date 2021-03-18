@@ -1,8 +1,7 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import './strings.dart';
 import './model.dart';
+import './api.dart';
 
 class SearchPage extends StatefulWidget {
   SearchPage({Key key, this.onSelect}) : super(key: key);
@@ -62,20 +61,10 @@ class _SearchPageState extends State<SearchPage> {
       return;
     }
 
-    final response =
-        await http.get(Uri.https('slajdyrocha2.herokuapp.com', 'v2/songs', {
-      'query': _query,
-    }));
-
-    if (response.statusCode != 200) {
-      return;
-    }
-
-    final body = Utf8Decoder().convert(response.body.codeUnits);
-    final json = jsonDecode(body) as List;
+    final items = await getSongs(_query);
 
     setState(() {
-      _items = json.map((itemJson) => Song.fromJson(itemJson)).toList();
+      _items = items;
     });
   }
 
