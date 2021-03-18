@@ -1,15 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import './strings.dart';
+import './state.dart';
 import './model.dart';
 import './api.dart';
 
 class SearchPage extends StatefulWidget {
-  SearchPage({Key key, this.onSelect}) : super(key: key);
-
-  final Function(Song) onSelect;
-
   @override
-  _SearchPageState createState() => _SearchPageState(onSelect: onSelect);
+  _SearchPageState createState() => _SearchPageState();
 }
 
 class SearchListItem extends StatelessWidget {
@@ -35,10 +33,6 @@ class SearchListItem extends StatelessWidget {
 }
 
 class _SearchPageState extends State<SearchPage> {
-  _SearchPageState({this.onSelect}) : super();
-
-  final Function(Song) onSelect;
-
   TextEditingController controller = TextEditingController();
   String _query = "";
   List<Song> _items = [];
@@ -87,7 +81,7 @@ class _SearchPageState extends State<SearchPage> {
             title: song.title,
             number: song.number,
             onTap: () {
-              onSelect(song);
+              Provider.of<SlidesModel>(context, listen: false).addItem(song);
               Navigator.pop(context);
             },
           );

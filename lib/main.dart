@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:slidesui/search.dart';
+import 'package:provider/provider.dart';
 import './strings.dart';
-import './model.dart';
+import './state.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => SlidesModel(),
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -62,30 +68,6 @@ class ListItem extends StatelessWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  List<Song> _items = [];
-
-  void _reorderItems(int oldIndex, int newIndex) {
-    setState(() {
-      if (newIndex > oldIndex) {
-        newIndex -= 1;
-      }
-      final item = _items.removeAt(oldIndex);
-      _items.insert(newIndex, item);
-    });
-  }
-
-  void _removeItem(int index) {
-    setState(() {
-      _items.removeAt(index);
-    });
-  }
-
-  void _addItem(Song item) {
-    setState(() {
-      _items.add(item);
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -101,29 +83,30 @@ class _MyHomePageState extends State<MyHomePage> {
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) {
-                  return SearchPage(onSelect: _addItem);
+                  return SearchPage();
                 }),
               );
             },
           ),
         ],
       ),
-      body: ReorderableListView.builder(
-        itemCount: _items.length,
-        itemBuilder: (BuildContext context, int index) {
-          final song = _items[index];
-          return ListItem(
-            key: ValueKey(song.id),
-            symbol: "${index + 1}",
-            title: song.title,
-            number: song.number,
-            onRemoved: () {
-              _removeItem(index);
-            },
-          );
-        },
-        onReorder: _reorderItems,
-      ),
+      body: Consumer<SlidesModel>(
+          builder: (context, state, child) => ReorderableListView.builder(
+                itemCount: state.items.length,
+                itemBuilder: (BuildContext context, int index) {
+                  final song = state.items[index];
+                  return ListItem(
+                    key: ValueKey(song.id),
+                    symbol: "${index + 1}",
+                    title: song.title,
+                    number: song.number,
+                    onRemoved: () {
+                      state.removeItem(index);
+                    },
+                  );
+                },
+                onReorder: state.reorderItems,
+              )),
       floatingActionButton: FloatingActionButton(
         onPressed: () {},
         tooltip: strings['generateSlides'],
