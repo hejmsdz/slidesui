@@ -26,10 +26,9 @@ class DeckRequest {
 }
 
 class DeckResponse {
-  final Uri url;
+  final String url;
 
   DeckResponse(this.url);
 
-  DeckResponse.fromJson(Map<String, dynamic> json)
-      : url = Uri.parse(json['url']);
+  DeckResponse.fromJson(Map<String, dynamic> json) : url = json['url'];
 }

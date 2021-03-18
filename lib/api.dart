@@ -32,7 +32,6 @@ Future<String> postDeck(List<Song> items) async {
   );
   final body = Utf8Decoder().convert(response.body.codeUnits);
   final deckResponse = DeckResponse.fromJson(jsonDecode(body));
-  print(deckResponse.url);
 
-  return "";
+  return deckResponse.url;
 }

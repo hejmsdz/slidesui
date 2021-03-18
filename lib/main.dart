@@ -2,10 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:slidesui/api.dart';
 import 'package:slidesui/search.dart';
 import 'package:provider/provider.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:flutter_downloader/flutter_downloader.dart';
 import './strings.dart';
 import './state.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  FlutterDownloader.initialize(debug: true);
   runApp(
     ChangeNotifierProvider(
       create: (context) => SlidesModel(),
@@ -118,9 +122,19 @@ class _MyHomePageState extends State<MyHomePage> {
                 onReorder: state.reorderItems,
               )),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
+        onPressed: () async {
+          await Permission.storage.request();
           final items = Provider.of<SlidesModel>(context, listen: false).items;
-          postDeck(items);
+          final url = await postDeck(items);
+
+          await FlutterDownloader.enqueue(
+            url: url,
+            savedDir: "/sdcard",
+            showNotification:
+                true, // show download progress in status bar (for Android)
+            openFileFromNotification:
+                true, // click on notification to open downloaded file (for Android)
+          );
         },
         tooltip: strings['generateSlides'],
         child: Icon(Icons.slideshow_rounded),
