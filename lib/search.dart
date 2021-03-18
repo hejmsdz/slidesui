@@ -22,20 +22,14 @@ class SearchListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
-        child: Row(children: [
-          Text(
-            title,
-            style: Theme.of(context).textTheme.bodyText1,
-            overflow: TextOverflow.ellipsis,
-          ),
-          Spacer(),
-          Text(number, style: Theme.of(context).textTheme.caption),
-        ]),
+    return ListTile(
+      title: Text(title),
+      trailing: Text(
+        number,
+        style: Theme.of(context).textTheme.caption,
       ),
+      dense: true,
+      onTap: onTap,
     );
   }
 }

@@ -42,32 +42,22 @@ class ListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Dismissible(
-        key: key,
-        onDismissed: (direction) {
-          onRemoved();
-        },
-        background: Container(color: Colors.red),
-        child: Container(
-          padding: EdgeInsets.all(8),
-          child: Row(children: [
-            Padding(
-                padding: EdgeInsets.only(right: 8),
-                child: CircleAvatar(
-                  // backgroundColor: Colors.orange,
-                  // foregroundColor: Colors.black87,
-                  child: Text(symbol),
-                )),
-            Text(
-              title,
-              style: Theme.of(context).textTheme.bodyText1,
-            ),
-            Spacer(),
-            Padding(
-                padding: EdgeInsets.all(8.0),
-                child:
-                    Text(number, style: Theme.of(context).textTheme.caption)),
-          ]),
-        ));
+      key: key,
+      onDismissed: (direction) {
+        onRemoved();
+      },
+      background: Container(color: Colors.red),
+      child: ListTile(
+        leading: CircleAvatar(
+          child: Text(symbol),
+        ),
+        title: Text(title),
+        trailing: Text(
+          number,
+          style: Theme.of(context).textTheme.caption,
+        ),
+      ),
+    );
   }
 }
 
