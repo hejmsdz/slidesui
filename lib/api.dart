@@ -4,7 +4,7 @@ import './model.dart';
 
 const rootURL = 'slajdyrocha2.herokuapp.com';
 
-Uri apiURL(String path, Map<String, dynamic> params) {
+Uri apiURL(String path, [Map<String, dynamic> params]) {
   return Uri.https(rootURL, path, params);
 }
 
@@ -19,4 +19,20 @@ Future<List<Song>> getSongs(String query) async {
   final json = jsonDecode(body) as List;
 
   return json.map((itemJson) => Song.fromJson(itemJson)).toList();
+}
+
+Future<String> postDeck(List<Song> items) async {
+  final deckRequest = DeckRequest(items);
+  final response = await http.post(
+    apiURL('v2/deck'),
+    headers: <String, String>{
+      'Content-Type': 'application/json; charset=UTF-8',
+    },
+    body: jsonEncode(deckRequest),
+  );
+  final body = Utf8Decoder().convert(response.body.codeUnits);
+  final deckResponse = DeckResponse.fromJson(jsonDecode(body));
+  print(deckResponse.url);
+
+  return "";
 }

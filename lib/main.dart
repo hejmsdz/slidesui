@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:slidesui/api.dart';
 import 'package:slidesui/search.dart';
 import 'package:provider/provider.dart';
 import './strings.dart';
@@ -117,7 +118,10 @@ class _MyHomePageState extends State<MyHomePage> {
                 onReorder: state.reorderItems,
               )),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () {
+          final items = Provider.of<SlidesModel>(context, listen: false).items;
+          postDeck(items);
+        },
         tooltip: strings['generateSlides'],
         child: Icon(Icons.slideshow_rounded),
       ),

@@ -10,3 +10,26 @@ class Song {
         title = json['title'],
         number = json['number'];
 }
+
+class DeckRequest {
+  final List<Song> items;
+
+  DeckRequest(this.items);
+
+  Map<String, dynamic> toJson() => {
+        'items': items
+            .map((item) => {
+                  'id': item.id,
+                })
+            .toList(),
+      };
+}
+
+class DeckResponse {
+  final Uri url;
+
+  DeckResponse(this.url);
+
+  DeckResponse.fromJson(Map<String, dynamic> json)
+      : url = Uri.parse(json['url']);
+}
