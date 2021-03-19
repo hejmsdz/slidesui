@@ -1,5 +1,7 @@
 const strings = {
   'appTitle': 'Slajdy',
+  'psalm': 'Psalm',
+  'acclamation': 'Aklamacja',
   'searchSongs': 'Wyszukaj pieśni',
   'itemRemoved': 'Usunięto element',
   'undo': 'Cofnij',

@@ -1,3 +1,5 @@
+import './strings.dart';
+
 class Song {
   final String id;
   final String title;
@@ -32,12 +34,30 @@ class SongDeckItem implements DeckItem {
   Map<String, dynamic> toJson() => {'id': id};
 }
 
+class PsalmDeckItem implements DeckItem {
+  String get id => 'PSALM';
+  String get title => strings['psalm'];
+  String get number => '';
+
+  Map<String, dynamic> toJson() => {'type': 'PSALM'};
+}
+
+class AcclamationDeckItem implements DeckItem {
+  String get id => 'ACCLAMATION';
+  String get title => strings['acclamation'];
+  String get number => '';
+
+  Map<String, dynamic> toJson() => {'type': 'ACCLAMATION'};
+}
+
 class DeckRequest {
   final List<DeckItem> items;
+  final String date = '2021-03-21';
 
   DeckRequest(this.items);
 
   Map<String, dynamic> toJson() => {
+        'date': date,
         'items': items.map((item) => item.toJson()).toList(),
       };
 }

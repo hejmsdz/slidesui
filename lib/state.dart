@@ -3,7 +3,10 @@ import 'package:flutter/material.dart';
 import './model.dart';
 
 class SlidesModel extends ChangeNotifier {
-  List<DeckItem> _items = [];
+  List<DeckItem> _items = [
+    PsalmDeckItem(),
+    AcclamationDeckItem(),
+  ];
   DeckItem _lastRemovedItem;
   int _lastRemovedIndex;
 
