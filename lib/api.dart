@@ -21,8 +21,8 @@ Future<List<Song>> getSongs(String query) async {
   return json.map((itemJson) => Song.fromJson(itemJson)).toList();
 }
 
-Future<String> postDeck(List<DeckItem> items) async {
-  final deckRequest = DeckRequest(items);
+Future<String> postDeck(DateTime date, List<DeckItem> items) async {
+  final deckRequest = DeckRequest(date, items);
   final response = await http.post(
     apiURL('v2/deck'),
     headers: <String, String>{

@@ -92,10 +92,24 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
           Consumer<SlidesModel>(
               builder: (context, state, child) =>
-                  PopupMenuButton<String>(onSelected: (choice) {
+                  PopupMenuButton<String>(onSelected: (choice) async {
                     switch (choice) {
                       case 'ADD_LITURGY':
                         state.addLiturgy();
+                        break;
+                      case 'CHANGE_DATE':
+                        final now = DateTime.now();
+                        final firstDate = DateTime(now.year - 1, 1, 1);
+                        final lastDate = DateTime(now.year + 1, 12, 31);
+                        final date = await showDatePicker(
+                          context: context,
+                          initialDate: state.date,
+                          firstDate: firstDate,
+                          lastDate: lastDate,
+                        );
+                        if (date != null) {
+                          state.setDate(date);
+                        }
                         break;
                     }
                     if (choice == 'ADD_LITURGY') {}
@@ -103,8 +117,12 @@ class _MyHomePageState extends State<MyHomePage> {
                     return [
                       PopupMenuItem(
                         enabled: !state.hasLiturgy(),
-                        child: Text("Dodaj liturgię słowa"),
+                        child: Text(strings['addLiturgy']),
                         value: 'ADD_LITURGY',
+                      ),
+                      PopupMenuItem(
+                        child: Text(strings['changeDate']),
+                        value: 'CHANGE_DATE',
                       ),
                     ];
                   })),

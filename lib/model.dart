@@ -53,13 +53,13 @@ class AcclamationDeckItem extends LiturgyDeckItem {
 }
 
 class DeckRequest {
+  final DateTime date;
   final List<DeckItem> items;
-  final String date = '2021-03-21';
 
-  DeckRequest(this.items);
+  DeckRequest(this.date, this.items);
 
   Map<String, dynamic> toJson() => {
-        'date': date,
+        'date': date.toIso8601String().substring(0, 10),
         'items': items.map((item) => item.toJson()).toList(),
       };
 }

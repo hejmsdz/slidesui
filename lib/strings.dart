@@ -2,6 +2,8 @@ const strings = {
   'appTitle': 'Slajdy',
   'psalm': 'Psalm',
   'acclamation': 'Aklamacja',
+  'addLiturgy': 'Dodaj liturgię słowa',
+  'changeDate': 'Zmień datę',
   'searchSongs': 'Wyszukaj pieśni',
   'itemRemoved': 'Usunięto element',
   'undo': 'Cofnij',

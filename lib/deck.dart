@@ -25,8 +25,8 @@ createDeck(BuildContext context) async {
   if (Platform.isAndroid) {
     await Permission.storage.request();
   }
-  final items = Provider.of<SlidesModel>(context, listen: false).items;
-  final url = await postDeck(items);
+  final state = Provider.of<SlidesModel>(context, listen: false);
+  final url = await postDeck(state.date, state.items);
 
   if (Platform.isAndroid && await Permission.storage.isGranted) {
     final externalDestination = await getExternalDownloadPathIfAvailable();

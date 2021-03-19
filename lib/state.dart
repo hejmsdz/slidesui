@@ -3,15 +3,23 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import './model.dart';
 
+nextSunday() {
+  final now = DateTime.now();
+  if (now.weekday == DateTime.sunday) {
+    return now;
+  }
+  return now.add(Duration(days: 7 - now.weekday));
+}
+
 class SlidesModel extends ChangeNotifier {
-  List<DeckItem> _items = [
-    PsalmDeckItem(),
-    AcclamationDeckItem(),
-  ];
+  DateTime _date = nextSunday();
+
+  List<DeckItem> _items = [];
   DeckItem _lastRemovedItem;
   int _lastRemovedIndex;
 
   UnmodifiableListView<DeckItem> get items => UnmodifiableListView(_items);
+  DateTime get date => _date;
 
   addItem(DeckItem item) {
     _items.add(item);
@@ -63,5 +71,9 @@ class SlidesModel extends ChangeNotifier {
     final index = min(_items.length, 1);
     _items.insertAll(index, [PsalmDeckItem(), AcclamationDeckItem()]);
     notifyListeners();
+  }
+
+  setDate(DateTime date) {
+    _date = date;
   }
 }
