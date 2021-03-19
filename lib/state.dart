@@ -3,13 +3,13 @@ import 'package:flutter/material.dart';
 import './model.dart';
 
 class SlidesModel extends ChangeNotifier {
-  List<Song> _items = [];
-  Song _lastRemovedItem;
+  List<DeckItem> _items = [];
+  DeckItem _lastRemovedItem;
   int _lastRemovedIndex;
 
-  UnmodifiableListView<Song> get items => UnmodifiableListView(_items);
+  UnmodifiableListView<DeckItem> get items => UnmodifiableListView(_items);
 
-  addItem(Song item) {
+  addItem(DeckItem item) {
     _items.add(item);
     notifyListeners();
   }

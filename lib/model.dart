@@ -13,17 +13,32 @@ class Song {
         slug = json['slug'];
 }
 
+abstract class DeckItem {
+  String get id;
+  String get title;
+  String get number;
+
+  Map<String, dynamic> toJson();
+}
+
+class SongDeckItem implements DeckItem {
+  SongDeckItem(this.song);
+
+  Song song;
+  String get id => song.id;
+  String get title => song.title;
+  String get number => song.number;
+
+  Map<String, dynamic> toJson() => {'id': id};
+}
+
 class DeckRequest {
-  final List<Song> items;
+  final List<DeckItem> items;
 
   DeckRequest(this.items);
 
   Map<String, dynamic> toJson() => {
-        'items': items
-            .map((item) => {
-                  'id': item.id,
-                })
-            .toList(),
+        'items': items.map((item) => item.toJson()).toList(),
       };
 }
 

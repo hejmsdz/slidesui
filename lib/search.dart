@@ -132,7 +132,7 @@ class _SearchPageState extends State<SearchPage> {
                 isChecked: isAdded,
                 onTap: () {
                   if (!isAdded) {
-                    state.addItem(song);
+                    state.addItem(SongDeckItem(song));
                   } else {
                     state.removeItemById(song.id);
                   }
