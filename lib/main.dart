@@ -90,6 +90,24 @@ class _MyHomePageState extends State<MyHomePage> {
               );
             },
           ),
+          Consumer<SlidesModel>(
+              builder: (context, state, child) =>
+                  PopupMenuButton<String>(onSelected: (choice) {
+                    switch (choice) {
+                      case 'ADD_LITURGY':
+                        state.addLiturgy();
+                        break;
+                    }
+                    if (choice == 'ADD_LITURGY') {}
+                  }, itemBuilder: (BuildContext context) {
+                    return [
+                      PopupMenuItem(
+                        enabled: !state.hasLiturgy(),
+                        child: Text("Dodaj liturgię słowa"),
+                        value: 'ADD_LITURGY',
+                      ),
+                    ];
+                  })),
         ],
       ),
       body: Consumer<SlidesModel>(

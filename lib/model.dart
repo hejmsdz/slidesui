@@ -34,7 +34,9 @@ class SongDeckItem implements DeckItem {
   Map<String, dynamic> toJson() => {'id': id};
 }
 
-class PsalmDeckItem implements DeckItem {
+abstract class LiturgyDeckItem implements DeckItem {}
+
+class PsalmDeckItem extends LiturgyDeckItem {
   String get id => 'PSALM';
   String get title => strings['psalm'];
   String get number => '';
@@ -42,7 +44,7 @@ class PsalmDeckItem implements DeckItem {
   Map<String, dynamic> toJson() => {'type': 'PSALM'};
 }
 
-class AcclamationDeckItem implements DeckItem {
+class AcclamationDeckItem extends LiturgyDeckItem {
   String get id => 'ACCLAMATION';
   String get title => strings['acclamation'];
   String get number => '';

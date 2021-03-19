@@ -1,4 +1,5 @@
 import 'dart:collection';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import './model.dart';
 
@@ -50,7 +51,17 @@ class SlidesModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  containsSong(String id) {
+  bool containsSong(String id) {
     return _items.any((item) => item.id == id);
+  }
+
+  bool hasLiturgy() {
+    return _items.any((item) => item is LiturgyDeckItem);
+  }
+
+  addLiturgy() {
+    final index = min(_items.length, 1);
+    _items.insertAll(index, [PsalmDeckItem(), AcclamationDeckItem()]);
+    notifyListeners();
   }
 }
