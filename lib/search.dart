@@ -108,17 +108,13 @@ class _SearchPageState extends State<SearchPage> {
             decoration: InputDecoration(
               hintText: strings['searchSongs'],
               border: InputBorder.none,
-              hintStyle: TextStyle(color: Colors.white30),
             ),
-            style: TextStyle(color: Colors.white, fontSize: 16.0),
+            style: TextStyle(fontSize: 16.0),
             onChanged: updateQuery,
           ),
           actions: [
             IconButton(
-              icon: Icon(
-                Icons.clear,
-                color: Colors.white,
-              ),
+              icon: Icon(Icons.clear),
               onPressed: resetQuery,
             ),
           ],

@@ -24,7 +24,8 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: strings['appTitle'],
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.orange,
+        accentColor: Colors.lightBlue[800],
       ),
       home: MyHomePage(title: strings['appTitle']),
     );
@@ -79,10 +80,7 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text(widget.title),
         actions: [
           IconButton(
-            icon: Icon(
-              Icons.search,
-              color: Colors.white,
-            ),
+            icon: Icon(Icons.search),
             onPressed: () {
               Navigator.push(
                 context,
@@ -120,13 +118,21 @@ class _MyHomePageState extends State<MyHomePage> {
                 },
                 onReorder: state.reorderItems,
               )),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          createDeck(context);
-        },
-        tooltip: strings['generateSlides'],
-        child: Icon(Icons.slideshow_rounded),
-      ),
+      floatingActionButton:
+          Consumer<SlidesModel>(builder: (context, state, child) {
+        if (state.items.isEmpty) {
+          return Container();
+        }
+        return FloatingActionButton(
+          onPressed: () {
+            createDeck(context);
+          },
+          backgroundColor: Theme.of(context).colorScheme.secondary,
+          foregroundColor: Theme.of(context).colorScheme.onSecondary,
+          tooltip: strings['generateSlides'],
+          child: Icon(Icons.slideshow_rounded),
+        );
+      }),
     );
   }
 }
