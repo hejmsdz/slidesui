@@ -68,8 +68,27 @@ class SlidesModel extends ChangeNotifier {
   }
 
   addLiturgy() {
-    final index = min(_items.length, 1);
+    final kyrieIndex =
+        _items.indexWhere((item) => item.id == OrdinaryItems.kyrie.id);
+    final index = min(
+      _items.length,
+      kyrieIndex >= 0 ? kyrieIndex + 1 : 1,
+    );
     _items.insertAll(index, [PsalmDeckItem(), AcclamationDeckItem()]);
+    notifyListeners();
+  }
+
+  bool hasOrdinary() {
+    return _items.any((item) => item is SongDeckItem && item.song.isOrdinary);
+  }
+
+  addOrdinary() {
+    final kyrieItem = SongDeckItem(OrdinaryItems.kyrie);
+    final sanctusItem = SongDeckItem(OrdinaryItems.sanctus);
+    final agnusItem = SongDeckItem(OrdinaryItems.agnus);
+
+    _items.insert(min(_items.length, 1), kyrieItem);
+    _items.insertAll(max(0, _items.length - 2), [sanctusItem, agnusItem]);
     notifyListeners();
   }
 

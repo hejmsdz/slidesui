@@ -104,6 +104,9 @@ class _MyHomePageState extends State<MyHomePage> {
                       case 'ADD_LITURGY':
                         state.addLiturgy();
                         break;
+                      case 'ADD_ORDINARY':
+                        state.addOrdinary();
+                        break;
                       case 'CHANGE_DATE':
                         final now = DateTime.now();
                         final firstDate = DateTime(now.year - 1, 1, 1);
@@ -126,6 +129,11 @@ class _MyHomePageState extends State<MyHomePage> {
                         enabled: !state.hasLiturgy(),
                         child: Text(strings['addLiturgy']),
                         value: 'ADD_LITURGY',
+                      ),
+                      PopupMenuItem(
+                        enabled: !state.hasOrdinary(),
+                        child: Text(strings['addOrdinary']),
+                        value: 'ADD_ORDINARY',
                       ),
                       PopupMenuItem(
                         child: Text(strings['changeDate']),

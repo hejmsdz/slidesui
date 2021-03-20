@@ -3,6 +3,7 @@ const strings = {
   'psalm': 'Psalm',
   'acclamation': 'Aklamacja',
   'addLiturgy': 'Dodaj liturgię słowa',
+  'addOrdinary': 'Dodaj części stałe',
   'changeDate': 'Zmień datę',
   'emptyTitle': 'Nic tu jeszcze nie ma!',
   'emptyDescription': 'Aby dodać slajdy, użyj wyszukiwarki.',

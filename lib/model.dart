@@ -5,14 +5,25 @@ class Song {
   final String title;
   final String number;
   final String slug;
+  final bool isOrdinary;
 
-  Song(this.id, this.title, this.number, this.slug);
+  Song(this.id, this.title, this.number, this.slug, [this.isOrdinary = false]);
 
   Song.fromJson(Map<String, dynamic> json)
       : id = json['id'],
         title = json['title'],
         number = json['number'],
-        slug = json['slug'];
+        slug = json['slug'],
+        isOrdinary = json['isOrdinary'] ?? false;
+}
+
+abstract class OrdinaryItems {
+  static Song kyrie = Song(
+      'f29bb232-be0c-4998-9142-5524c38ec9d7', 'Kyrie eleison', '', '', true);
+  static Song sanctus =
+      Song('bf218c0a-ac22-4049-85d0-6072b2830f15', 'Sanctus', '', '', true);
+  static Song agnus =
+      Song('548120f1-604c-4386-ae89-f9737aac7ae4', 'Agnus Dei', '', '', true);
 }
 
 abstract class DeckItem {
@@ -32,6 +43,7 @@ class SongDeckItem implements DeckItem {
   String get id => song.id;
   String get title => song.title;
   String get number => song.number;
+  bool get isOrdinary => song.isOrdinary;
 
   String get removedMessage =>
       strings['itemRemovedSong'].replaceFirst("{}", song.title);
