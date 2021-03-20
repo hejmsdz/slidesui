@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -22,13 +23,13 @@ Future<String> getExternalDownloadPathIfAvailable() async {
 }
 
 createDeck(BuildContext context) async {
-  if (Platform.isAndroid) {
+  if (!kIsWeb && Platform.isAndroid) {
     await Permission.storage.request();
   }
   final state = Provider.of<SlidesModel>(context, listen: false);
   final url = await postDeck(state.date, state.items);
 
-  if (Platform.isAndroid && await Permission.storage.isGranted) {
+  if (!kIsWeb && Platform.isAndroid && await Permission.storage.isGranted) {
     final externalDestination = await getExternalDownloadPathIfAvailable();
     final isExternal = externalDestination != null;
     final destination = isExternal ? externalDestination : '/sdcard';

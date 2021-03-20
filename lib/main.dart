@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
@@ -8,8 +9,10 @@ import './search.dart';
 import './manual.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await FlutterDownloader.initialize(debug: true);
+  if (!kIsWeb) {
+    WidgetsFlutterBinding.ensureInitialized();
+    await FlutterDownloader.initialize(debug: kDebugMode);
+  }
   runApp(
     ChangeNotifierProvider(
       create: (context) => SlidesModel(),
