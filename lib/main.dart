@@ -73,6 +73,14 @@ class ListItem extends StatelessWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  bool _isWorking = false;
+
+  setIsWorking(bool isWorking) {
+    setState(() {
+      _isWorking = isWorking;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -127,6 +135,15 @@ class _MyHomePageState extends State<MyHomePage> {
                     ];
                   })),
         ],
+        bottom: PreferredSize(
+            preferredSize: Size(double.infinity, 1.0),
+            child: Opacity(
+              opacity: _isWorking ? 1 : 0,
+              child: LinearProgressIndicator(
+                value: null,
+                // valueColor: Theme.of(context).,
+              ),
+            )),
       ),
       body: Consumer<SlidesModel>(
           builder: (context, state, child) => ReorderableListView.builder(
@@ -154,21 +171,31 @@ class _MyHomePageState extends State<MyHomePage> {
                 },
                 onReorder: state.reorderItems,
               )),
-      floatingActionButton:
-          Consumer<SlidesModel>(builder: (context, state, child) {
-        if (state.items.isEmpty) {
-          return Container();
-        }
-        return FloatingActionButton(
-          onPressed: () {
-            createDeck(context);
-          },
-          backgroundColor: Theme.of(context).colorScheme.secondary,
-          foregroundColor: Theme.of(context).colorScheme.onSecondary,
-          tooltip: strings['generateSlides'],
-          child: Icon(Icons.slideshow_rounded),
-        );
-      }),
+      floatingActionButton: Consumer<SlidesModel>(
+        builder: (context, state, child) => Visibility(
+          visible: state.items.isNotEmpty,
+          child: FloatingActionButton(
+            onPressed: _isWorking
+                ? null
+                : () async {
+                    setIsWorking(true);
+                    try {
+                      await createDeck(context);
+                    } finally {
+                      setIsWorking(false);
+                    }
+                  },
+            backgroundColor: _isWorking
+                ? Theme.of(context).disabledColor
+                : Theme.of(context).colorScheme.secondary,
+            foregroundColor: _isWorking
+                ? Colors.white
+                : Theme.of(context).colorScheme.onSecondary,
+            tooltip: strings['generateSlides'],
+            child: Icon(Icons.slideshow_rounded),
+          ),
+        ),
+      ),
     );
   }
 }
