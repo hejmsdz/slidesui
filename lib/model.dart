@@ -20,6 +20,8 @@ abstract class DeckItem {
   String get title;
   String get number;
 
+  String get removedMessage;
+
   Map<String, dynamic> toJson();
 }
 
@@ -31,6 +33,9 @@ class SongDeckItem implements DeckItem {
   String get title => song.title;
   String get number => song.number;
 
+  String get removedMessage =>
+      strings['itemRemovedSong'].replaceFirst("{}", song.title);
+
   Map<String, dynamic> toJson() => {'id': id};
 }
 
@@ -41,6 +46,8 @@ class PsalmDeckItem extends LiturgyDeckItem {
   String get title => strings['psalm'];
   String get number => '';
 
+  String get removedMessage => strings['itemRemovedPsalm'];
+
   Map<String, dynamic> toJson() => {'type': 'PSALM'};
 }
 
@@ -48,6 +55,8 @@ class AcclamationDeckItem extends LiturgyDeckItem {
   String get id => 'ACCLAMATION';
   String get title => strings['acclamation'];
   String get number => '';
+
+  String get removedMessage => strings['itemRemovedAcclamation'];
 
   Map<String, dynamic> toJson() => {'type': 'ACCLAMATION'};
 }

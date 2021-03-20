@@ -175,7 +175,7 @@ class _MyHomePageState extends State<MyHomePage> {
               onRemoved: () {
                 state.removeItem(index);
                 final snackBar = SnackBar(
-                  content: Text(strings['itemRemoved']),
+                  content: Text(song.removedMessage),
                   action: SnackBarAction(
                     label: strings['undo'],
                     onPressed: state.undoRemoveItem,
