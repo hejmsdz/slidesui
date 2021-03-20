@@ -25,7 +25,6 @@ class MyApp extends StatelessWidget {
       title: strings['appTitle'],
       theme: ThemeData(
         primarySwatch: Colors.orange,
-        accentColor: Colors.blueAccent, //[800],
       ),
       home: MyHomePage(title: strings['appTitle']),
     );
@@ -136,14 +135,14 @@ class _MyHomePageState extends State<MyHomePage> {
                   })),
         ],
         bottom: PreferredSize(
-            preferredSize: Size(double.infinity, 1.0),
-            child: Opacity(
-              opacity: _isWorking ? 1 : 0,
-              child: LinearProgressIndicator(
-                value: null,
-                // valueColor: Theme.of(context).,
-              ),
-            )),
+          preferredSize: Size(double.infinity, 1.0),
+          child: Opacity(
+            opacity: _isWorking ? 1 : 0,
+            child: LinearProgressIndicator(
+              value: null,
+            ),
+          ),
+        ),
       ),
       body: Consumer<SlidesModel>(
           builder: (context, state, child) => ReorderableListView.builder(
