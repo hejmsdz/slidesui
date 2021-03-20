@@ -104,8 +104,14 @@ class _MyHomePageState extends State<MyHomePage> {
                       case 'ADD_LITURGY':
                         state.addLiturgy();
                         break;
+                      case 'REMOVE_LITURGY':
+                        state.removeLiturgy();
+                        break;
                       case 'ADD_ORDINARY':
                         state.addOrdinary();
+                        break;
+                      case 'REMOVE_ORDINARY':
+                        state.removeOrdinary();
                         break;
                       case 'CHANGE_DATE':
                         final now = DateTime.now();
@@ -122,19 +128,26 @@ class _MyHomePageState extends State<MyHomePage> {
                         }
                         break;
                     }
-                    if (choice == 'ADD_LITURGY') {}
                   }, itemBuilder: (BuildContext context) {
                     return [
-                      PopupMenuItem(
-                        enabled: !state.hasLiturgy(),
-                        child: Text(strings['addLiturgy']),
-                        value: 'ADD_LITURGY',
-                      ),
-                      PopupMenuItem(
-                        enabled: !state.hasOrdinary(),
-                        child: Text(strings['addOrdinary']),
-                        value: 'ADD_ORDINARY',
-                      ),
+                      state.hasLiturgy()
+                          ? PopupMenuItem(
+                              child: Text(strings['removeLiturgy']),
+                              value: 'REMOVE_LITURGY',
+                            )
+                          : PopupMenuItem(
+                              child: Text(strings['addLiturgy']),
+                              value: 'ADD_LITURGY',
+                            ),
+                      state.hasOrdinary()
+                          ? PopupMenuItem(
+                              child: Text(strings['removeOrdinary']),
+                              value: 'REMOVE_ORDINARY',
+                            )
+                          : PopupMenuItem(
+                              child: Text(strings['addOrdinary']),
+                              value: 'ADD_ORDINARY',
+                            ),
                       PopupMenuItem(
                         child: Text(strings['changeDate']),
                         value: 'CHANGE_DATE',

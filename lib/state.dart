@@ -78,6 +78,11 @@ class SlidesModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  removeLiturgy() {
+    _items.removeWhere((item) => item is LiturgyDeckItem);
+    notifyListeners();
+  }
+
   bool hasOrdinary() {
     return _items.any((item) => item is SongDeckItem && item.song.isOrdinary);
   }
@@ -89,6 +94,11 @@ class SlidesModel extends ChangeNotifier {
 
     _items.insert(min(_items.length, 1), kyrieItem);
     _items.insertAll(max(0, _items.length - 2), [sanctusItem, agnusItem]);
+    notifyListeners();
+  }
+
+  removeOrdinary() {
+    _items.removeWhere((item) => item is SongDeckItem && item.song.isOrdinary);
     notifyListeners();
   }
 
