@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import './strings.dart';
 
 class Song {
@@ -91,4 +93,13 @@ class DeckResponse {
   DeckResponse(this.url);
 
   DeckResponse.fromJson(Map<String, dynamic> json) : url = json['url'];
+}
+
+class Manual {
+  final List<String> steps;
+
+  Manual(this.steps);
+
+  Manual.fromJson(Map<String, dynamic> json)
+      : steps = List<String>.from(json['steps']);
 }

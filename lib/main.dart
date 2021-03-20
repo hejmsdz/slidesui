@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:slidesui/search.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import './strings.dart';
 import './state.dart';
 import './deck.dart';
+import './search.dart';
+import './manual.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -127,6 +128,13 @@ class _MyHomePageState extends State<MyHomePage> {
                           state.setDate(date);
                         }
                         break;
+                      case 'OPEN_MANUAL':
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) {
+                            return ManualPage();
+                          }),
+                        );
                     }
                   }, itemBuilder: (BuildContext context) {
                     return [
@@ -151,6 +159,10 @@ class _MyHomePageState extends State<MyHomePage> {
                       PopupMenuItem(
                         child: Text(strings['changeDate']),
                         value: 'CHANGE_DATE',
+                      ),
+                      PopupMenuItem(
+                        child: Text(strings['manual']),
+                        value: 'OPEN_MANUAL',
                       ),
                     ];
                   })),

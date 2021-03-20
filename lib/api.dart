@@ -35,3 +35,14 @@ Future<String> postDeck(DateTime date, List<DeckItem> items) async {
 
   return deckResponse.url;
 }
+
+Future<Manual> getManual() async {
+  final response = await http.get(apiURL('v2/manual'));
+
+  if (response.statusCode != 200) {
+    return null;
+  }
+
+  final body = Utf8Decoder().convert(response.body.codeUnits);
+  return Manual.fromJson(jsonDecode(body));
+}

@@ -23,4 +23,5 @@ const strings = {
   'slidesDownloadedExternal':
       'Plik PDF ze slajdami został pobrany na urządzenie zewnętrzne.',
   'open': 'OTWÓRZ',
+  'manual': 'Instrukcja obsługi rzutnika',
 };
