@@ -93,7 +93,7 @@ class SlidesModel extends ChangeNotifier {
     final agnusItem = SongDeckItem(OrdinaryItems.agnus);
 
     _items.insert(min(_items.length, 1), kyrieItem);
-    _items.insertAll(max(0, _items.length - 2), [sanctusItem, agnusItem]);
+    _items.insertAll(max(0, _items.length - 3), [sanctusItem, agnusItem]);
     notifyListeners();
   }
 
