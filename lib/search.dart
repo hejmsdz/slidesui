@@ -57,6 +57,7 @@ class _SearchPageState extends State<SearchPage> {
   List<Song> _prefilteredItems = [];
   List<Song> _items = [];
   bool _isLoading = false;
+  bool _isQueryValid = false;
 
   setIsLoading(bool isLoading) {
     setState(() {
@@ -68,12 +69,10 @@ class _SearchPageState extends State<SearchPage> {
     final previousQuery = _query;
     setState(() {
       _query = query;
+      _isQueryValid = _query.length >= queryPrefixLength;
     });
 
-    if (_query.length < queryPrefixLength) {
-      setState(() {
-        _items = [];
-      });
+    if (!_isQueryValid) {
       return;
     }
 
@@ -140,26 +139,44 @@ class _SearchPageState extends State<SearchPage> {
           ),
         ),
         body: Consumer<SlidesModel>(
-          builder: (context, state, child) => ListView.builder(
-            itemCount: _items.length,
-            itemBuilder: (BuildContext context, int index) {
-              final song = _items[index];
-              final isAdded = state.containsSong(song.id);
-              return SearchListItem(
-                id: song.id,
-                title: song.title,
-                number: song.number,
-                isChecked: isAdded,
-                onTap: () {
-                  if (!isAdded) {
-                    state.addItem(SongDeckItem(song));
-                  } else {
-                    state.removeItemById(song.id);
-                  }
-                },
+          builder: (context, state, child) {
+            if (!_isQueryValid) {
+              return Center(
+                child: Text(
+                  strings['searchStartTyping'],
+                  style: Theme.of(context).textTheme.caption,
+                ),
               );
-            },
-          ),
+            }
+            if (!_isLoading && _items.isEmpty) {
+              return Center(
+                child: Text(
+                  strings['searchNoResults'],
+                  style: Theme.of(context).textTheme.caption,
+                ),
+              );
+            }
+            return ListView.builder(
+              itemCount: _items.length,
+              itemBuilder: (BuildContext context, int index) {
+                final song = _items[index];
+                final isAdded = state.containsSong(song.id);
+                return SearchListItem(
+                  id: song.id,
+                  title: song.title,
+                  number: song.number,
+                  isChecked: isAdded,
+                  onTap: () {
+                    if (!isAdded) {
+                      state.addItem(SongDeckItem(song));
+                    } else {
+                      state.removeItemById(song.id);
+                    }
+                  },
+                );
+              },
+            );
+          },
         ));
   }
 }

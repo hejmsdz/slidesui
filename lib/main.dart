@@ -144,32 +144,51 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ),
       ),
-      body: Consumer<SlidesModel>(
-          builder: (context, state, child) => ReorderableListView.builder(
-                itemCount: state.items.length,
-                itemBuilder: (BuildContext context, int index) {
-                  final song = state.items[index];
-                  return ListItem(
-                    key: ValueKey(song.id),
-                    symbol: "${index + 1}",
-                    title: song.title,
-                    number: song.number,
-                    onRemoved: () {
-                      state.removeItem(index);
-                      final snackBar = SnackBar(
-                        content: Text(strings['itemRemoved']),
-                        action: SnackBarAction(
-                          label: strings['undo'],
-                          onPressed: state.undoRemoveItem,
-                        ),
-                      );
+      body: Consumer<SlidesModel>(builder: (context, state, child) {
+        if (state.items.isEmpty) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Padding(
+                  padding: EdgeInsets.all(8),
+                  child: Text(
+                    strings['emptyTitle'],
+                    style: Theme.of(context).textTheme.headline6,
+                  ),
+                ),
+                Text(strings['emptyDescription'])
+              ],
+            ),
+          );
+        }
+        return ReorderableListView.builder(
+          itemCount: state.items.length,
+          itemBuilder: (BuildContext context, int index) {
+            final song = state.items[index];
+            return ListItem(
+              key: ValueKey(song.id),
+              symbol: "${index + 1}",
+              title: song.title,
+              number: song.number,
+              onRemoved: () {
+                state.removeItem(index);
+                final snackBar = SnackBar(
+                  content: Text(strings['itemRemoved']),
+                  action: SnackBarAction(
+                    label: strings['undo'],
+                    onPressed: state.undoRemoveItem,
+                  ),
+                );
 
-                      ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                    },
-                  );
-                },
-                onReorder: state.reorderItems,
-              )),
+                ScaffoldMessenger.of(context).showSnackBar(snackBar);
+              },
+            );
+          },
+          onReorder: state.reorderItems,
+        );
+      }),
       floatingActionButton: Consumer<SlidesModel>(
         builder: (context, state, child) => Visibility(
           visible: state.items.isNotEmpty,
