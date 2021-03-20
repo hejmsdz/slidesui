@@ -29,7 +29,6 @@ class SearchListItem extends StatelessWidget {
         number,
         style: Theme.of(context).textTheme.caption,
       ),
-      dense: true,
       onTap: onTap,
     );
   }
@@ -57,6 +56,13 @@ class _SearchPageState extends State<SearchPage> {
   String _query = "";
   List<Song> _prefilteredItems = [];
   List<Song> _items = [];
+  bool _isLoading = false;
+
+  setIsLoading(bool isLoading) {
+    setState(() {
+      _isLoading = isLoading;
+    });
+  }
 
   void updateQuery(String query) async {
     final previousQuery = _query;
@@ -78,8 +84,13 @@ class _SearchPageState extends State<SearchPage> {
     final querySlug = slugify(query);
 
     if (queryPrefixChanged) {
-      _prefilteredItems =
-          await getSongs(_query.substring(0, queryPrefixLength));
+      setIsLoading(true);
+      try {
+        _prefilteredItems =
+            await getSongs(_query.substring(0, queryPrefixLength));
+      } finally {
+        setIsLoading(false);
+      }
     }
 
     setState(() {
@@ -118,6 +129,15 @@ class _SearchPageState extends State<SearchPage> {
               onPressed: resetQuery,
             ),
           ],
+          bottom: PreferredSize(
+            preferredSize: Size(double.infinity, 1.0),
+            child: Opacity(
+              opacity: _isLoading ? 1 : 0,
+              child: LinearProgressIndicator(
+                value: null,
+              ),
+            ),
+          ),
         ),
         body: Consumer<SlidesModel>(
           builder: (context, state, child) => ListView.builder(
