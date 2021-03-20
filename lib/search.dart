@@ -82,7 +82,7 @@ class _SearchPageState extends State<SearchPage> {
 
     final querySlug = slugify(query);
 
-    if (queryPrefixChanged) {
+    if (queryPrefixChanged && !_isLoading) {
       setIsLoading(true);
       try {
         _prefilteredItems =
