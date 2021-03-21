@@ -12,6 +12,8 @@ nextSunday() {
 }
 
 class SlidesModel extends ChangeNotifier {
+  SlidesModel();
+
   DateTime _date = nextSunday();
 
   List<DeckItem> _items = [];
@@ -20,6 +22,32 @@ class SlidesModel extends ChangeNotifier {
 
   UnmodifiableListView<DeckItem> get items => UnmodifiableListView(_items);
   DateTime get date => _date;
+
+  Map<String, dynamic> toJson() => {
+        'date': _date.toIso8601String().substring(0, 10),
+        'items': _items.map((item) => item.toFullJson()).toList(),
+      };
+
+  SlidesModel.fromJson(Map<String, dynamic> json) {
+    _date = DateTime.parse(json['date'] as String);
+
+    final items = json['items'] as List;
+    _items = items
+        .map((itemJson) {
+          switch (itemJson['type']) {
+            case 'SONG':
+              return SongDeckItem(Song.fromJson(itemJson));
+            case 'PSALM':
+              return PsalmDeckItem();
+            case 'ACCLAMATION':
+              return AcclamationDeckItem();
+            default:
+              return null;
+          }
+        })
+        .where((item) => item != null)
+        .toList();
+  }
 
   addItem(DeckItem item) {
     _items.add(item);

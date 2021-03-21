@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
+import './persistence.dart';
 import './strings.dart';
 import './state.dart';
 import './deck.dart';
@@ -13,9 +14,11 @@ void main() async {
     WidgetsFlutterBinding.ensureInitialized();
     await FlutterDownloader.initialize(debug: kDebugMode);
   }
+  final state = await loadSavedState();
+  saveStateChanges(state);
   runApp(
     ChangeNotifierProvider(
-      create: (context) => SlidesModel(),
+      create: (context) => state,
       child: MyApp(),
     ),
   );

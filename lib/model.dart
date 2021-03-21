@@ -17,6 +17,14 @@ class Song {
         number = json['number'],
         slug = json['slug'],
         isOrdinary = json['isOrdinary'] ?? false;
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'title': title,
+        'number': number,
+        'slug': slug,
+        'isOrdinary': isOrdinary,
+      };
 }
 
 abstract class OrdinaryItems {
@@ -36,6 +44,7 @@ abstract class DeckItem {
   String get removedMessage;
 
   Map<String, dynamic> toJson();
+  Map<String, dynamic> toFullJson();
 }
 
 class SongDeckItem implements DeckItem {
@@ -51,6 +60,7 @@ class SongDeckItem implements DeckItem {
       strings['itemRemovedSong'].replaceFirst("{}", song.title);
 
   Map<String, dynamic> toJson() => {'id': id};
+  Map<String, dynamic> toFullJson() => {'type': 'SONG'}..addAll(song.toJson());
 }
 
 abstract class LiturgyDeckItem implements DeckItem {}
@@ -63,6 +73,7 @@ class PsalmDeckItem extends LiturgyDeckItem {
   String get removedMessage => strings['itemRemovedPsalm'];
 
   Map<String, dynamic> toJson() => {'type': 'PSALM'};
+  Map<String, dynamic> toFullJson() => toJson();
 }
 
 class AcclamationDeckItem extends LiturgyDeckItem {
@@ -73,6 +84,7 @@ class AcclamationDeckItem extends LiturgyDeckItem {
   String get removedMessage => strings['itemRemovedAcclamation'];
 
   Map<String, dynamic> toJson() => {'type': 'ACCLAMATION'};
+  Map<String, dynamic> toFullJson() => toJson();
 }
 
 class DeckRequest {
