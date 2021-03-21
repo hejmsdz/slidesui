@@ -19,9 +19,8 @@ const strings = {
   'generateSlides': 'Generuj slajdy',
   'slidesOpeningInBrowser': 'Plik ze slajdami zostanie otwarty w przeglądarce.',
   'slidesDownloadedInternal':
-      'Plik PDF ze slajdami został pobrany do pamięci wewnętrznej telefonu.',
-  'slidesDownloadedExternal':
-      'Plik PDF ze slajdami został pobrany na urządzenie zewnętrzne.',
-  'open': 'OTWÓRZ',
+      'Plik PDF ze slajdami został pobrany do pamięci telefonu.',
+  'move': 'PRZENIEŚ',
+  'slidesMoved': 'Plik PDF ze slajdami został przeniesiony.',
   'manual': 'Instrukcja obsługi rzutnika',
 };

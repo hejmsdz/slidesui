@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -9,17 +10,43 @@ import './state.dart';
 import './strings.dart';
 import './api.dart';
 
-Future<String> getExternalDownloadPathIfAvailable() async {
-  // external storage doesn't seem to work because of permission issues
-  return Future(() => null);
+Future<String> moveFile(String source) async {
+  const platform = MethodChannel("com.example.slidesui/filePicker");
+  try {
+    return await platform.invokeMethod("moveFile", {
+      "source": source,
+    });
+  } on PlatformException catch (_) {
+    return null;
+  }
+}
 
-  /*
-  final volume = await Directory('/storage').list().firstWhere(
-      (volume) =>
-          !volume.path.endsWith('emulated') && !volume.path.endsWith('self'),
-      orElse: () => null);
-  return volume?.path;
-  */
+notifyOnDownloaded(
+  BuildContext context,
+  String taskId,
+  String destinationFile,
+) {
+  final snackBar = SnackBar(
+    content: Text(strings['slidesDownloadedInternal']),
+    action: SnackBarAction(
+      label: strings['move'],
+      onPressed: () async {
+        FlutterDownloader.remove(taskId: taskId);
+        final moveTarget = await moveFile(destinationFile);
+        if (moveTarget != "") {
+          notifyOnMoved(context);
+        }
+      },
+    ),
+  );
+  ScaffoldMessenger.of(context).showSnackBar(snackBar);
+}
+
+notifyOnMoved(BuildContext context) {
+  final snackBar = SnackBar(
+    content: Text(strings['slidesMoved']),
+  );
+  ScaffoldMessenger.of(context).showSnackBar(snackBar);
 }
 
 createDeck(BuildContext context) async {
@@ -30,27 +57,17 @@ createDeck(BuildContext context) async {
   final url = await postDeck(state.date, state.items);
 
   if (!kIsWeb && Platform.isAndroid && await Permission.storage.isGranted) {
-    final externalDestination = await getExternalDownloadPathIfAvailable();
-    final isExternal = externalDestination != null;
-    final destination = isExternal ? externalDestination : '/sdcard';
+    final destination = '/sdcard';
+    final fileName = state.date.toIso8601String().substring(0, 10) + '.pdf';
     final taskId = await FlutterDownloader.enqueue(
       url: url,
       savedDir: destination,
-      showNotification: false,
+      fileName: fileName,
+      showNotification: true,
+      openFileFromNotification: true,
     );
 
-    final snackBar = SnackBar(
-      content: Text(isExternal
-          ? strings['slidesDownloadedExternal']
-          : strings['slidesDownloadedInternal']),
-      action: SnackBarAction(
-        label: strings['open'],
-        onPressed: () {
-          FlutterDownloader.open(taskId: taskId);
-        },
-      ),
-    );
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    notifyOnDownloaded(context, taskId, "$destination/$fileName");
   } else if (await canLaunch(url)) {
     await launch(url);
 
