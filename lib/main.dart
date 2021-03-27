@@ -81,12 +81,15 @@ class ListItem extends StatelessWidget {
           child: Text(symbol),
         ),
         title: Text(title),
-        trailing: number == '?'
-            ? Icon(Icons.report)
-            : Text(
-                number,
-                style: Theme.of(context).textTheme.caption,
-              ),
+        trailing: Padding(
+          padding: EdgeInsets.only(right: kIsWeb ? 24 : 0),
+          child: number == '?'
+              ? Icon(Icons.report)
+              : Text(
+                  number,
+                  style: Theme.of(context).textTheme.caption,
+                ),
+        ),
         onTap: triggerSearch
             ? () {
                 Navigator.push(
@@ -277,7 +280,7 @@ class _MyHomePageState extends State<MyHomePage> {
               title: song.title,
               number: song.number,
               index: index,
-              triggerSearch: song is SongDeckItem,
+              triggerSearch: song is SongDeckItem || song is UnresolvedDeckItem,
               onRemoved: () {
                 state.removeItem(index);
                 final snackBar = SnackBar(
