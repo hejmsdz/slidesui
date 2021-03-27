@@ -56,13 +56,15 @@ class _ManualPageState extends State<ManualPage> {
       body: _manual == null
           ? Container()
           : ListView.builder(
-              itemCount: _manual.steps.length,
+              itemCount: _manual.steps.length + 1,
               itemBuilder: (context, index) => Padding(
                 padding: EdgeInsets.all(16),
-                child: Text(
-                  "${index + 1}. ${_manual.steps[index]}",
-                  style: Theme.of(context).textTheme.subtitle1,
-                ),
+                child: index < _manual.steps.length
+                    ? Text(
+                        "${index + 1}. ${_manual.steps[index]}",
+                        style: Theme.of(context).textTheme.subtitle1,
+                      )
+                    : Image.network(_manual.image),
               ),
             ),
     );

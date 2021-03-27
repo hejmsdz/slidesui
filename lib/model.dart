@@ -124,9 +124,11 @@ class DeckResponse {
 
 class Manual {
   final List<String> steps;
+  final String image;
 
-  Manual(this.steps);
+  Manual(this.steps, this.image);
 
   Manual.fromJson(Map<String, dynamic> json)
-      : steps = List<String>.from(json['steps']);
+      : steps = List<String>.from(json['steps']),
+        image = json['image'];
 }
