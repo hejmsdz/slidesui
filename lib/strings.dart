@@ -8,8 +8,10 @@ const strings = {
   'removeOrdinary': 'Usuń części stałe',
   'changeDate': 'Zmień datę',
   'emptyTitle': 'Nic tu jeszcze nie ma!',
-  'emptyDescription': 'Aby dodać slajdy, użyj wyszukiwarki.',
+  'emptyDescription':
+      'Aby dodać slajdy, użyj wyszukiwarki\nlub wklej plan jako tekst.',
   'searchSongs': 'Wyszukaj pieśni',
+  'editAsText': 'Edytuj jako tekst',
   'searchStartTyping': 'Zacznij wpisywać tytuł lub numer pieśni.',
   'searchNoResults': 'Nie znaleziono pasujących pieśni.',
   'itemRemovedSong': 'Usunięto „{}”.',

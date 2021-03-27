@@ -130,7 +130,14 @@ class SlidesModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  setItems(List<DeckItem> items) {
+    _items.clear();
+    _items.addAll(items);
+    notifyListeners();
+  }
+
   setDate(DateTime date) {
     _date = date;
+    notifyListeners();
   }
 }

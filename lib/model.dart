@@ -87,6 +87,21 @@ class AcclamationDeckItem extends LiturgyDeckItem {
   Map<String, dynamic> toFullJson() => toJson();
 }
 
+class UnresolvedDeckItem implements DeckItem {
+  UnresolvedDeckItem(this.title);
+
+  String title;
+  String get id => title.hashCode.toString();
+  final String number = '?';
+  final bool isOrdinary = false;
+
+  String get removedMessage =>
+      strings['itemRemovedSong'].replaceFirst("{}", title);
+
+  Map<String, dynamic> toJson() => null;
+  Map<String, dynamic> toFullJson() => {'type': 'UNRESOLVED', 'title': title};
+}
+
 class DeckRequest {
   final DateTime date;
   final List<DeckItem> items;

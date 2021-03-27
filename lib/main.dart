@@ -7,6 +7,7 @@ import './strings.dart';
 import './state.dart';
 import './deck.dart';
 import './search.dart';
+import './textedit.dart';
 import './manual.dart';
 
 void main() async {
@@ -69,10 +70,12 @@ class ListItem extends StatelessWidget {
           child: Text(symbol),
         ),
         title: Text(title),
-        trailing: Text(
-          number,
-          style: Theme.of(context).textTheme.caption,
-        ),
+        trailing: number == '?'
+            ? Icon(Icons.report)
+            : Text(
+                number,
+                style: Theme.of(context).textTheme.caption,
+              ),
       ),
     );
   }
@@ -100,6 +103,17 @@ class _MyHomePageState extends State<MyHomePage> {
                 context,
                 MaterialPageRoute(builder: (context) {
                   return SearchPage();
+                }),
+              );
+            },
+          ),
+          IconButton(
+            icon: Icon(Icons.assignment_outlined),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) {
+                  return TextEditPage();
                 }),
               );
             },
@@ -197,7 +211,10 @@ class _MyHomePageState extends State<MyHomePage> {
                     style: Theme.of(context).textTheme.headline6,
                   ),
                 ),
-                Text(strings['emptyDescription'])
+                Text(
+                  strings['emptyDescription'],
+                  textAlign: TextAlign.center,
+                ),
               ],
             ),
           );
