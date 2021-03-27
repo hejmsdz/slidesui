@@ -141,6 +141,7 @@ class _MyHomePageState extends State<MyHomePage> {
         actions: [
           IconButton(
             icon: Icon(Icons.search),
+            tooltip: strings['searchSongs'],
             onPressed: () {
               Navigator.push(
                 context,
@@ -152,6 +153,7 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
           IconButton(
             icon: Icon(Icons.assignment_outlined),
+            tooltip: strings['editAsText'],
             onPressed: () {
               Navigator.push(
                 context,
@@ -162,8 +164,9 @@ class _MyHomePageState extends State<MyHomePage> {
             },
           ),
           Consumer<SlidesModel>(
-              builder: (context, state, child) =>
-                  PopupMenuButton<String>(onSelected: (choice) async {
+              builder: (context, state, child) => PopupMenuButton<String>(
+                  tooltip: strings['menu'],
+                  onSelected: (choice) async {
                     switch (choice) {
                       case 'ADD_LITURGY':
                         state.addLiturgy();
@@ -203,7 +206,8 @@ class _MyHomePageState extends State<MyHomePage> {
                         reloadLyrics();
                         break;
                     }
-                  }, itemBuilder: (BuildContext context) {
+                  },
+                  itemBuilder: (BuildContext context) {
                     return [
                       state.hasLiturgy()
                           ? PopupMenuItem(

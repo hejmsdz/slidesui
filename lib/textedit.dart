@@ -107,10 +107,12 @@ class _TextEditPageState extends State<TextEditPage> {
         actions: [
           IconButton(
             icon: Icon(Icons.clear),
+            tooltip: strings['clearText'],
             onPressed: _isLoading ? null : clearText,
           ),
           IconButton(
             icon: Icon(Icons.check),
+            tooltip: strings['applyText'],
             onPressed: _isLoading ? null : applyText,
           ),
         ],

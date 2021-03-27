@@ -12,6 +12,9 @@ const strings = {
       'Aby dodać slajdy, użyj wyszukiwarki\nlub wklej plan jako tekst.',
   'searchSongs': 'Wyszukaj pieśni',
   'editAsText': 'Edytuj jako tekst',
+  'menu': 'Pokaż menu',
+  'clearText': 'Wyczyść',
+  'applyText': 'Wczytaj slajdy',
   'unresolvedOne':
       'Nie udało się jednoznacznie dopasować jednej pieśni. Dotknij ją, aby wybrać odpowiednią.',
   'unresolvedMany':
