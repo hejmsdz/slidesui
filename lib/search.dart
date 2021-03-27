@@ -61,17 +61,17 @@ slugify(String text) {
 
 class _SearchPageState extends State<SearchPage> {
   _SearchPageState({String query, int replaceIndex}) {
-    _query = query;
-    _replaceIndex = replaceIndex;
+    _query = query ?? "";
+    _replaceIndex = replaceIndex ?? -1;
   }
 
   TextEditingController controller = TextEditingController();
-  String _query = "";
+  String _query;
   List<Song> _prefilteredItems = [];
   List<Song> _items = [];
   bool _isLoading = false;
   bool _isQueryValid = false;
-  int _replaceIndex = -1;
+  int _replaceIndex;
 
   @override
   void initState() {

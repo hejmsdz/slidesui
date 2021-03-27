@@ -29,4 +29,5 @@ const strings = {
   'move': 'PRZENIEŚ',
   'slidesMoved': 'Plik PDF ze slajdami został przeniesiony.',
   'manual': 'Instrukcja obsługi rzutnika',
+  'reloadLyrics': 'Odśwież teksty',
 };

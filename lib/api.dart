@@ -46,3 +46,11 @@ Future<Manual> getManual() async {
   final body = Utf8Decoder().convert(response.body.codeUnits);
   return Manual.fromJson(jsonDecode(body));
 }
+
+Future<void> getBootstrap() async {
+  await http.get(apiURL('v2/bootstrap'));
+}
+
+Future<void> postReload() async {
+  await http.post(apiURL('v2/reload'));
+}

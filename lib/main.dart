@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
+import './api.dart';
 import './persistence.dart';
 import './strings.dart';
 import './state.dart';
@@ -106,10 +107,26 @@ class ListItem extends StatelessWidget {
 class _MyHomePageState extends State<MyHomePage> {
   bool _isWorking = false;
 
+  @override
+  void initState() {
+    super.initState();
+
+    getBootstrap();
+  }
+
   setIsWorking(bool isWorking) {
     setState(() {
       _isWorking = isWorking;
     });
+  }
+
+  reloadLyrics() async {
+    setIsWorking(true);
+    try {
+      await postReload();
+    } finally {
+      setIsWorking(false);
+    }
   }
 
   @override
@@ -177,6 +194,10 @@ class _MyHomePageState extends State<MyHomePage> {
                             return ManualPage();
                           }),
                         );
+                        break;
+                      case 'RELOAD_LYRICS':
+                        reloadLyrics();
+                        break;
                     }
                   }, itemBuilder: (BuildContext context) {
                     return [
@@ -205,6 +226,10 @@ class _MyHomePageState extends State<MyHomePage> {
                       PopupMenuItem(
                         child: Text(strings['manual']),
                         value: 'OPEN_MANUAL',
+                      ),
+                      PopupMenuItem(
+                        child: Text(strings['reloadLyrics']),
+                        value: 'RELOAD_LYRICS',
                       ),
                     ];
                   })),
