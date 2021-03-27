@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
+import 'package:slidesui/model.dart';
 import './api.dart';
 import './persistence.dart';
 import './strings.dart';
@@ -276,7 +277,7 @@ class _MyHomePageState extends State<MyHomePage> {
               title: song.title,
               number: song.number,
               index: index,
-              triggerSearch: song.number == '?',
+              triggerSearch: song is SongDeckItem,
               onRemoved: () {
                 state.removeItem(index);
                 final snackBar = SnackBar(
