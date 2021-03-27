@@ -12,6 +12,10 @@ const strings = {
       'Aby dodać slajdy, użyj wyszukiwarki\nlub wklej plan jako tekst.',
   'searchSongs': 'Wyszukaj pieśni',
   'editAsText': 'Edytuj jako tekst',
+  'unresolvedOne':
+      'Nie udało się jednoznacznie dopasować jednej pieśni. Dotknij ją, aby wybrać odpowiednią.',
+  'unresolvedMany':
+      'Nie udało się jednoznacznie dopasować {} pieśni. Dotknij je, aby wybrać odpowiednie.',
   'searchStartTyping': 'Zacznij wpisywać tytuł lub numer pieśni.',
   'searchNoResults': 'Nie znaleziono pasujących pieśni.',
   'itemRemovedSong': 'Usunięto „{}”.',

@@ -86,8 +86,16 @@ class _TextEditPageState extends State<TextEditPage> {
       setIsLoading(false);
     }
 
-    state.setItems(parsedItems);
+    final unresolvedCount = parsedItems.whereType<UnresolvedDeckItem>().length;
+    if (unresolvedCount > 0) {
+      final unresolvedMessage = unresolvedCount == 1
+          ? strings['unresolvedOne']
+          : strings['unresolvedMany'].replaceFirst('{}', "$unresolvedCount");
+      final snackBar = SnackBar(content: Text(unresolvedMessage));
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    }
 
+    state.setItems(parsedItems);
     Navigator.pop(context);
   }
 

@@ -6,8 +6,16 @@ import './model.dart';
 import './api.dart';
 
 class SearchPage extends StatefulWidget {
+  SearchPage({Key key, this.initialQuery, this.replaceIndex}) : super(key: key);
+
+  final String initialQuery;
+  final int replaceIndex;
+
   @override
-  _SearchPageState createState() => _SearchPageState();
+  _SearchPageState createState() => _SearchPageState(
+        query: initialQuery,
+        replaceIndex: replaceIndex,
+      );
 }
 
 class SearchListItem extends StatelessWidget {
@@ -52,12 +60,28 @@ slugify(String text) {
 }
 
 class _SearchPageState extends State<SearchPage> {
+  _SearchPageState({String query, int replaceIndex}) {
+    _query = query;
+    _replaceIndex = replaceIndex;
+  }
+
   TextEditingController controller = TextEditingController();
   String _query = "";
   List<Song> _prefilteredItems = [];
   List<Song> _items = [];
   bool _isLoading = false;
   bool _isQueryValid = false;
+  int _replaceIndex = -1;
+
+  @override
+  void initState() {
+    super.initState();
+
+    controller.text = _query;
+    if (_query.isNotEmpty) {
+      updateQuery(_query, forceUpdate: true);
+    }
+  }
 
   setIsLoading(bool isLoading) {
     setState(() {
@@ -65,7 +89,7 @@ class _SearchPageState extends State<SearchPage> {
     });
   }
 
-  void updateQuery(String query) async {
+  void updateQuery(String query, {bool forceUpdate = false}) async {
     final previousQuery = _query;
     setState(() {
       _query = query;
@@ -82,7 +106,7 @@ class _SearchPageState extends State<SearchPage> {
 
     final querySlug = slugify(query);
 
-    if (queryPrefixChanged && !_isLoading) {
+    if (forceUpdate || (queryPrefixChanged && !_isLoading)) {
       setIsLoading(true);
       try {
         _prefilteredItems =
@@ -168,7 +192,12 @@ class _SearchPageState extends State<SearchPage> {
                   isChecked: isAdded,
                   onTap: () {
                     if (!isAdded) {
-                      state.addItem(SongDeckItem(song));
+                      if (_replaceIndex > -1) {
+                        state.replaceItem(_replaceIndex, SongDeckItem(song));
+                        Navigator.pop(context);
+                      } else {
+                        state.addItem(SongDeckItem(song));
+                      }
                     } else {
                       state.removeItemById(song.id);
                     }

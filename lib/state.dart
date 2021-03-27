@@ -54,6 +54,11 @@ class SlidesModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  replaceItem(int index, DeckItem item) {
+    _items[index] = item;
+    notifyListeners();
+  }
+
   removeItem(int index) {
     _lastRemovedIndex = index;
     _lastRemovedItem = _items.removeAt(index);

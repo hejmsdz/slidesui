@@ -49,13 +49,22 @@ class MyHomePage extends StatefulWidget {
 }
 
 class ListItem extends StatelessWidget {
-  ListItem({Key key, this.symbol, this.title, this.number, this.onRemoved})
+  ListItem(
+      {Key key,
+      this.symbol,
+      this.title,
+      this.number,
+      this.index,
+      this.onRemoved,
+      this.triggerSearch = false})
       : super(key: key);
 
   final String symbol;
   final String title;
   final String number;
   final void Function() onRemoved;
+  final bool triggerSearch;
+  final int index;
 
   @override
   Widget build(BuildContext context) {
@@ -76,6 +85,19 @@ class ListItem extends StatelessWidget {
                 number,
                 style: Theme.of(context).textTheme.caption,
               ),
+        onTap: triggerSearch
+            ? () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) {
+                    return SearchPage(
+                      initialQuery: title,
+                      replaceIndex: index,
+                    );
+                  }),
+                );
+              }
+            : null,
       ),
     );
   }
@@ -228,6 +250,8 @@ class _MyHomePageState extends State<MyHomePage> {
               symbol: "${index + 1}",
               title: song.title,
               number: song.number,
+              index: index,
+              triggerSearch: song.number == '?',
               onRemoved: () {
                 state.removeItem(index);
                 final snackBar = SnackBar(
@@ -237,7 +261,6 @@ class _MyHomePageState extends State<MyHomePage> {
                     onPressed: state.undoRemoveItem,
                   ),
                 );
-
                 ScaffoldMessenger.of(context).showSnackBar(snackBar);
               },
             );
