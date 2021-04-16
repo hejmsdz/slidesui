@@ -45,8 +45,14 @@ class _TextEditPageState extends State<TextEditPage> {
   }
 
   applyText() async {
-    final lines = controller.text.split("\n");
     final state = Provider.of<SlidesModel>(context, listen: false);
+    final text = controller.text.trim();
+    if (text.isEmpty) {
+      state.setItems([]);
+      Navigator.pop(context);
+      return;
+    }
+    final lines = text.split("\n");
     final Map<String, DeckItem> currentTitles = Map.fromIterable(
       state.items,
       key: (item) => item.title.toLowerCase(),
