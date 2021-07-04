@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:path_provider/path_provider.dart';
 import './state.dart';
 import './strings.dart';
 import './api.dart';
@@ -49,6 +50,15 @@ notifyOnMoved(BuildContext context) {
   ScaffoldMessenger.of(context).showSnackBar(snackBar);
 }
 
+Future<String> getDownloadDirectory() async {
+  final directory = await getExternalStorageDirectory();
+  if (!(await directory.exists())) {
+    await directory.create();
+  }
+
+  return directory.path;
+}
+
 createDeck(BuildContext context) async {
   if (!kIsWeb && Platform.isAndroid) {
     await Permission.storage.request();
@@ -57,7 +67,7 @@ createDeck(BuildContext context) async {
   final url = await postDeck(state.date, state.items);
 
   if (!kIsWeb && Platform.isAndroid && await Permission.storage.isGranted) {
-    final destination = '/sdcard';
+    final destination = await getDownloadDirectory();
     final fileName = state.date.toIso8601String().substring(0, 10) + '.pdf';
     final taskId = await FlutterDownloader.enqueue(
       url: url,
