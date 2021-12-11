@@ -102,6 +102,30 @@ class UnresolvedDeckItem implements DeckItem {
   Map<String, dynamic> toFullJson() => {'type': 'UNRESOLVED', 'title': title};
 }
 
+class TextDeckItem implements DeckItem {
+  TextDeckItem(this.contents);
+
+  String contents;
+
+  String get id => contents.hashCode.toString();
+  String get title => getTitle();
+  String get number => '';
+
+  String get removedMessage =>
+      strings['itemRemovedSong'].replaceFirst("{}", title);
+
+  Map<String, dynamic> toJson() => {'contents': contents.split("\n\n")};
+  Map<String, dynamic> toFullJson() => {'type': 'TEXT', 'contents': contents};
+
+  String getTitle() {
+    final lines = contents.split("\n");
+    final slice = lines[0].substring(0, 30);
+    final isTruncated = contents.length > 30 || lines[0].length > 30;
+
+    return isTruncated ? "${slice}..." : slice;
+  }
+}
+
 class DeckRequest {
   final DateTime date;
   final List<DeckItem> items;

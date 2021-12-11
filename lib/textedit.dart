@@ -10,6 +10,8 @@ class TextEditPage extends StatefulWidget {
   _TextEditPageState createState() => _TextEditPageState();
 }
 
+final String TEXT_ITEM_DELIMITER = "'''";
+
 class _TextEditPageState extends State<TextEditPage> {
   TextEditingController controller = TextEditingController();
   bool _isLoading = false;
@@ -36,12 +38,40 @@ class _TextEditPageState extends State<TextEditPage> {
       final numberSuffix = (item.number.isEmpty || item.number == '?')
           ? ''
           : " [${item.number}]";
-      return "${index + 1}. ${item.title}$numberSuffix";
+      final text = item is TextDeckItem ? "${TEXT_ITEM_DELIMITER}${item.contents}${TEXT_ITEM_DELIMITER}" : item.title;
+      return "${index + 1}. ${text}$numberSuffix";
     }).join("\n");
   }
 
   clearText() {
     controller.clear();
+  }
+
+  List<String> splitLines(String text) {
+    final naiveLines = text.split("\n");
+    final lines = List<String>();
+
+    String textItem = null;
+    naiveLines.forEach((naiveLine) {
+      final hasDelimiter = naiveLine.contains(TEXT_ITEM_DELIMITER);
+      if (hasDelimiter) {
+        if (textItem == null) {
+          textItem = naiveLine + "\n";
+        } else {
+          textItem += naiveLine + "\n";
+          lines.add(textItem);
+          textItem = null;
+        }
+      } else {
+        if (textItem == null) {
+          lines.add(naiveLine);
+        } else {
+          textItem += naiveLine + "\n";
+        }
+      }
+    });
+
+    return lines;
   }
 
   applyText() async {
@@ -52,7 +82,8 @@ class _TextEditPageState extends State<TextEditPage> {
       Navigator.pop(context);
       return;
     }
-    final lines = text.split("\n");
+    final lines = splitLines(text);
+    print(lines);
     final Map<String, DeckItem> currentTitles = Map.fromIterable(
       state.items,
       key: (item) => item.title.toLowerCase(),
@@ -68,6 +99,12 @@ class _TextEditPageState extends State<TextEditPage> {
             .replaceFirst(RegExp(r"^\w+[.:]\s"), "")
             .replaceFirst(RegExp(r"\s[\[\(].*[\]\)]$"), "")
             .trim();
+
+        if (title.startsWith(TEXT_ITEM_DELIMITER) && title.endsWith(TEXT_ITEM_DELIMITER)) {
+          final trimChars = TEXT_ITEM_DELIMITER.length;
+          return TextDeckItem(title.substring(trimChars, title.length - trimChars));
+        }
+
         final titleNormalized = title.toLowerCase();
         if (title.isEmpty) {
           return null;

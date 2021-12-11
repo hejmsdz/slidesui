@@ -6,6 +6,10 @@ const strings = {
   'removeLiturgy': 'Usuń liturgię słowa',
   'addOrdinary': 'Dodaj części stałe',
   'removeOrdinary': 'Usuń części stałe',
+  'addText': 'Dodaj własny tekst',
+  'enterText': 'Wpisz tekst',
+  'cancel': 'ANULUJ',
+  'ok': 'OK',
   'changeDate': 'Zmień datę',
   'emptyTitle': 'Nic tu jeszcze nie ma!',
   'emptyDescription':

@@ -58,14 +58,14 @@ class ListItem extends StatelessWidget {
       this.number,
       this.index,
       this.onRemoved,
-      this.triggerSearch = false})
+      this.onTap})
       : super(key: key);
 
   final String symbol;
   final String title;
   final String number;
   final void Function() onRemoved;
-  final bool triggerSearch;
+  final void Function() onTap;
   final int index;
 
   @override
@@ -90,19 +90,7 @@ class ListItem extends StatelessWidget {
                   style: Theme.of(context).textTheme.caption,
                 ),
         ),
-        onTap: triggerSearch
-            ? () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) {
-                    return SearchPage(
-                      initialQuery: title,
-                      replaceIndex: index,
-                    );
-                  }),
-                );
-              }
-            : null,
+        onTap: onTap,
       ),
     );
   }
@@ -131,6 +119,42 @@ class _MyHomePageState extends State<MyHomePage> {
     } finally {
       setIsWorking(false);
     }
+  }
+
+  showTextDialog(Function(String) callback, [String initialValue = ""]) {
+    TextEditingController controller =
+        TextEditingController(text: initialValue);
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+          title: Text(strings['enterText']),
+          content: TextField(
+            controller: controller,
+            keyboardType: TextInputType.multiline,
+            maxLines: null,
+            autofocus: true,
+          ),
+          actions: [
+            TextButton(
+              child: Text(strings['cancel']),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text(strings['ok']),
+              onPressed: () {
+                if (controller.text.isEmpty) {
+                  return;
+                }
+
+                callback(controller.text);
+                Navigator.of(context).pop();
+              },
+            ),
+          ]),
+    );
   }
 
   @override
@@ -180,6 +204,11 @@ class _MyHomePageState extends State<MyHomePage> {
                       case 'REMOVE_ORDINARY':
                         state.removeOrdinary();
                         break;
+                      case 'ADD_TEXT':
+                        showTextDialog((String contents) {
+                          state.addText(contents);
+                        });
+                        break;
                       case 'CHANGE_DATE':
                         final now = DateTime.now();
                         final firstDate = DateTime(now.year - 1, 1, 1);
@@ -227,6 +256,10 @@ class _MyHomePageState extends State<MyHomePage> {
                               child: Text(strings['addOrdinary']),
                               value: 'ADD_ORDINARY',
                             ),
+                      PopupMenuItem(
+                        child: Text(strings['addText']),
+                        value: 'ADD_TEXT',
+                      ),
                       PopupMenuItem(
                         child: Text(strings['changeDate']),
                         value: 'CHANGE_DATE',
@@ -284,7 +317,6 @@ class _MyHomePageState extends State<MyHomePage> {
               title: song.title,
               number: song.number,
               index: index,
-              triggerSearch: song is SongDeckItem || song is UnresolvedDeckItem,
               onRemoved: () {
                 state.removeItem(index);
                 final snackBar = SnackBar(
@@ -295,6 +327,23 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                 );
                 ScaffoldMessenger.of(context).showSnackBar(snackBar);
+              },
+              onTap: () {
+                if (song is SongDeckItem || song is UnresolvedDeckItem) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) {
+                      return SearchPage(
+                        initialQuery: song.title,
+                        replaceIndex: index,
+                      );
+                    }),
+                  );
+                } else if (song is TextDeckItem) {
+                  showTextDialog((String newContents) {
+                    state.updateText(index, newContents);
+                  }, song.contents);
+                }
               },
             );
           },

@@ -41,6 +41,8 @@ class SlidesModel extends ChangeNotifier {
               return PsalmDeckItem();
             case 'ACCLAMATION':
               return AcclamationDeckItem();
+            case 'TEXT':
+              return TextDeckItem(itemJson['contents']);
             default:
               return null;
           }
@@ -132,6 +134,19 @@ class SlidesModel extends ChangeNotifier {
 
   removeOrdinary() {
     _items.removeWhere((item) => item is SongDeckItem && item.song.isOrdinary);
+    notifyListeners();
+  }
+
+  addText(String contents) {
+    _items.add(TextDeckItem(contents));
+    notifyListeners();
+  }
+
+  updateText(int index, String newContents) {
+    final item = _items[index];
+    if (item is TextDeckItem) {
+      item.contents = newContents;
+    }
     notifyListeners();
   }
 
