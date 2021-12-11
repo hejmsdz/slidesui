@@ -119,10 +119,12 @@ class TextDeckItem implements DeckItem {
 
   String getTitle() {
     final lines = contents.split("\n");
-    final slice = lines[0].substring(0, 30);
-    final isTruncated = contents.length > 30 || lines[0].length > 30;
+    final firstLine = lines[0];
+    final firstLineLength = firstLine.length;
+    final slice = firstLineLength > 30 ? firstLine.substring(0, 30) : firstLine;
+    final isTruncated = contents.length > 30 || firstLineLength > 30;
 
-    return isTruncated ? "${slice}..." : slice;
+    return isTruncated ? "$slice..." : slice;
   }
 }
 

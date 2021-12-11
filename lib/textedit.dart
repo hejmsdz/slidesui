@@ -10,7 +10,7 @@ class TextEditPage extends StatefulWidget {
   _TextEditPageState createState() => _TextEditPageState();
 }
 
-final String TEXT_ITEM_DELIMITER = "'''";
+const String TEXT_ITEM_DELIMITER = "'''";
 
 class _TextEditPageState extends State<TextEditPage> {
   TextEditingController controller = TextEditingController();
@@ -38,8 +38,10 @@ class _TextEditPageState extends State<TextEditPage> {
       final numberSuffix = (item.number.isEmpty || item.number == '?')
           ? ''
           : " [${item.number}]";
-      final text = item is TextDeckItem ? "${TEXT_ITEM_DELIMITER}${item.contents}${TEXT_ITEM_DELIMITER}" : item.title;
-      return "${index + 1}. ${text}$numberSuffix";
+      final text = item is TextDeckItem
+          ? "$TEXT_ITEM_DELIMITER${item.contents}$TEXT_ITEM_DELIMITER"
+          : item.title;
+      return "${index + 1}. $text$numberSuffix";
     }).join("\n");
   }
 
@@ -49,14 +51,19 @@ class _TextEditPageState extends State<TextEditPage> {
 
   List<String> splitLines(String text) {
     final naiveLines = text.split("\n");
-    final lines = List<String>();
+    final List<String> lines = [];
 
-    String textItem = null;
+    String textItem;
     naiveLines.forEach((naiveLine) {
       final hasDelimiter = naiveLine.contains(TEXT_ITEM_DELIMITER);
       if (hasDelimiter) {
         if (textItem == null) {
           textItem = naiveLine + "\n";
+
+          if (naiveLine.endsWith(TEXT_ITEM_DELIMITER)) {
+            lines.add(naiveLine);
+            textItem = null;
+          }
         } else {
           textItem += naiveLine + "\n";
           lines.add(textItem);
@@ -100,9 +107,11 @@ class _TextEditPageState extends State<TextEditPage> {
             .replaceFirst(RegExp(r"\s[\[\(].*[\]\)]$"), "")
             .trim();
 
-        if (title.startsWith(TEXT_ITEM_DELIMITER) && title.endsWith(TEXT_ITEM_DELIMITER)) {
+        if (title.startsWith(TEXT_ITEM_DELIMITER) &&
+            title.endsWith(TEXT_ITEM_DELIMITER)) {
           final trimChars = TEXT_ITEM_DELIMITER.length;
-          return TextDeckItem(title.substring(trimChars, title.length - trimChars));
+          return TextDeckItem(
+              title.substring(trimChars, title.length - trimChars));
         }
 
         final titleNormalized = title.toLowerCase();
