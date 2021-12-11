@@ -73,8 +73,7 @@ createDeck(BuildContext context) async {
       url: url,
       savedDir: destination,
       fileName: fileName,
-      showNotification: true,
-      openFileFromNotification: true,
+      showNotification: false,
     );
 
     notifyOnDownloaded(context, taskId, "$destination/$fileName");
