@@ -37,4 +37,10 @@ const strings = {
   'slidesMoved': 'Plik PDF ze slajdami został przeniesiony.',
   'manual': 'Instrukcja obsługi rzutnika',
   'reloadLyrics': 'Odśwież teksty',
+  'newVersionAvailable': 'Nowa wersja jest dostępna',
+  'newVersionDescription':
+      "Czy chcesz pobrać wersję {latestVersion}? Obecnie masz zainstalowaną {yourVersion}.",
+  'download': 'POBIERZ',
+  'notNow': 'PÓŹNIEJ',
+  'skipVersion': 'POMIŃ',
 };

@@ -47,8 +47,15 @@ Future<Manual> getManual() async {
   return Manual.fromJson(jsonDecode(body));
 }
 
-Future<void> getBootstrap() async {
-  await http.get(apiURL('v2/bootstrap'));
+Future<BootstrapResponse> getBootstrap() async {
+  final response = await http.get(apiURL('v2/bootstrap'));
+
+  if (response.statusCode != 200) {
+    return null;
+  }
+
+  final body = Utf8Decoder().convert(response.body.codeUnits);
+  return BootstrapResponse.fromJson(jsonDecode(body));
 }
 
 Future<void> postReload() async {

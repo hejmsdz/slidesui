@@ -2,7 +2,10 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:slidesui/model.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import './api.dart';
 import './persistence.dart';
 import './strings.dart';
@@ -103,7 +106,22 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     super.initState();
 
-    getBootstrap();
+    checkVersion();
+  }
+
+  void checkVersion() async {
+    final bootstrap = await getBootstrap();
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    final localVersion = packageInfo.version;
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    final latestVersion = bootstrap.currentVersion;
+    final isSkipped = prefs.getString("skippedVersion") == latestVersion;
+
+    if (latestVersion != localVersion && !isSkipped) {
+      showNewVersionDialog(
+          latestVersion, localVersion, bootstrap.appDownloadUrl);
+    }
   }
 
   setIsWorking(bool isWorking) {
@@ -150,6 +168,41 @@ class _MyHomePageState extends State<MyHomePage> {
                 }
 
                 callback(controller.text);
+                Navigator.of(context).pop();
+              },
+            ),
+          ]),
+    );
+  }
+
+  showNewVersionDialog(
+      String latestVersion, String yourVersion, String appDownloadUrl) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+          title: Text(strings['newVersionAvailable']),
+          content: Text(strings['newVersionDescription']
+              .replaceFirst("{latestVersion}", latestVersion)
+              .replaceFirst("{yourVersion}", yourVersion)),
+          actions: [
+            TextButton(
+              child: Text(strings['skipVersion']),
+              onPressed: () async {
+                SharedPreferences prefs = await SharedPreferences.getInstance();
+                prefs.setString("skippedVersion", latestVersion);
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text(strings['notNow']),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text(strings['download']),
+              onPressed: () {
+                launch(appDownloadUrl);
                 Navigator.of(context).pop();
               },
             ),

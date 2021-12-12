@@ -158,3 +158,14 @@ class Manual {
       : steps = List<String>.from(json['steps']),
         image = json['image'];
 }
+
+class BootstrapResponse {
+  final String currentVersion;
+  final String appDownloadUrl;
+
+  BootstrapResponse(this.currentVersion, this.appDownloadUrl);
+
+  BootstrapResponse.fromJson(Map<String, dynamic> json)
+      : currentVersion = json['currentVersion'],
+        appDownloadUrl = json['appDownloadUrl'];
+}
