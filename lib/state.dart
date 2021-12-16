@@ -3,18 +3,48 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import './model.dart';
 
-nextSunday() {
-  final now = DateTime.now();
-  if (now.weekday == DateTime.sunday) {
-    return now;
+DateTime nextWeekday(int weekday, DateTime date, [int lastestHour = 24]) {
+  final daysOffset = (weekday - date.weekday) % 7;
+  final nextDate = date.add(Duration(days: daysOffset));
+
+  if (daysOffset == 0 && date.hour > lastestHour) {
+    return nextDate.add(Duration(days: 7));
   }
-  return now.add(Duration(days: 7 - now.weekday));
+
+  return nextDate;
+}
+
+bool isAdvent(DateTime date) {
+  if (date.month < 11) {
+    return false;
+  }
+
+  final christmasEve = new DateTime(date.year, 12, 24);
+  final firstSundayOfAdvent = christmasEve
+      .subtract(Duration(days: (christmasEve.weekday % 7) + (3 * 7)));
+
+  return date.isAfter(firstSundayOfAdvent) && date.isBefore(christmasEve);
+}
+
+DateTime nextMassDay() {
+  final now = DateTime.now();
+  final nextSunday = nextWeekday(DateTime.sunday, now, 21);
+
+  if (isAdvent(now)) {
+    DateTime nextTuesday = nextWeekday(DateTime.tuesday, now, 8);
+    DateTime nextThursday = nextWeekday(DateTime.thursday, now, 8);
+
+    return [nextSunday, nextTuesday, nextThursday]
+        .reduce((a, b) => a.isBefore(b) ? a : b);
+  }
+
+  return nextSunday;
 }
 
 class SlidesModel extends ChangeNotifier {
   SlidesModel();
 
-  DateTime _date = nextSunday();
+  DateTime _date = nextMassDay();
 
   List<DeckItem> _items = [];
   DeckItem _lastRemovedItem;
