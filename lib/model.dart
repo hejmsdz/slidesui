@@ -131,12 +131,14 @@ class TextDeckItem implements DeckItem {
 class DeckRequest {
   final DateTime date;
   final List<DeckItem> items;
+  final bool hints;
 
-  DeckRequest(this.date, this.items);
+  DeckRequest(this.date, this.items, this.hints);
 
   Map<String, dynamic> toJson() => {
         'date': date.toIso8601String().substring(0, 10),
         'items': items.map((item) => item.toJson()).toList(),
+        'hints': hints,
       };
 }
 

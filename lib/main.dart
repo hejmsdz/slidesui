@@ -287,6 +287,9 @@ class _MyHomePageState extends State<MyHomePage> {
                       case 'RELOAD_LYRICS':
                         reloadLyrics();
                         break;
+                      case 'TOGGLE_HINTS':
+                        state.toggleHints();
+                        break;
                     }
                   },
                   itemBuilder: (BuildContext context) {
@@ -324,6 +327,11 @@ class _MyHomePageState extends State<MyHomePage> {
                       PopupMenuItem(
                         child: Text(strings['reloadLyrics']),
                         value: 'RELOAD_LYRICS',
+                      ),
+                      CheckedPopupMenuItem(
+                        child: Text(strings['hints']),
+                        checked: state.hints,
+                        value: 'TOGGLE_HINTS',
                       ),
                     ];
                   })),

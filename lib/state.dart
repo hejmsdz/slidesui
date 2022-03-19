@@ -49,13 +49,16 @@ class SlidesModel extends ChangeNotifier {
   List<DeckItem> _items = [];
   DeckItem _lastRemovedItem;
   int _lastRemovedIndex;
+  bool _hints = true;
 
   UnmodifiableListView<DeckItem> get items => UnmodifiableListView(_items);
   DateTime get date => _date;
+  bool get hints => _hints;
 
   Map<String, dynamic> toJson() => {
         'date': _date.toIso8601String().substring(0, 10),
         'items': _items.map((item) => item.toFullJson()).toList(),
+        'hints': _hints,
       };
 
   SlidesModel.fromJson(Map<String, dynamic> json) {
@@ -79,6 +82,8 @@ class SlidesModel extends ChangeNotifier {
         })
         .where((item) => item != null)
         .toList();
+
+    _hints = json['hints'];
   }
 
   addItem(DeckItem item) {
@@ -188,6 +193,11 @@ class SlidesModel extends ChangeNotifier {
 
   setDate(DateTime date) {
     _date = date;
+    notifyListeners();
+  }
+
+  toggleHints() {
+    _hints = !_hints;
     notifyListeners();
   }
 }

@@ -64,7 +64,7 @@ createDeck(BuildContext context) async {
     await Permission.storage.request();
   }
   final state = Provider.of<SlidesModel>(context, listen: false);
-  final url = await postDeck(state.date, state.items);
+  final url = await postDeck(state.date, state.items, state.hints);
 
   if (!kIsWeb && Platform.isAndroid && await Permission.storage.isGranted) {
     final destination = await getDownloadDirectory();
