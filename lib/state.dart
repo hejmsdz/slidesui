@@ -83,7 +83,7 @@ class SlidesModel extends ChangeNotifier {
         .where((item) => item != null)
         .toList();
 
-    _hints = json['hints'];
+    _hints = json['hints'] == null ? true : json['hints'];
   }
 
   addItem(DeckItem item) {
