@@ -90,7 +90,6 @@ class _TextEditPageState extends State<TextEditPage> {
       return;
     }
     final lines = splitLines(text);
-    print(lines);
     final Map<String, DeckItem> currentTitles = Map.fromIterable(
       state.items,
       key: (item) => item.title.toLowerCase(),
@@ -104,7 +103,7 @@ class _TextEditPageState extends State<TextEditPage> {
       parsedItems = await Future.wait<DeckItem>(lines.map((line) async {
         final title = line
             .replaceFirst(RegExp(r"^\w+[.:]\s"), "")
-            .replaceFirst(RegExp(r"\s[\[\(].*[\]\)]$"), "")
+            .replaceFirst(RegExp(r"\s[\[\(]\d+\.\d+[\]\)]$"), "")
             .trim();
 
         if (title.startsWith(TEXT_ITEM_DELIMITER) &&
