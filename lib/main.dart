@@ -413,7 +413,7 @@ class _MyHomePageState extends State<MyHomePage> {
       }),
       floatingActionButton: Consumer<SlidesModel>(
         builder: (context, state, child) => Visibility(
-          visible: state.items.isNotEmpty,
+          visible: state.isValid(),
           child: FloatingActionButton(
             onPressed: _isWorking
                 ? null

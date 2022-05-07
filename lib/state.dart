@@ -200,4 +200,9 @@ class SlidesModel extends ChangeNotifier {
     _hints = !_hints;
     notifyListeners();
   }
+
+  bool isValid() {
+    return _items.isNotEmpty &&
+        !_items.any((item) => item is UnresolvedDeckItem);
+  }
 }
