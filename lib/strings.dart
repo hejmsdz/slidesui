@@ -24,6 +24,7 @@ const strings = {
       'Nie udało się jednoznacznie dopasować jednej pieśni. Dotknij ją, aby wybrać odpowiednią.',
   'unresolvedMany':
       'Nie udało się jednoznacznie dopasować {} pieśni. Dotknij je, aby wybrać odpowiednie.',
+  'duplicatesRemoved': 'Powtarzające się elementy zostały usunięte z listy.',
   'searchStartTyping': 'Zacznij wpisywać tytuł lub numer pieśni.',
   'searchNoResults': 'Nie znaleziono pasujących pieśni.',
   'itemRemovedSong': 'Usunięto „{}”.',

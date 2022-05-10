@@ -98,9 +98,11 @@ class _TextEditPageState extends State<TextEditPage> {
 
     setIsLoading(true);
     List<DeckItem> parsedItems;
+    var duplicatesCount = 0;
 
     try {
-      parsedItems = await Future.wait<DeckItem>(lines.map((line) async {
+      final Set<String> resolvedIds = {};
+      parsedItems = (await Future.wait<DeckItem>(lines.map((line) async {
         final title = line
             .replaceFirst(RegExp(r"^\w+[.:]\s"), "")
             .replaceFirst(RegExp(r"\s[\[\(]\d+\.\d+[\]\)]$"), "")
@@ -113,26 +115,17 @@ class _TextEditPageState extends State<TextEditPage> {
               title.substring(trimChars, title.length - trimChars));
         }
 
-        final titleNormalized = title.toLowerCase();
-        if (title.isEmpty) {
+        final item = await createDeckItem(title, currentTitles);
+        if (resolvedIds.contains(item.id)) {
+          duplicatesCount++;
           return null;
         }
-        if (currentTitles.containsKey(titleNormalized)) {
-          return currentTitles[titleNormalized];
-        }
-        if (titleNormalized == strings['psalm'].toLowerCase()) {
-          return PsalmDeckItem();
-        }
-        if (titleNormalized == strings['acclamation'].toLowerCase()) {
-          return AcclamationDeckItem();
-        }
-        final songs = await getSongs(titleNormalized);
-        if (songs.length == 1) {
-          return SongDeckItem(songs[0]);
-        } else {
-          return UnresolvedDeckItem(title);
-        }
-      }).where((item) => item != null));
+
+        resolvedIds.add(item.id);
+        return item;
+      })))
+          .where((item) => item != null)
+          .toList();
     } finally {
       setIsLoading(false);
     }
@@ -146,8 +139,36 @@ class _TextEditPageState extends State<TextEditPage> {
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
     }
 
+    if (duplicatesCount > 0) {
+      final snackBar = SnackBar(content: Text(strings['duplicatesRemoved']));
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    }
+
     state.setItems(parsedItems);
     Navigator.pop(context);
+  }
+
+  Future<DeckItem> createDeckItem(
+      String title, Map<String, DeckItem> currentTitles) async {
+    if (title.isEmpty) {
+      return null;
+    }
+    final titleNormalized = title.toLowerCase();
+    if (currentTitles.containsKey(titleNormalized)) {
+      return currentTitles[titleNormalized];
+    }
+    if (titleNormalized == strings['psalm'].toLowerCase()) {
+      return PsalmDeckItem();
+    }
+    if (titleNormalized == strings['acclamation'].toLowerCase()) {
+      return AcclamationDeckItem();
+    }
+    final songs = await getSongs(titleNormalized);
+    if (songs.length == 1) {
+      return SongDeckItem(songs[0]);
+    } else {
+      return UnresolvedDeckItem(title);
+    }
   }
 
   @override
