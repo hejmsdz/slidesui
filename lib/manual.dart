@@ -42,7 +42,7 @@ class _ManualPageState extends State<ManualPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(strings['manual']),
+        title: Text(strings['manual']!),
         bottom: PreferredSize(
           preferredSize: Size(double.infinity, 1.0),
           child: Opacity(

@@ -28,9 +28,9 @@ notifyOnDownloaded(
   String destinationFile,
 ) {
   final snackBar = SnackBar(
-    content: Text(strings['slidesDownloadedInternal']),
+    content: Text(strings['slidesDownloadedInternal']!),
     action: SnackBarAction(
-      label: strings['move'],
+      label: strings['move']!,
       onPressed: () async {
         FlutterDownloader.remove(taskId: taskId);
         final moveTarget = await moveFile(destinationFile);
@@ -45,7 +45,7 @@ notifyOnDownloaded(
 
 notifyOnMoved(BuildContext context) {
   final snackBar = SnackBar(
-    content: Text(strings['slidesMoved']),
+    content: Text(strings['slidesMoved']!),
   );
   ScaffoldMessenger.of(context).showSnackBar(snackBar);
 }
@@ -81,7 +81,7 @@ createDeck(BuildContext context) async {
     await launch(url);
 
     final snackBar = SnackBar(
-      content: Text(strings['slidesOpeningInBrowser']),
+      content: Text(strings['slidesOpeningInBrowser']!),
     );
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   } else {}

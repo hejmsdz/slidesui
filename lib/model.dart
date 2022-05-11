@@ -57,7 +57,7 @@ class SongDeckItem implements DeckItem {
   bool get isOrdinary => song.isOrdinary;
 
   String get removedMessage =>
-      strings['itemRemovedSong'].replaceFirst("{}", song.title);
+      strings['itemRemovedSong']!.replaceFirst("{}", song.title);
 
   Map<String, dynamic> toJson() => {'id': id};
   Map<String, dynamic> toFullJson() => {'type': 'SONG'}..addAll(song.toJson());
@@ -67,10 +67,10 @@ abstract class LiturgyDeckItem implements DeckItem {}
 
 class PsalmDeckItem extends LiturgyDeckItem {
   String get id => 'PSALM';
-  String get title => strings['psalm'];
+  String get title => strings['psalm']!;
   String get number => '';
 
-  String get removedMessage => strings['itemRemovedPsalm'];
+  String get removedMessage => strings['itemRemovedPsalm']!;
 
   Map<String, dynamic> toJson() => {'type': 'PSALM'};
   Map<String, dynamic> toFullJson() => toJson();
@@ -78,10 +78,10 @@ class PsalmDeckItem extends LiturgyDeckItem {
 
 class AcclamationDeckItem extends LiturgyDeckItem {
   String get id => 'ACCLAMATION';
-  String get title => strings['acclamation'];
+  String get title => strings['acclamation']!;
   String get number => '';
 
-  String get removedMessage => strings['itemRemovedAcclamation'];
+  String get removedMessage => strings['itemRemovedAcclamation']!;
 
   Map<String, dynamic> toJson() => {'type': 'ACCLAMATION'};
   Map<String, dynamic> toFullJson() => toJson();
@@ -96,7 +96,7 @@ class UnresolvedDeckItem implements DeckItem {
   final bool isOrdinary = false;
 
   String get removedMessage =>
-      strings['itemRemovedSong'].replaceFirst("{}", title);
+      strings['itemRemovedSong']!.replaceFirst("{}", title);
 
   Map<String, dynamic> toJson() => null;
   Map<String, dynamic> toFullJson() => {'type': 'UNRESOLVED', 'title': title};
@@ -112,7 +112,7 @@ class TextDeckItem implements DeckItem {
   String get number => '';
 
   String get removedMessage =>
-      strings['itemRemovedSong'].replaceFirst("{}", title);
+      strings['itemRemovedSong']!.replaceFirst("{}", title);
 
   Map<String, dynamic> toJson() => {'contents': contents.split("\n\n")};
   Map<String, dynamic> toFullJson() => {'type': 'TEXT', 'contents': contents};

@@ -140,7 +140,7 @@ class _SearchPageState extends State<SearchPage> {
             controller: controller,
             autofocus: true,
             decoration: InputDecoration(
-              hintText: strings['searchSongs'],
+              hintText: strings['searchSongs']!,
               border: InputBorder.none,
             ),
             style: TextStyle(fontSize: 16.0),
@@ -167,7 +167,7 @@ class _SearchPageState extends State<SearchPage> {
             if (!_isQueryValid) {
               return Center(
                 child: Text(
-                  strings['searchStartTyping'],
+                  strings['searchStartTyping']!,
                   style: Theme.of(context).textTheme.caption,
                 ),
               );
@@ -175,7 +175,7 @@ class _SearchPageState extends State<SearchPage> {
             if (!_isLoading && _items.isEmpty) {
               return Center(
                 child: Text(
-                  strings['searchNoResults'],
+                  strings['searchNoResults']!,
                   style: Theme.of(context).textTheme.caption,
                 ),
               );

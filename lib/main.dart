@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-import 'package:slidesui/model.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import './model.dart';
 import './api.dart';
 import './persistence.dart';
 import './strings.dart';
@@ -35,17 +35,17 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: strings['appTitle'],
+      title: strings['appTitle']!,
       theme: ThemeData(
         primarySwatch: Colors.orange,
       ),
-      home: MyHomePage(title: strings['appTitle']),
+      home: MyHomePage(title: strings['appTitle']!),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
+  const MyHomePage({Key key, this.title}) : super(key: key);
 
   final String title;
 
@@ -146,7 +146,7 @@ class _MyHomePageState extends State<MyHomePage> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-          title: Text(strings['enterText']),
+          title: Text(strings['enterText']!),
           content: TextField(
             controller: controller,
             keyboardType: TextInputType.multiline,
@@ -155,13 +155,13 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
           actions: [
             TextButton(
-              child: Text(strings['cancel']),
+              child: Text(strings['cancel']!),
               onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
             TextButton(
-              child: Text(strings['ok']),
+              child: Text(strings['ok']!),
               onPressed: () {
                 if (controller.text.isEmpty) {
                   return;
@@ -180,13 +180,13 @@ class _MyHomePageState extends State<MyHomePage> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-          title: Text(strings['newVersionAvailable']),
-          content: Text(strings['newVersionDescription']
+          title: Text(strings['newVersionAvailable']!),
+          content: Text(strings['newVersionDescription']!
               .replaceFirst("{latestVersion}", latestVersion)
               .replaceFirst("{yourVersion}", yourVersion)),
           actions: [
             TextButton(
-              child: Text(strings['skipVersion']),
+              child: Text(strings['skipVersion']!),
               onPressed: () async {
                 SharedPreferences prefs = await SharedPreferences.getInstance();
                 prefs.setString("skippedVersion", latestVersion);
@@ -194,13 +194,13 @@ class _MyHomePageState extends State<MyHomePage> {
               },
             ),
             TextButton(
-              child: Text(strings['notNow']),
+              child: Text(strings['notNow']!),
               onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
             TextButton(
-              child: Text(strings['download']),
+              child: Text(strings['download']!),
               onPressed: () {
                 launch(appDownloadUrl);
                 Navigator.of(context).pop();
@@ -218,7 +218,7 @@ class _MyHomePageState extends State<MyHomePage> {
         actions: [
           IconButton(
             icon: Icon(Icons.search),
-            tooltip: strings['searchSongs'],
+            tooltip: strings['searchSongs']!,
             onPressed: () {
               Navigator.push(
                 context,
@@ -230,7 +230,7 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
           IconButton(
             icon: Icon(Icons.assignment_outlined),
-            tooltip: strings['editAsText'],
+            tooltip: strings['editAsText']!,
             onPressed: () {
               Navigator.push(
                 context,
@@ -242,7 +242,7 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
           Consumer<SlidesModel>(
               builder: (context, state, child) => PopupMenuButton<String>(
-                  tooltip: strings['menu'],
+                  tooltip: strings['menu']!,
                   onSelected: (choice) async {
                     switch (choice) {
                       case 'ADD_LITURGY':
@@ -296,40 +296,40 @@ class _MyHomePageState extends State<MyHomePage> {
                     return [
                       state.hasLiturgy()
                           ? PopupMenuItem(
-                              child: Text(strings['removeLiturgy']),
+                              child: Text(strings['removeLiturgy']!),
                               value: 'REMOVE_LITURGY',
                             )
                           : PopupMenuItem(
-                              child: Text(strings['addLiturgy']),
+                              child: Text(strings['addLiturgy']!),
                               value: 'ADD_LITURGY',
                             ),
                       state.hasOrdinary()
                           ? PopupMenuItem(
-                              child: Text(strings['removeOrdinary']),
+                              child: Text(strings['removeOrdinary']!),
                               value: 'REMOVE_ORDINARY',
                             )
                           : PopupMenuItem(
-                              child: Text(strings['addOrdinary']),
+                              child: Text(strings['addOrdinary']!),
                               value: 'ADD_ORDINARY',
                             ),
                       PopupMenuItem(
-                        child: Text(strings['addText']),
+                        child: Text(strings['addText']!),
                         value: 'ADD_TEXT',
                       ),
                       PopupMenuItem(
-                        child: Text(strings['changeDate']),
+                        child: Text(strings['changeDate']!),
                         value: 'CHANGE_DATE',
                       ),
                       PopupMenuItem(
-                        child: Text(strings['manual']),
+                        child: Text(strings['manual']!),
                         value: 'OPEN_MANUAL',
                       ),
                       PopupMenuItem(
-                        child: Text(strings['reloadLyrics']),
+                        child: Text(strings['reloadLyrics']!),
                         value: 'RELOAD_LYRICS',
                       ),
                       CheckedPopupMenuItem(
-                        child: Text(strings['hints']),
+                        child: Text(strings['hints']!),
                         checked: state.hints,
                         value: 'TOGGLE_HINTS',
                       ),
@@ -356,12 +356,12 @@ class _MyHomePageState extends State<MyHomePage> {
                 Padding(
                   padding: EdgeInsets.all(8),
                   child: Text(
-                    strings['emptyTitle'],
+                    strings['emptyTitle']!,
                     style: Theme.of(context).textTheme.headline6,
                   ),
                 ),
                 Text(
-                  strings['emptyDescription'],
+                  strings['emptyDescription']!,
                   textAlign: TextAlign.center,
                 ),
               ],
@@ -383,7 +383,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 final snackBar = SnackBar(
                   content: Text(song.removedMessage),
                   action: SnackBarAction(
-                    label: strings['undo'],
+                    label: strings['undo']!,
                     onPressed: state.undoRemoveItem,
                   ),
                 );
@@ -431,7 +431,7 @@ class _MyHomePageState extends State<MyHomePage> {
             foregroundColor: _isWorking
                 ? Colors.white
                 : Theme.of(context).colorScheme.onSecondary,
-            tooltip: strings['generateSlides'],
+            tooltip: strings['generateSlides']!,
             child: Icon(Icons.slideshow_rounded),
           ),
         ),

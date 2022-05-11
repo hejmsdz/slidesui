@@ -133,14 +133,14 @@ class _TextEditPageState extends State<TextEditPage> {
     final unresolvedCount = parsedItems.whereType<UnresolvedDeckItem>().length;
     if (unresolvedCount > 0) {
       final unresolvedMessage = unresolvedCount == 1
-          ? strings['unresolvedOne']
-          : strings['unresolvedMany'].replaceFirst('{}', "$unresolvedCount");
+          ? strings['unresolvedOne']!
+          : strings['unresolvedMany']!.replaceFirst('{}', "$unresolvedCount");
       final snackBar = SnackBar(content: Text(unresolvedMessage));
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
     }
 
     if (duplicatesCount > 0) {
-      final snackBar = SnackBar(content: Text(strings['duplicatesRemoved']));
+      final snackBar = SnackBar(content: Text(strings['duplicatesRemoved']!));
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
     }
 
@@ -157,10 +157,10 @@ class _TextEditPageState extends State<TextEditPage> {
     if (currentTitles.containsKey(titleNormalized)) {
       return currentTitles[titleNormalized];
     }
-    if (titleNormalized == strings['psalm'].toLowerCase()) {
+    if (titleNormalized == strings['psalm']!.toLowerCase()) {
       return PsalmDeckItem();
     }
-    if (titleNormalized == strings['acclamation'].toLowerCase()) {
+    if (titleNormalized == strings['acclamation']!.toLowerCase()) {
       return AcclamationDeckItem();
     }
     final songs = await getSongs(titleNormalized);
@@ -175,16 +175,16 @@ class _TextEditPageState extends State<TextEditPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(strings['editAsText']),
+        title: Text(strings['editAsText']!),
         actions: [
           IconButton(
             icon: Icon(Icons.clear),
-            tooltip: strings['clearText'],
+            tooltip: strings['clearText']!,
             onPressed: _isLoading ? null : clearText,
           ),
           IconButton(
             icon: Icon(Icons.check),
-            tooltip: strings['applyText'],
+            tooltip: strings['applyText']!,
             onPressed: _isLoading ? null : applyText,
           ),
         ],
