@@ -25,12 +25,14 @@ void main() async {
   runApp(
     ChangeNotifierProvider(
       create: (context) => state,
-      child: MyApp(),
+      child: const MyApp(),
     ),
   );
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({Key? key}) : super(key: key);
+
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
@@ -45,8 +47,7 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key key, this.title}) : super(key: key);
-
+  const MyHomePage({Key? key, required this.title}) : super(key: key);
   final String title;
 
   @override
@@ -54,16 +55,17 @@ class MyHomePage extends StatefulWidget {
 }
 
 class ListItem extends StatelessWidget {
-  ListItem(
-      {Key key,
-      this.symbol,
-      this.title,
-      this.number,
-      this.index,
-      this.onRemoved,
-      this.onTap})
-      : super(key: key);
+  const ListItem(
+      {required this.itemKey,
+      required this.symbol,
+      required this.title,
+      required this.number,
+      required this.index,
+      required this.onRemoved,
+      required this.onTap})
+      : super(key: itemKey);
 
+  final Key itemKey;
   final String symbol;
   final String title;
   final String number;
@@ -74,7 +76,7 @@ class ListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Dismissible(
-      key: key,
+      key: itemKey,
       onDismissed: (direction) {
         onRemoved();
       },
@@ -85,9 +87,9 @@ class ListItem extends StatelessWidget {
         ),
         title: Text(title),
         trailing: Padding(
-          padding: EdgeInsets.only(right: kIsWeb ? 24 : 0),
+          padding: const EdgeInsets.only(right: kIsWeb ? 24 : 0),
           child: number == '?'
-              ? Icon(Icons.report)
+              ? const Icon(Icons.report)
               : Text(
                   number,
                   style: Theme.of(context).textTheme.caption,
@@ -217,7 +219,7 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text(widget.title),
         actions: [
           IconButton(
-            icon: Icon(Icons.search),
+            icon: const Icon(Icons.search),
             tooltip: strings['searchSongs']!,
             onPressed: () {
               Navigator.push(
@@ -229,7 +231,7 @@ class _MyHomePageState extends State<MyHomePage> {
             },
           ),
           IconButton(
-            icon: Icon(Icons.assignment_outlined),
+            icon: const Icon(Icons.assignment_outlined),
             tooltip: strings['editAsText']!,
             onPressed: () {
               Navigator.push(
@@ -337,10 +339,10 @@ class _MyHomePageState extends State<MyHomePage> {
                   })),
         ],
         bottom: PreferredSize(
-          preferredSize: Size(double.infinity, 1.0),
+          preferredSize: const Size(double.infinity, 1.0),
           child: Opacity(
             opacity: _isWorking ? 1 : 0,
-            child: LinearProgressIndicator(
+            child: const LinearProgressIndicator(
               value: null,
             ),
           ),
@@ -354,7 +356,7 @@ class _MyHomePageState extends State<MyHomePage> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Padding(
-                  padding: EdgeInsets.all(8),
+                  padding: const EdgeInsets.all(8),
                   child: Text(
                     strings['emptyTitle']!,
                     style: Theme.of(context).textTheme.headline6,
@@ -373,7 +375,7 @@ class _MyHomePageState extends State<MyHomePage> {
           itemBuilder: (BuildContext context, int index) {
             final song = state.items[index];
             return ListItem(
-              key: ValueKey(song.id),
+              itemKey: ValueKey(song.id),
               symbol: "${index + 1}",
               title: song.title,
               number: song.number,
@@ -432,7 +434,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 ? Colors.white
                 : Theme.of(context).colorScheme.onSecondary,
             tooltip: strings['generateSlides']!,
-            child: Icon(Icons.slideshow_rounded),
+            child: const Icon(Icons.slideshow_rounded),
           ),
         ),
       ),

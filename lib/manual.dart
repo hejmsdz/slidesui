@@ -4,13 +4,15 @@ import './model.dart';
 import './api.dart';
 
 class ManualPage extends StatefulWidget {
+  const ManualPage({Key? key}) : super(key: key);
+
   @override
   _ManualPageState createState() => _ManualPageState();
 }
 
 class _ManualPageState extends State<ManualPage> {
   bool _isLoading = false;
-  Manual _manual;
+  Manual? _manual;
 
   @override
   void initState() {
@@ -41,32 +43,42 @@ class _ManualPageState extends State<ManualPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(strings['manual']!),
-        bottom: PreferredSize(
-          preferredSize: Size(double.infinity, 1.0),
-          child: Opacity(
-            opacity: _isLoading ? 1 : 0,
-            child: LinearProgressIndicator(
-              value: null,
+        appBar: AppBar(
+          title: Text(strings['manual']!),
+          bottom: PreferredSize(
+            preferredSize: const Size(double.infinity, 1.0),
+            child: Opacity(
+              opacity: _isLoading ? 1 : 0,
+              child: const LinearProgressIndicator(
+                value: null,
+              ),
             ),
           ),
         ),
-      ),
-      body: _manual == null
-          ? Container()
-          : ListView.builder(
-              itemCount: _manual.steps.length + 1,
+        body: (() {
+          if (_manual == null) {
+            return Container();
+          }
+
+          final manual = _manual!;
+
+          return ListView.builder(
+              itemCount: manual.steps.length + 1,
               itemBuilder: (context, index) => Padding(
-                padding: EdgeInsets.all(16),
-                child: index < _manual.steps.length
-                    ? Text(
-                        "${index + 1}. ${_manual.steps[index]}",
-                        style: Theme.of(context).textTheme.subtitle1,
-                      )
-                    : Image.network(_manual.image),
-              ),
-            ),
-    );
+                    padding: const EdgeInsets.all(16),
+                    child: index < manual.steps.length
+                        ? Text(
+                            "${index + 1}. ${manual.steps[index]}",
+                            style: Theme.of(context).textTheme.subtitle1,
+                          )
+                        : Image.network(manual.image),
+                  ));
+        })()
+        // body:
+        /*_manual == null
+          ? Container()
+          :
+            ),*/
+        );
   }
 }

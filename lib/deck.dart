@@ -18,7 +18,7 @@ Future<String> moveFile(String source) async {
       "source": source,
     });
   } on PlatformException catch (_) {
-    return null;
+    return "";
   }
 }
 
@@ -52,6 +52,9 @@ notifyOnMoved(BuildContext context) {
 
 Future<String> getDownloadDirectory() async {
   final directory = await getExternalStorageDirectory();
+  if (directory == null) {
+    return "";
+  }
   if (!(await directory.exists())) {
     await directory.create();
   }
@@ -64,21 +67,23 @@ createDeck(BuildContext context) async {
     await Permission.storage.request();
   }
   final state = Provider.of<SlidesModel>(context, listen: false);
-  final url = await postDeck(state.date, state.items, state.hints);
+  final url = Uri.parse(await postDeck(state.date, state.items, state.hints));
 
   if (!kIsWeb && Platform.isAndroid && await Permission.storage.isGranted) {
     final destination = await getDownloadDirectory();
     final fileName = state.date.toIso8601String().substring(0, 10) + '.pdf';
     final taskId = await FlutterDownloader.enqueue(
-      url: url,
+      url: url.toString(),
       savedDir: destination,
       fileName: fileName,
       showNotification: false,
     );
 
-    notifyOnDownloaded(context, taskId, "$destination/$fileName");
-  } else if (await canLaunch(url)) {
-    await launch(url);
+    if (taskId != null) {
+      notifyOnDownloaded(context, taskId, "$destination/$fileName");
+    }
+  } else if (await canLaunchUrl(url)) {
+    await launchUrl(url);
 
     final snackBar = SnackBar(
       content: Text(strings['slidesOpeningInBrowser']!),

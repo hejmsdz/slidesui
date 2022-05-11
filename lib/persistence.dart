@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:path_provider/path_provider.dart';
 import './state.dart';
 
-Future<File> getStateFile() async {
+Future<File?> getStateFile() async {
   try {
     final directory = await getApplicationDocumentsDirectory();
     return File('${directory.path}/state.json');

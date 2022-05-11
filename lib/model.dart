@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import './strings.dart';
 
 class Song {
@@ -51,54 +49,78 @@ class SongDeckItem implements DeckItem {
   SongDeckItem(this.song);
 
   Song song;
+  @override
   String get id => song.id;
+  @override
   String get title => song.title;
+  @override
   String get number => song.number;
   bool get isOrdinary => song.isOrdinary;
 
+  @override
   String get removedMessage =>
       strings['itemRemovedSong']!.replaceFirst("{}", song.title);
 
+  @override
   Map<String, dynamic> toJson() => {'id': id};
+  @override
   Map<String, dynamic> toFullJson() => {'type': 'SONG'}..addAll(song.toJson());
 }
 
 abstract class LiturgyDeckItem implements DeckItem {}
 
 class PsalmDeckItem extends LiturgyDeckItem {
+  @override
   String get id => 'PSALM';
+  @override
   String get title => strings['psalm']!;
+  @override
   String get number => '';
 
+  @override
   String get removedMessage => strings['itemRemovedPsalm']!;
 
+  @override
   Map<String, dynamic> toJson() => {'type': 'PSALM'};
+  @override
   Map<String, dynamic> toFullJson() => toJson();
 }
 
 class AcclamationDeckItem extends LiturgyDeckItem {
+  @override
   String get id => 'ACCLAMATION';
+  @override
   String get title => strings['acclamation']!;
+  @override
   String get number => '';
 
+  @override
   String get removedMessage => strings['itemRemovedAcclamation']!;
 
+  @override
   Map<String, dynamic> toJson() => {'type': 'ACCLAMATION'};
+  @override
   Map<String, dynamic> toFullJson() => toJson();
 }
 
 class UnresolvedDeckItem implements DeckItem {
   UnresolvedDeckItem(this.title);
 
+  @override
   String title;
+  @override
   String get id => title.hashCode.toString();
+  @override
   final String number = '?';
   final bool isOrdinary = false;
 
+  @override
   String get removedMessage =>
       strings['itemRemovedSong']!.replaceFirst("{}", title);
 
-  Map<String, dynamic> toJson() => null;
+  @override
+  Map<String, dynamic> toJson() => {};
+  @override
   Map<String, dynamic> toFullJson() => {'type': 'UNRESOLVED', 'title': title};
 }
 
@@ -107,14 +129,20 @@ class TextDeckItem implements DeckItem {
 
   String contents;
 
+  @override
   String get id => contents.hashCode.toString();
+  @override
   String get title => getTitle();
+  @override
   String get number => '';
 
+  @override
   String get removedMessage =>
       strings['itemRemovedSong']!.replaceFirst("{}", title);
 
+  @override
   Map<String, dynamic> toJson() => {'contents': contents.split("\n\n")};
+  @override
   Map<String, dynamic> toFullJson() => {'type': 'TEXT', 'contents': contents};
 
   String getTitle() {
