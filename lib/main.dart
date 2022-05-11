@@ -15,10 +15,13 @@ import './search.dart';
 import './textedit.dart';
 import './manual.dart';
 
+void downloaderCallback(String id, DownloadTaskStatus status, int progress) {}
+
 void main() async {
   if (!kIsWeb) {
     WidgetsFlutterBinding.ensureInitialized();
     await FlutterDownloader.initialize(debug: kDebugMode);
+    FlutterDownloader.registerCallback(downloaderCallback);
   }
   final state = await loadSavedState();
   saveStateChanges(state);
