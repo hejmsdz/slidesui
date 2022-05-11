@@ -9,7 +9,7 @@ import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 import java.io.File
 
-class MainActivity: FlutterActivity() {
+class MainActivity : FlutterActivity() {
     companion object {
         const val CHANNEL_NAME = "com.example.slidesui/filePicker"
         const val REQUEST_CODE = 54264
@@ -20,11 +20,12 @@ class MainActivity: FlutterActivity() {
 
     override fun configureFlutterEngine(@NonNull flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
-        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CHANNEL_NAME).setMethodCallHandler { call, result ->
-            this.result = result
-            this.source = File(call.argument<String>("source")!!)
-            createDocument()
-        }
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CHANNEL_NAME)
+                .setMethodCallHandler { call, result ->
+                    this.result = result
+                    this.source = File(call.argument<String>("source")!!)
+                    createDocument()
+                }
     }
 
     private fun createDocument() {
@@ -44,7 +45,7 @@ class MainActivity: FlutterActivity() {
                 Activity.RESULT_OK -> {
                     if (intent?.data != null) {
                         val destination = intent.data
-                        moveFile(destination!!);
+                        moveFile(destination!!)
                     }
                 }
                 Activity.RESULT_CANCELED -> {
