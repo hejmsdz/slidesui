@@ -8,7 +8,7 @@ DateTime nextWeekday(int weekday, DateTime date, [int lastestHour = 24]) {
   final nextDate = date.add(Duration(days: daysOffset));
 
   if (daysOffset == 0 && date.hour > lastestHour) {
-    return nextDate.add(Duration(days: 7));
+    return nextDate.add(const Duration(days: 7));
   }
 
   return nextDate;
@@ -19,7 +19,7 @@ bool isAdvent(DateTime date) {
     return false;
   }
 
-  final christmasEve = new DateTime(date.year, 12, 24);
+  final christmasEve = DateTime(date.year, 12, 24);
   final firstSundayOfAdvent = christmasEve
       .subtract(Duration(days: (christmasEve.weekday % 7) + (3 * 7)));
 
@@ -47,8 +47,8 @@ class SlidesModel extends ChangeNotifier {
   DateTime _date = nextMassDay();
 
   List<DeckItem> _items = [];
-  DeckItem _lastRemovedItem;
-  int _lastRemovedIndex;
+  DeckItem? _lastRemovedItem;
+  int? _lastRemovedIndex;
   bool _hints = true;
 
   UnmodifiableListView<DeckItem> get items => UnmodifiableListView(_items);
@@ -81,9 +81,9 @@ class SlidesModel extends ChangeNotifier {
           }
         })
         .where((item) => item != null)
-        .toList();
+        .toList() as List<DeckItem>;
 
-    _hints = json['hints'] == null ? true : json['hints'];
+    _hints = json['hints'] ?? true;
   }
 
   addItem(DeckItem item) {
@@ -114,7 +114,7 @@ class SlidesModel extends ChangeNotifier {
       return;
     }
 
-    _items.insert(_lastRemovedIndex, _lastRemovedItem);
+    _items.insert(_lastRemovedIndex!, _lastRemovedItem!);
     _lastRemovedIndex = null;
     _lastRemovedItem = null;
     notifyListeners();

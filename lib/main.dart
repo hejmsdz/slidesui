@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-import 'package:slidesui/model.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import './model.dart';
 import './api.dart';
 import './persistence.dart';
 import './strings.dart';
@@ -15,38 +15,42 @@ import './search.dart';
 import './textedit.dart';
 import './manual.dart';
 
+void downloaderCallback(String id, DownloadTaskStatus status, int progress) {}
+
 void main() async {
   if (!kIsWeb) {
     WidgetsFlutterBinding.ensureInitialized();
     await FlutterDownloader.initialize(debug: kDebugMode);
+    FlutterDownloader.registerCallback(downloaderCallback);
   }
   final state = await loadSavedState();
   saveStateChanges(state);
   runApp(
     ChangeNotifierProvider(
       create: (context) => state,
-      child: MyApp(),
+      child: const MyApp(),
     ),
   );
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({Key? key}) : super(key: key);
+
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: strings['appTitle'],
+      title: strings['appTitle']!,
       theme: ThemeData(
         primarySwatch: Colors.orange,
       ),
-      home: MyHomePage(title: strings['appTitle']),
+      home: MyHomePage(title: strings['appTitle']!),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
-
+  const MyHomePage({Key? key, required this.title}) : super(key: key);
   final String title;
 
   @override
@@ -54,16 +58,17 @@ class MyHomePage extends StatefulWidget {
 }
 
 class ListItem extends StatelessWidget {
-  ListItem(
-      {Key key,
-      this.symbol,
-      this.title,
-      this.number,
-      this.index,
-      this.onRemoved,
-      this.onTap})
-      : super(key: key);
+  const ListItem(
+      {required this.itemKey,
+      required this.symbol,
+      required this.title,
+      required this.number,
+      required this.index,
+      required this.onRemoved,
+      required this.onTap})
+      : super(key: itemKey);
 
+  final Key itemKey;
   final String symbol;
   final String title;
   final String number;
@@ -74,7 +79,7 @@ class ListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Dismissible(
-      key: key,
+      key: itemKey,
       onDismissed: (direction) {
         onRemoved();
       },
@@ -85,9 +90,9 @@ class ListItem extends StatelessWidget {
         ),
         title: Text(title),
         trailing: Padding(
-          padding: EdgeInsets.only(right: kIsWeb ? 24 : 0),
+          padding: const EdgeInsets.only(right: kIsWeb ? 24 : 0),
           child: number == '?'
-              ? Icon(Icons.report)
+              ? const Icon(Icons.report)
               : Text(
                   number,
                   style: Theme.of(context).textTheme.caption,
@@ -146,7 +151,7 @@ class _MyHomePageState extends State<MyHomePage> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-          title: Text(strings['enterText']),
+          title: Text(strings['enterText']!),
           content: TextField(
             controller: controller,
             keyboardType: TextInputType.multiline,
@@ -155,13 +160,13 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
           actions: [
             TextButton(
-              child: Text(strings['cancel']),
+              child: Text(strings['cancel']!),
               onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
             TextButton(
-              child: Text(strings['ok']),
+              child: Text(strings['ok']!),
               onPressed: () {
                 if (controller.text.isEmpty) {
                   return;
@@ -180,13 +185,13 @@ class _MyHomePageState extends State<MyHomePage> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-          title: Text(strings['newVersionAvailable']),
-          content: Text(strings['newVersionDescription']
+          title: Text(strings['newVersionAvailable']!),
+          content: Text(strings['newVersionDescription']!
               .replaceFirst("{latestVersion}", latestVersion)
               .replaceFirst("{yourVersion}", yourVersion)),
           actions: [
             TextButton(
-              child: Text(strings['skipVersion']),
+              child: Text(strings['skipVersion']!),
               onPressed: () async {
                 SharedPreferences prefs = await SharedPreferences.getInstance();
                 prefs.setString("skippedVersion", latestVersion);
@@ -194,13 +199,13 @@ class _MyHomePageState extends State<MyHomePage> {
               },
             ),
             TextButton(
-              child: Text(strings['notNow']),
+              child: Text(strings['notNow']!),
               onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
             TextButton(
-              child: Text(strings['download']),
+              child: Text(strings['download']!),
               onPressed: () {
                 launch(appDownloadUrl);
                 Navigator.of(context).pop();
@@ -217,8 +222,8 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text(widget.title),
         actions: [
           IconButton(
-            icon: Icon(Icons.search),
-            tooltip: strings['searchSongs'],
+            icon: const Icon(Icons.search),
+            tooltip: strings['searchSongs']!,
             onPressed: () {
               Navigator.push(
                 context,
@@ -229,8 +234,8 @@ class _MyHomePageState extends State<MyHomePage> {
             },
           ),
           IconButton(
-            icon: Icon(Icons.assignment_outlined),
-            tooltip: strings['editAsText'],
+            icon: const Icon(Icons.assignment_outlined),
+            tooltip: strings['editAsText']!,
             onPressed: () {
               Navigator.push(
                 context,
@@ -242,7 +247,7 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
           Consumer<SlidesModel>(
               builder: (context, state, child) => PopupMenuButton<String>(
-                  tooltip: strings['menu'],
+                  tooltip: strings['menu']!,
                   onSelected: (choice) async {
                     switch (choice) {
                       case 'ADD_LITURGY':
@@ -296,40 +301,40 @@ class _MyHomePageState extends State<MyHomePage> {
                     return [
                       state.hasLiturgy()
                           ? PopupMenuItem(
-                              child: Text(strings['removeLiturgy']),
+                              child: Text(strings['removeLiturgy']!),
                               value: 'REMOVE_LITURGY',
                             )
                           : PopupMenuItem(
-                              child: Text(strings['addLiturgy']),
+                              child: Text(strings['addLiturgy']!),
                               value: 'ADD_LITURGY',
                             ),
                       state.hasOrdinary()
                           ? PopupMenuItem(
-                              child: Text(strings['removeOrdinary']),
+                              child: Text(strings['removeOrdinary']!),
                               value: 'REMOVE_ORDINARY',
                             )
                           : PopupMenuItem(
-                              child: Text(strings['addOrdinary']),
+                              child: Text(strings['addOrdinary']!),
                               value: 'ADD_ORDINARY',
                             ),
                       PopupMenuItem(
-                        child: Text(strings['addText']),
+                        child: Text(strings['addText']!),
                         value: 'ADD_TEXT',
                       ),
                       PopupMenuItem(
-                        child: Text(strings['changeDate']),
+                        child: Text(strings['changeDate']!),
                         value: 'CHANGE_DATE',
                       ),
                       PopupMenuItem(
-                        child: Text(strings['manual']),
+                        child: Text(strings['manual']!),
                         value: 'OPEN_MANUAL',
                       ),
                       PopupMenuItem(
-                        child: Text(strings['reloadLyrics']),
+                        child: Text(strings['reloadLyrics']!),
                         value: 'RELOAD_LYRICS',
                       ),
                       CheckedPopupMenuItem(
-                        child: Text(strings['hints']),
+                        child: Text(strings['hints']!),
                         checked: state.hints,
                         value: 'TOGGLE_HINTS',
                       ),
@@ -337,10 +342,10 @@ class _MyHomePageState extends State<MyHomePage> {
                   })),
         ],
         bottom: PreferredSize(
-          preferredSize: Size(double.infinity, 1.0),
+          preferredSize: const Size(double.infinity, 1.0),
           child: Opacity(
             opacity: _isWorking ? 1 : 0,
-            child: LinearProgressIndicator(
+            child: const LinearProgressIndicator(
               value: null,
             ),
           ),
@@ -354,14 +359,14 @@ class _MyHomePageState extends State<MyHomePage> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Padding(
-                  padding: EdgeInsets.all(8),
+                  padding: const EdgeInsets.all(8),
                   child: Text(
-                    strings['emptyTitle'],
+                    strings['emptyTitle']!,
                     style: Theme.of(context).textTheme.headline6,
                   ),
                 ),
                 Text(
-                  strings['emptyDescription'],
+                  strings['emptyDescription']!,
                   textAlign: TextAlign.center,
                 ),
               ],
@@ -373,7 +378,7 @@ class _MyHomePageState extends State<MyHomePage> {
           itemBuilder: (BuildContext context, int index) {
             final song = state.items[index];
             return ListItem(
-              key: ValueKey(song.id),
+              itemKey: ValueKey(song.id),
               symbol: "${index + 1}",
               title: song.title,
               number: song.number,
@@ -383,7 +388,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 final snackBar = SnackBar(
                   content: Text(song.removedMessage),
                   action: SnackBarAction(
-                    label: strings['undo'],
+                    label: strings['undo']!,
                     onPressed: state.undoRemoveItem,
                   ),
                 );
@@ -431,8 +436,8 @@ class _MyHomePageState extends State<MyHomePage> {
             foregroundColor: _isWorking
                 ? Colors.white
                 : Theme.of(context).colorScheme.onSecondary,
-            tooltip: strings['generateSlides'],
-            child: Icon(Icons.slideshow_rounded),
+            tooltip: strings['generateSlides']!,
+            child: const Icon(Icons.slideshow_rounded),
           ),
         ),
       ),

@@ -6,7 +6,8 @@ import './model.dart';
 import './api.dart';
 
 class SearchPage extends StatefulWidget {
-  SearchPage({Key key, this.initialQuery, this.replaceIndex}) : super(key: key);
+  const SearchPage({Key? key, this.initialQuery = "", this.replaceIndex = -1})
+      : super(key: key);
 
   final String initialQuery;
   final int replaceIndex;
@@ -19,20 +20,25 @@ class SearchPage extends StatefulWidget {
 }
 
 class SearchListItem extends StatelessWidget {
-  SearchListItem({this.id, this.title, this.number, this.isChecked, this.onTap})
+  SearchListItem(
+      {required this.id,
+      required this.title,
+      this.number = "",
+      this.isChecked = false,
+      this.onTap})
       : super(key: ValueKey(id));
 
   final String id;
   final String title;
   final String number;
   final bool isChecked;
-  final Function onTap;
+  final Function()? onTap;
 
   @override
   Widget build(BuildContext context) {
     return ListTile(
       title: Text(title),
-      leading: this.isChecked ? Icon(Icons.check) : Icon(null),
+      leading: isChecked ? const Icon(Icons.check) : const Icon(null),
       trailing: Text(
         number,
         style: Theme.of(context).textTheme.caption,
@@ -60,26 +66,23 @@ slugify(String text) {
 }
 
 class _SearchPageState extends State<SearchPage> {
-  _SearchPageState({String query, int replaceIndex}) {
-    _query = query ?? "";
-    _replaceIndex = replaceIndex ?? -1;
-  }
+  _SearchPageState({this.query = "", this.replaceIndex = -1});
 
   TextEditingController controller = TextEditingController();
-  String _query;
+  String query;
   List<Song> _prefilteredItems = [];
   List<Song> _items = [];
   bool _isLoading = false;
   bool _isQueryValid = false;
-  int _replaceIndex;
+  int replaceIndex;
 
   @override
   void initState() {
     super.initState();
 
-    controller.text = _query;
-    if (_query.isNotEmpty) {
-      updateQuery(_query, forceUpdate: true);
+    controller.text = query;
+    if (query.isNotEmpty) {
+      updateQuery(query, forceUpdate: true);
     }
   }
 
@@ -89,11 +92,11 @@ class _SearchPageState extends State<SearchPage> {
     });
   }
 
-  void updateQuery(String query, {bool forceUpdate = false}) async {
-    final previousQuery = _query;
+  void updateQuery(String newQuery, {bool forceUpdate = false}) async {
+    final previousQuery = query;
     setState(() {
-      _query = query;
-      _isQueryValid = _query.length >= queryPrefixLength;
+      query = newQuery;
+      _isQueryValid = query.length >= queryPrefixLength;
     });
 
     if (!_isQueryValid) {
@@ -101,16 +104,16 @@ class _SearchPageState extends State<SearchPage> {
     }
 
     final queryPrefixChanged = previousQuery.length < queryPrefixLength ||
-        query.substring(0, queryPrefixLength) !=
+        newQuery.substring(0, queryPrefixLength) !=
             previousQuery.substring(0, queryPrefixLength);
 
-    final querySlug = slugify(query);
+    final querySlug = slugify(newQuery);
 
     if (forceUpdate || (queryPrefixChanged && !_isLoading)) {
       setIsLoading(true);
       try {
         _prefilteredItems =
-            await getSongs(_query.substring(0, queryPrefixLength));
+            await getSongs(query.substring(0, queryPrefixLength));
       } finally {
         setIsLoading(false);
       }
@@ -125,7 +128,7 @@ class _SearchPageState extends State<SearchPage> {
 
   void resetQuery() {
     setState(() {
-      _query = "";
+      query = "";
       _prefilteredItems = [];
       _items = [];
     });
@@ -140,23 +143,23 @@ class _SearchPageState extends State<SearchPage> {
             controller: controller,
             autofocus: true,
             decoration: InputDecoration(
-              hintText: strings['searchSongs'],
+              hintText: strings['searchSongs']!,
               border: InputBorder.none,
             ),
-            style: TextStyle(fontSize: 16.0),
+            style: const TextStyle(fontSize: 16.0),
             onChanged: updateQuery,
           ),
           actions: [
             IconButton(
-              icon: Icon(Icons.clear),
+              icon: const Icon(Icons.clear),
               onPressed: resetQuery,
             ),
           ],
           bottom: PreferredSize(
-            preferredSize: Size(double.infinity, 1.0),
+            preferredSize: const Size(double.infinity, 1.0),
             child: Opacity(
               opacity: _isLoading ? 1 : 0,
-              child: LinearProgressIndicator(
+              child: const LinearProgressIndicator(
                 value: null,
               ),
             ),
@@ -167,7 +170,7 @@ class _SearchPageState extends State<SearchPage> {
             if (!_isQueryValid) {
               return Center(
                 child: Text(
-                  strings['searchStartTyping'],
+                  strings['searchStartTyping']!,
                   style: Theme.of(context).textTheme.caption,
                 ),
               );
@@ -175,7 +178,7 @@ class _SearchPageState extends State<SearchPage> {
             if (!_isLoading && _items.isEmpty) {
               return Center(
                 child: Text(
-                  strings['searchNoResults'],
+                  strings['searchNoResults']!,
                   style: Theme.of(context).textTheme.caption,
                 ),
               );
@@ -192,8 +195,8 @@ class _SearchPageState extends State<SearchPage> {
                   isChecked: isAdded,
                   onTap: () {
                     if (!isAdded) {
-                      if (_replaceIndex > -1) {
-                        state.replaceItem(_replaceIndex, SongDeckItem(song));
+                      if (replaceIndex > -1) {
+                        state.replaceItem(replaceIndex, SongDeckItem(song));
                         Navigator.pop(context);
                       } else {
                         state.addItem(SongDeckItem(song));
