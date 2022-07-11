@@ -295,6 +295,9 @@ class _MyHomePageState extends State<MyHomePage> {
                       case 'TOGGLE_HINTS':
                         state.toggleHints();
                         break;
+                      case 'SWITCH_RATIO':
+                        state.setRatio(state.ratio == '4:3' ? '16:9' : '4:3');
+                        break;
                     }
                   },
                   itemBuilder: (BuildContext context) {
@@ -337,6 +340,10 @@ class _MyHomePageState extends State<MyHomePage> {
                         child: Text(strings['hints']!),
                         checked: state.hints,
                         value: 'TOGGLE_HINTS',
+                      ),
+                      PopupMenuItem(
+                        child: Text("Proporcje slajdów: ${state.ratio}"),
+                        value: 'SWITCH_RATIO',
                       ),
                     ];
                   })),

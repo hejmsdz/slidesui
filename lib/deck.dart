@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
+import 'package:slidesui/model.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:path_provider/path_provider.dart';
 import './state.dart';
@@ -67,7 +68,13 @@ createDeck(BuildContext context) async {
     await Permission.storage.request();
   }
   final state = Provider.of<SlidesModel>(context, listen: false);
-  final url = Uri.parse(await postDeck(state.date, state.items, state.hints));
+  final deckRequest = DeckRequest(
+    date: state.date,
+    items: state.items,
+    hints: state.hints,
+    ratio: state.ratio,
+  );
+  final url = Uri.parse(await postDeck(deckRequest));
 
   if (!kIsWeb && Platform.isAndroid && await Permission.storage.isGranted) {
     final destination = await getDownloadDirectory();

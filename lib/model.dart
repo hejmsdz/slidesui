@@ -160,13 +160,20 @@ class DeckRequest {
   final DateTime date;
   final List<DeckItem> items;
   final bool hints;
+  final String ratio;
 
-  DeckRequest(this.date, this.items, this.hints);
+  DeckRequest({
+    required this.date,
+    required this.items,
+    required this.hints,
+    this.ratio = "4:3",
+  });
 
   Map<String, dynamic> toJson() => {
         'date': date.toIso8601String().substring(0, 10),
         'items': items.map((item) => item.toJson()).toList(),
         'hints': hints,
+        'ratio': ratio,
       };
 }
 
