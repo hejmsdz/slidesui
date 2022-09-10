@@ -17,8 +17,7 @@ Future<List<Song>> getSongs(String query) async {
     throw ApiError();
   }
 
-  final body = const Utf8Decoder().convert(response.body.codeUnits);
-  final json = jsonDecode(body) as List;
+  final json = jsonDecode(response.body) as List;
 
   return json.map((itemJson) => Song.fromJson(itemJson)).toList();
 }
@@ -31,8 +30,7 @@ Future<String> postDeck(deckRequest) async {
     },
     body: jsonEncode(deckRequest),
   );
-  final body = const Utf8Decoder().convert(response.body.codeUnits);
-  final deckResponse = DeckResponse.fromJson(jsonDecode(body));
+  final deckResponse = DeckResponse.fromJson(jsonDecode(response.body));
 
   return deckResponse.url;
 }
@@ -44,8 +42,7 @@ Future<Manual> getManual() async {
     throw ApiError();
   }
 
-  final body = const Utf8Decoder().convert(response.body.codeUnits);
-  return Manual.fromJson(jsonDecode(body));
+  return Manual.fromJson(jsonDecode(response.body));
 }
 
 Future<BootstrapResponse> getBootstrap() async {
@@ -55,8 +52,7 @@ Future<BootstrapResponse> getBootstrap() async {
     throw ApiError();
   }
 
-  final body = const Utf8Decoder().convert(response.body.codeUnits);
-  return BootstrapResponse.fromJson(jsonDecode(body));
+  return BootstrapResponse.fromJson(jsonDecode(response.body));
 }
 
 Future<void> postReload() async {
