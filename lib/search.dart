@@ -62,7 +62,7 @@ slugify(String text) {
       .replaceAll('ś', 's')
       .replaceAll('ź', 'z')
       .replaceAll('ż', 'z')
-      .replaceAll(RegExp('[^a-zA-Z0-9\. ]+'), '');
+      .replaceAll(RegExp('[^a-zA-Z0-9\\. ]+'), '');
 }
 
 class _SearchPageState extends State<SearchPage> {
@@ -107,8 +107,6 @@ class _SearchPageState extends State<SearchPage> {
         newQuery.substring(0, queryPrefixLength) !=
             previousQuery.substring(0, queryPrefixLength);
 
-    final querySlug = slugify(newQuery);
-
     if (forceUpdate || (queryPrefixChanged && !_isLoading)) {
       setIsLoading(true);
       try {
@@ -118,6 +116,8 @@ class _SearchPageState extends State<SearchPage> {
         setIsLoading(false);
       }
     }
+
+    final querySlug = slugify(query);
 
     setState(() {
       _items = _prefilteredItems
