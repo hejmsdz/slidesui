@@ -7,6 +7,10 @@ class Song {
   final String slug;
   final bool isOrdinary;
 
+  List<String> get titleParts => title.split(" / ");
+  String get mainTitle => titleParts[0];
+  String? get subtitle => titleParts.length > 1 ? titleParts[1] : null;
+
   Song(this.id, this.title, this.number, this.slug, [this.isOrdinary = false]);
 
   Song.fromJson(Map<String, dynamic> json)
@@ -37,6 +41,7 @@ abstract class OrdinaryItems {
 abstract class DeckItem {
   String get id;
   String get title;
+  String? get subtitle;
   String get number;
 
   String get removedMessage;
@@ -52,7 +57,9 @@ class SongDeckItem implements DeckItem {
   @override
   String get id => song.id;
   @override
-  String get title => song.title;
+  String get title => song.mainTitle;
+  @override
+  String? get subtitle => song.subtitle;
   @override
   String get number => song.number;
   bool get isOrdinary => song.isOrdinary;
@@ -75,6 +82,8 @@ class PsalmDeckItem extends LiturgyDeckItem {
   @override
   String get title => strings['psalm']!;
   @override
+  String? get subtitle => null;
+  @override
   String get number => '';
 
   @override
@@ -92,6 +101,8 @@ class AcclamationDeckItem extends LiturgyDeckItem {
   @override
   String get title => strings['acclamation']!;
   @override
+  String? get subtitle => null;
+  @override
   String get number => '';
 
   @override
@@ -108,6 +119,8 @@ class UnresolvedDeckItem implements DeckItem {
 
   @override
   String title;
+  @override
+  String get subtitle => '';
   @override
   String get id => title.hashCode.toString();
   @override
@@ -133,6 +146,8 @@ class TextDeckItem implements DeckItem {
   String get id => contents.hashCode.toString();
   @override
   String get title => getTitle();
+  @override
+  String get subtitle => '';
   @override
   String get number => '';
 

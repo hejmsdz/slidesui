@@ -65,6 +65,7 @@ class ListItem extends StatelessWidget {
       {required this.itemKey,
       required this.symbol,
       required this.title,
+      this.subtitle,
       required this.number,
       required this.index,
       required this.onRemoved,
@@ -74,6 +75,7 @@ class ListItem extends StatelessWidget {
   final Key itemKey;
   final String symbol;
   final String title;
+  final String? subtitle;
   final String number;
   final void Function() onRemoved;
   final void Function() onTap;
@@ -92,6 +94,7 @@ class ListItem extends StatelessWidget {
           child: Text(symbol),
         ),
         title: Text(title),
+        subtitle: subtitle == null ? null : Text(subtitle!),
         trailing: Padding(
           padding: const EdgeInsets.only(right: kIsWeb ? 24 : 0),
           child: number == '?'
@@ -386,6 +389,7 @@ class _MyHomePageState extends State<MyHomePage> {
               itemKey: ValueKey(song.id),
               symbol: "${index + 1}",
               title: song.title,
+              subtitle: song.subtitle,
               number: song.number,
               index: index,
               onRemoved: () {

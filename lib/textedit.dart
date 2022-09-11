@@ -42,7 +42,8 @@ class _TextEditPageState extends State<TextEditPage> {
           : " [${item.number}]";
       final text = item is TextDeckItem
           ? "$TEXT_ITEM_DELIMITER${item.contents}$TEXT_ITEM_DELIMITER"
-          : item.title;
+          : item.title +
+              (item.subtitle == null ? '' : (' / ' + item.subtitle!));
       return "${index + 1}. $text$numberSuffix";
     }).join("\n");
   }

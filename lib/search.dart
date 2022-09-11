@@ -23,6 +23,7 @@ class SearchListItem extends StatelessWidget {
   SearchListItem(
       {required this.id,
       required this.title,
+      this.subtitle,
       this.number = "",
       this.isChecked = false,
       this.onTap})
@@ -30,6 +31,7 @@ class SearchListItem extends StatelessWidget {
 
   final String id;
   final String title;
+  final String? subtitle;
   final String number;
   final bool isChecked;
   final Function()? onTap;
@@ -38,6 +40,7 @@ class SearchListItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       title: Text(title),
+      subtitle: subtitle == null ? null : Text(subtitle!),
       leading: isChecked ? const Icon(Icons.check) : const Icon(null),
       trailing: Text(
         number,
@@ -191,6 +194,7 @@ class _SearchPageState extends State<SearchPage> {
                 return SearchListItem(
                   id: song.id,
                   title: song.title,
+                  subtitle: song.subtitle,
                   number: song.number,
                   isChecked: isAdded,
                   onTap: () {
