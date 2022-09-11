@@ -5,6 +5,7 @@ import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_settings_screens/flutter_settings_screens.dart';
 import './model.dart';
 import './api.dart';
 import './persistence.dart';
@@ -14,6 +15,7 @@ import './deck.dart';
 import './search.dart';
 import './textedit.dart';
 import './manual.dart';
+import './settings.dart';
 
 void downloaderCallback(String id, DownloadTaskStatus status, int progress) {}
 
@@ -24,6 +26,7 @@ void main() async {
     FlutterDownloader.registerCallback(downloaderCallback);
   }
   final state = await loadSavedState();
+  await Settings.init();
   saveStateChanges(state);
   runApp(
     ChangeNotifierProvider(
@@ -284,19 +287,19 @@ class _MyHomePageState extends State<MyHomePage> {
                       case 'OPEN_MANUAL':
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) {
-                            return ManualPage();
-                          }),
+                          MaterialPageRoute(
+                              builder: (context) => const ManualPage()),
                         );
                         break;
                       case 'RELOAD_LYRICS':
                         reloadLyrics();
                         break;
-                      case 'TOGGLE_HINTS':
-                        state.toggleHints();
-                        break;
-                      case 'SWITCH_RATIO':
-                        state.setRatio(state.ratio == '4:3' ? '16:9' : '4:3');
+                      case 'OPEN_SETTINGS':
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const SettingsPage()),
+                        );
                         break;
                     }
                   },
@@ -336,14 +339,9 @@ class _MyHomePageState extends State<MyHomePage> {
                         child: Text(strings['reloadLyrics']!),
                         value: 'RELOAD_LYRICS',
                       ),
-                      CheckedPopupMenuItem(
-                        child: Text(strings['hints']!),
-                        checked: state.hints,
-                        value: 'TOGGLE_HINTS',
-                      ),
                       PopupMenuItem(
-                        child: Text("Proporcje slajdów: ${state.ratio}"),
-                        value: 'SWITCH_RATIO',
+                        child: Text(strings['settings']!),
+                        value: 'OPEN_SETTINGS',
                       ),
                     ];
                   })),

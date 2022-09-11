@@ -11,7 +11,6 @@ const strings = {
   'cancel': 'ANULUJ',
   'ok': 'OK',
   'changeDate': 'Zmień datę',
-  'hints': 'Podpowiedzi',
   'emptyTitle': 'Nic tu jeszcze nie ma!',
   'emptyDescription':
       'Aby dodać slajdy, użyj wyszukiwarki\nlub wklej plan jako tekst.',
@@ -45,4 +44,11 @@ const strings = {
   'download': 'POBIERZ',
   'notNow': 'PÓŹNIEJ',
   'skipVersion': 'POMIŃ',
+  'settings': 'Ustawienia',
+  'settingsSectionSlides': 'Slajdy',
+  'hints': 'Podpowiedzi',
+  'enabled': 'Włączone',
+  'disabled': 'Wyłączone',
+  'fontSize': 'Rozmiar tekstu',
+  'aspectRatio': 'Proporcje slajdów',
 };

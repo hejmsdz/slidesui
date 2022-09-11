@@ -8,6 +8,7 @@ import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:slidesui/model.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:flutter_settings_screens/flutter_settings_screens.dart';
 import './state.dart';
 import './strings.dart';
 import './api.dart';
@@ -71,8 +72,9 @@ createDeck(BuildContext context) async {
   final deckRequest = DeckRequest(
     date: state.date,
     items: state.items,
-    hints: state.hints,
-    ratio: state.ratio,
+    hints: Settings.getValue<bool>('slides.hints'),
+    ratio: Settings.getValue<String>('slides.aspectRatio'),
+    fontSize: Settings.getValue<int>('slides.fontSize'),
   );
   final url = Uri.parse(await postDeck(deckRequest));
 

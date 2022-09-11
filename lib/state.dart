@@ -49,19 +49,13 @@ class SlidesModel extends ChangeNotifier {
   List<DeckItem> _items = [];
   DeckItem? _lastRemovedItem;
   int? _lastRemovedIndex;
-  bool _hints = true;
-  String _ratio = "4:3";
 
   UnmodifiableListView<DeckItem> get items => UnmodifiableListView(_items);
   DateTime get date => _date;
-  bool get hints => _hints;
-  String get ratio => _ratio;
 
   Map<String, dynamic> toJson() => {
         'date': _date.toIso8601String().substring(0, 10),
         'items': _items.map((item) => item.toFullJson()).toList(),
-        'hints': _hints,
-        'ratio': _ratio,
       };
 
   SlidesModel.fromJson(Map<String, dynamic> json) {
@@ -85,8 +79,6 @@ class SlidesModel extends ChangeNotifier {
         })
         .where((item) => item != null)
         .toList() as List<DeckItem>;
-
-    _hints = json['hints'] ?? true;
   }
 
   addItem(DeckItem item) {
@@ -196,16 +188,6 @@ class SlidesModel extends ChangeNotifier {
 
   setDate(DateTime date) {
     _date = date;
-    notifyListeners();
-  }
-
-  toggleHints() {
-    _hints = !_hints;
-    notifyListeners();
-  }
-
-  setRatio(String ratio) {
-    _ratio = ratio;
     notifyListeners();
   }
 

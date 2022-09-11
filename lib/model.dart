@@ -159,14 +159,16 @@ class TextDeckItem implements DeckItem {
 class DeckRequest {
   final DateTime date;
   final List<DeckItem> items;
-  final bool hints;
-  final String ratio;
+  final bool? hints;
+  final String? ratio;
+  final int? fontSize;
 
   DeckRequest({
     required this.date,
     required this.items,
-    required this.hints,
-    this.ratio = "4:3",
+    this.hints,
+    this.ratio,
+    this.fontSize,
   });
 
   Map<String, dynamic> toJson() => {
@@ -174,6 +176,7 @@ class DeckRequest {
         'items': items.map((item) => item.toJson()).toList(),
         'hints': hints,
         'ratio': ratio,
+        'fontSize': fontSize,
       };
 }
 
