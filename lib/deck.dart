@@ -74,7 +74,7 @@ createDeck(BuildContext context) async {
     items: state.items,
     hints: Settings.getValue<bool>('slides.hints'),
     ratio: Settings.getValue<String>('slides.aspectRatio'),
-    fontSize: Settings.getValue<int>('slides.fontSize'),
+    fontSize: Settings.getValue<double>('slides.fontSize')?.toInt(),
   );
   final url = Uri.parse(await postDeck(deckRequest));
 
