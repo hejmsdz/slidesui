@@ -3,19 +3,18 @@ import './strings.dart';
 class Song {
   final String id;
   final String title;
+  final String? subtitle;
   final String number;
   final String slug;
   final bool isOrdinary;
 
-  List<String> get titleParts => title.split(" / ");
-  String get mainTitle => titleParts[0];
-  String? get subtitle => titleParts.length > 1 ? titleParts[1] : null;
-
-  Song(this.id, this.title, this.number, this.slug, [this.isOrdinary = false]);
+  Song(this.id, this.title, this.subtitle, this.number, this.slug,
+      [this.isOrdinary = false]);
 
   Song.fromJson(Map<String, dynamic> json)
       : id = json['id'],
         title = json['title'],
+        subtitle = json['subtitle'],
         number = json['number'],
         slug = json['slug'],
         isOrdinary = json['isOrdinary'] ?? false;
@@ -23,6 +22,7 @@ class Song {
   Map<String, dynamic> toJson() => {
         'id': id,
         'title': title,
+        'subtitle': title,
         'number': number,
         'slug': slug,
         'isOrdinary': isOrdinary,
@@ -30,12 +30,12 @@ class Song {
 }
 
 abstract class OrdinaryItems {
-  static Song kyrie = Song(
-      'f29bb232-be0c-4998-9142-5524c38ec9d7', 'Kyrie eleison', '', '', true);
-  static Song sanctus =
-      Song('bf218c0a-ac22-4049-85d0-6072b2830f15', 'Sanctus', '', '', true);
-  static Song agnus =
-      Song('548120f1-604c-4386-ae89-f9737aac7ae4', 'Agnus Dei', '', '', true);
+  static Song kyrie = Song('f29bb232-be0c-4998-9142-5524c38ec9d7',
+      'Kyrie eleison', null, '', '', true);
+  static Song sanctus = Song(
+      'bf218c0a-ac22-4049-85d0-6072b2830f15', 'Sanctus', null, '', '', true);
+  static Song agnus = Song(
+      '548120f1-604c-4386-ae89-f9737aac7ae4', 'Agnus Dei', null, '', '', true);
 }
 
 abstract class DeckItem {
@@ -57,7 +57,7 @@ class SongDeckItem implements DeckItem {
   @override
   String get id => song.id;
   @override
-  String get title => song.mainTitle;
+  String get title => song.title;
   @override
   String? get subtitle => song.subtitle;
   @override
