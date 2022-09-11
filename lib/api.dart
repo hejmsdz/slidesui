@@ -58,3 +58,14 @@ Future<BootstrapResponse> getBootstrap() async {
 Future<void> postReload() async {
   await http.post(apiURL('v2/reload'));
 }
+
+Future<Liturgy> getLiturgy(DateTime date) async {
+  final dateString = date.toIso8601String().substring(0, 10);
+  final response = await http.get(apiURL("v2/liturgy/$dateString"));
+
+  if (response.statusCode != 200) {
+    throw ApiError();
+  }
+
+  return Liturgy.fromJson(jsonDecode(response.body));
+}

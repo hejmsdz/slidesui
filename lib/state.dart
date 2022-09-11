@@ -1,6 +1,8 @@
 import 'dart:collection';
 import 'dart:math';
 import 'package:flutter/material.dart';
+
+import './api.dart';
 import './model.dart';
 
 DateTime nextWeekday(int weekday, DateTime date, [int lastestHour = 24]) {
@@ -41,8 +43,10 @@ DateTime nextMassDay() {
   return nextSunday;
 }
 
-class SlidesModel extends ChangeNotifier {
-  SlidesModel();
+class SlidesModel extends ChangeNotifier implements LiturgyHolder {
+  SlidesModel() {
+    updateLiturgy();
+  }
 
   DateTime _date = nextMassDay();
 
@@ -52,6 +56,8 @@ class SlidesModel extends ChangeNotifier {
 
   UnmodifiableListView<DeckItem> get items => UnmodifiableListView(_items);
   DateTime get date => _date;
+
+  Liturgy? liturgy;
 
   Map<String, dynamic> toJson() => {
         'date': _date.toIso8601String().substring(0, 10),
@@ -68,9 +74,9 @@ class SlidesModel extends ChangeNotifier {
             case 'SONG':
               return SongDeckItem(Song.fromJson(itemJson));
             case 'PSALM':
-              return PsalmDeckItem();
+              return PsalmDeckItem(this);
             case 'ACCLAMATION':
-              return AcclamationDeckItem();
+              return AcclamationDeckItem(this);
             case 'TEXT':
               return TextDeckItem(itemJson['contents']);
             default:
@@ -139,7 +145,7 @@ class SlidesModel extends ChangeNotifier {
       _items.length,
       kyrieIndex >= 0 ? kyrieIndex + 1 : 1,
     );
-    _items.insertAll(index, [PsalmDeckItem(), AcclamationDeckItem()]);
+    _items.insertAll(index, [PsalmDeckItem(this), AcclamationDeckItem(this)]);
     notifyListeners();
   }
 
@@ -188,6 +194,12 @@ class SlidesModel extends ChangeNotifier {
 
   setDate(DateTime date) {
     _date = date;
+    updateLiturgy();
+    notifyListeners();
+  }
+
+  updateLiturgy() async {
+    liturgy = await getLiturgy(date);
     notifyListeners();
   }
 

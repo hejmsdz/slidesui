@@ -93,8 +93,10 @@ class ListItem extends StatelessWidget {
         leading: CircleAvatar(
           child: Text(symbol),
         ),
-        title: Text(title),
-        subtitle: subtitle == null ? null : Text(subtitle!),
+        title: Text(title, overflow: TextOverflow.ellipsis),
+        subtitle: subtitle == null
+            ? null
+            : Text(subtitle!, overflow: TextOverflow.ellipsis),
         trailing: Padding(
           padding: const EdgeInsets.only(right: kIsWeb ? 24 : 0),
           child: number == '?'

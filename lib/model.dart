@@ -74,15 +74,26 @@ class SongDeckItem implements DeckItem {
   Map<String, dynamic> toFullJson() => {'type': 'SONG'}..addAll(song.toJson());
 }
 
-abstract class LiturgyDeckItem implements DeckItem {}
+abstract class LiturgyHolder {
+  Liturgy? liturgy;
+}
+
+abstract class LiturgyDeckItem implements DeckItem {
+  LiturgyDeckItem(this.state);
+
+  LiturgyHolder state;
+  Liturgy? get liturgy => state.liturgy;
+}
 
 class PsalmDeckItem extends LiturgyDeckItem {
+  PsalmDeckItem(state) : super(state);
+
   @override
   String get id => 'PSALM';
   @override
   String get title => strings['psalm']!;
   @override
-  String? get subtitle => null;
+  String? get subtitle => liturgy?.psalm;
   @override
   String get number => '';
 
@@ -96,12 +107,16 @@ class PsalmDeckItem extends LiturgyDeckItem {
 }
 
 class AcclamationDeckItem extends LiturgyDeckItem {
+  AcclamationDeckItem(state) : super(state);
+
   @override
   String get id => 'ACCLAMATION';
   @override
-  String get title => strings['acclamation']!;
+  String get title =>
+      liturgy?.acclamation.replaceFirst(", alleluja, alleluja", "") ??
+      strings['acclamation']!;
   @override
-  String? get subtitle => null;
+  String? get subtitle => liturgy?.acclamationVerse.replaceAll("\n", " ");
   @override
   String get number => '';
 
@@ -223,4 +238,17 @@ class BootstrapResponse {
   BootstrapResponse.fromJson(Map<String, dynamic> json)
       : currentVersion = json['currentVersion'],
         appDownloadUrl = json['appDownloadUrl'];
+}
+
+class Liturgy {
+  final String psalm;
+  final String acclamation;
+  final String acclamationVerse;
+
+  Liturgy(this.psalm, this.acclamation, this.acclamationVerse);
+
+  Liturgy.fromJson(Map<String, dynamic> json)
+      : psalm = json['psalm'],
+        acclamation = json['acclamation'],
+        acclamationVerse = json['acclamationVerse'];
 }

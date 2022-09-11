@@ -156,6 +156,7 @@ class _TextEditPageState extends State<TextEditPage> {
 
   Future<DeckItem?> createDeckItem(
       String title, Map<String, DeckItem> currentTitles) async {
+    final state = Provider.of<SlidesModel>(context, listen: false);
     if (title.isEmpty) {
       return null;
     }
@@ -164,10 +165,10 @@ class _TextEditPageState extends State<TextEditPage> {
       return currentTitles[titleNormalized];
     }
     if (titleNormalized == strings['psalm']!.toLowerCase()) {
-      return PsalmDeckItem();
+      return PsalmDeckItem(state);
     }
     if (titleNormalized == strings['acclamation']!.toLowerCase()) {
-      return AcclamationDeckItem();
+      return AcclamationDeckItem(state);
     }
     final songs = await getSongs(titleNormalized);
     if (songs.length == 1) {
