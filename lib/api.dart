@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import './model.dart';
 
-const rootURL = 'slajdyrocha.onrender.com';
+const rootURL = 'slajdy.swro.ch';
 
 class ApiError implements Exception {}
 
