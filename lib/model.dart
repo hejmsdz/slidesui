@@ -30,12 +30,12 @@ class Song {
 }
 
 abstract class OrdinaryItems {
-  static Song kyrie = Song('f29bb232-be0c-4998-9142-5524c38ec9d7',
-      'Kyrie eleison', null, '', '', true);
-  static Song sanctus = Song(
-      'bf218c0a-ac22-4049-85d0-6072b2830f15', 'Sanctus', null, '', '', true);
-  static Song agnus = Song(
-      '548120f1-604c-4386-ae89-f9737aac7ae4', 'Agnus Dei', null, '', '', true);
+  static Song kyrie = Song(
+      'a583dc8a31c94d2f9f5272ec7fa46710', 'Kyrie eleison', null, '', '', true);
+  static Song sanctus =
+      Song('a48d891417ee457aaa32218834128eab', 'Sanctus', null, '', '', true);
+  static Song agnus =
+      Song('46d9557071eb45e5bd325c981d46bb09', 'Agnus Dei', null, '', '', true);
 }
 
 abstract class DeckItem {
@@ -89,7 +89,7 @@ class SongDeckItem implements DeckItem {
       strings['itemRemovedSong']!.replaceFirst("{}", song.title);
 
   @override
-  Map<String, dynamic> toJson() => {'id': id};
+  Map<String, dynamic> toJson() => {'id': id, 'order': order};
   @override
   Map<String, dynamic> toFullJson() => {'type': 'SONG'}..addAll(song.toJson());
 }
