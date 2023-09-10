@@ -78,7 +78,7 @@ createDeck(BuildContext context) async {
   );
   final url = Uri.parse(await postDeck(deckRequest));
 
-  if (!kIsWeb && Platform.isAndroid && await Permission.storage.isGranted) {
+  if (Platform.isAndroid) {
     final destination = await getDownloadDirectory();
     final fileName = state.date.toIso8601String().substring(0, 10) + '.pdf';
     final taskId = await FlutterDownloader.enqueue(
