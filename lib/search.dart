@@ -44,7 +44,7 @@ class SearchListItem extends StatelessWidget {
       leading: isChecked ? const Icon(Icons.check) : const Icon(null),
       trailing: Text(
         number,
-        style: Theme.of(context).textTheme.caption,
+        style: Theme.of(context).textTheme.bodySmall,
       ),
       onTap: onTap,
     );
@@ -174,7 +174,7 @@ class _SearchPageState extends State<SearchPage> {
               return Center(
                 child: Text(
                   strings['searchStartTyping']!,
-                  style: Theme.of(context).textTheme.caption,
+                  style: Theme.of(context).textTheme.bodySmall,
                 ),
               );
             }
@@ -182,7 +182,7 @@ class _SearchPageState extends State<SearchPage> {
               return Center(
                 child: Text(
                   strings['searchNoResults']!,
-                  style: Theme.of(context).textTheme.caption,
+                  style: Theme.of(context).textTheme.bodySmall,
                 ),
               );
             }
