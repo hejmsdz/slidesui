@@ -24,11 +24,9 @@ class _VerseOrderPageState extends State<VerseOrderPage> {
     final state = Provider.of<SlidesModel>(context, listen: false);
     final item = state.items[itemIndex] as SongDeckItem;
 
-    if (item.rawVerses != null) {
-      return;
+    if (item.rawVerses == null) {
+      setIsLoading(true);
     }
-
-    setIsLoading(true);
 
     try {
       List<String> rawVerses = await getLyrics(item.id, raw: true);
@@ -39,8 +37,11 @@ class _VerseOrderPageState extends State<VerseOrderPage> {
                 .map((verse) => verse.replaceFirst(RegExp("//\\s+"), ""))
                 .toList());
 
-        state.setSelectedVerses(itemIndex,
-            rawVerses.map((verse) => !verse.startsWith("//")).toList());
+        if (item.selectedVerses == null ||
+            item.selectedVerses!.length != rawVerses.length) {
+          state.setSelectedVerses(itemIndex,
+              rawVerses.map((verse) => !verse.startsWith("//")).toList());
+        }
       });
     } finally {
       setIsLoading(false);
