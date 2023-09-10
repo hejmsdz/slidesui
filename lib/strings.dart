@@ -13,6 +13,7 @@ const strings = {
   'changeDate': 'Zmień datę',
   'remove': 'Usuń',
   'edit': 'Edytuj',
+  'verseOrder': 'Zwrotki',
   'emptyTitle': 'Nic tu jeszcze nie ma!',
   'emptyDescription':
       'Aby dodać slajdy, użyj wyszukiwarki\nlub wklej plan jako tekst.',

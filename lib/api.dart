@@ -22,6 +22,19 @@ Future<List<Song>> getSongs(String query) async {
   return json.map((itemJson) => Song.fromJson(itemJson)).toList();
 }
 
+Future<List<String>> getLyrics(String songId, {bool raw = false}) async {
+  final response =
+      await http.get(apiURL("v2/lyrics/$songId", {'raw': raw ? '1' : null}));
+
+  if (response.statusCode != 200) {
+    throw ApiError();
+  }
+
+  final json = jsonDecode(response.body) as List;
+
+  return json.map((itemJson) => itemJson.toString()).toList();
+}
+
 Future<String> postDeck(deckRequest) async {
   final response = await http.post(
     apiURL('v2/deck'),

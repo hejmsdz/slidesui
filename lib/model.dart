@@ -64,6 +64,26 @@ class SongDeckItem implements DeckItem {
   String get number => song.number;
   bool get isOrdinary => song.isOrdinary;
 
+  List<String>? rawVerses;
+  List<bool>? selectedVerses;
+
+  List<int>? get order {
+    if (selectedVerses == null) {
+      return null;
+    }
+
+    final _selectedVerses = selectedVerses!;
+    List<int> _order = [];
+
+    for (int i = 0; i < _selectedVerses.length; i++) {
+      if (_selectedVerses[i]) {
+        _order.add(i);
+      }
+    }
+
+    return _order;
+  }
+
   @override
   String get removedMessage =>
       strings['itemRemovedSong']!.replaceFirst("{}", song.title);

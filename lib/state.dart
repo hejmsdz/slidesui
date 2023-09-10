@@ -57,6 +57,7 @@ class SlidesModel extends ChangeNotifier implements LiturgyHolder {
   UnmodifiableListView<DeckItem> get items => UnmodifiableListView(_items);
   DateTime get date => _date;
 
+  @override
   Liturgy? liturgy;
 
   Map<String, dynamic> toJson() => {
@@ -200,6 +201,30 @@ class SlidesModel extends ChangeNotifier implements LiturgyHolder {
 
   updateLiturgy() async {
     liturgy = await getLiturgy(date);
+    notifyListeners();
+  }
+
+  setRawVerses(int index, List<String> verses) {
+    final item = _items[index];
+    if (item is SongDeckItem) {
+      item.rawVerses = verses;
+    }
+    notifyListeners();
+  }
+
+  setSelectedVerses(int index, List<bool> selectedVerses) {
+    final item = _items[index];
+    if (item is SongDeckItem) {
+      item.selectedVerses = selectedVerses;
+    }
+    notifyListeners();
+  }
+
+  updateSelectedVerses(int index, int verseIndex, bool value) {
+    final item = _items[index];
+    if (item is SongDeckItem) {
+      item.selectedVerses![verseIndex] = value;
+    }
     notifyListeners();
   }
 

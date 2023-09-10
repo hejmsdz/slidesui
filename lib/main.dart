@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:slidesui/verse_order.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_settings_screens/flutter_settings_screens.dart';
@@ -86,52 +87,60 @@ class ListItem extends StatelessWidget {
 
   edit(BuildContext context) {
     String id = itemKey.value.replaceAll('-', '');
-    Uri editUrl = Uri.parse("https://www.notion.so/${id}");
+    Uri editUrl = Uri.parse("https://www.notion.so/$id");
     launchUrl(editUrl);
-  }
-
-  doNothing(BuildContext context) {
   }
 
   @override
   Widget build(BuildContext context) {
-
     return Slidable(
       key: itemKey,
-      startActionPane: isSong ? ActionPane(
-        motion: const ScrollMotion(),
-        children: [
-          /*
-          SlidableAction(
-            onPressed: doNothing,
-            backgroundColor: Colors.green,
-            foregroundColor: Colors.white,
-            icon: Icons.reorder,
-            label: 'Kolejność',
-          ),
-          */
-          SlidableAction(
-            onPressed: edit,
-            backgroundColor: Colors.blue,
-            foregroundColor: Colors.white,
-            icon: Icons.edit,
-            label: strings['edit']!,
-          ),
-        ],
-      ) : null,
+      startActionPane: isSong
+          ? ActionPane(
+              motion: const ScrollMotion(),
+              children: [
+                SlidableAction(
+                  onPressed: (context) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) {
+                        return VerseOrderPage(
+                          itemIndex: index,
+                        );
+                      }),
+                    );
+                  },
+                  backgroundColor: Colors.green,
+                  foregroundColor: Colors.white,
+                  icon: Icons.reorder,
+                  label: strings['verseOrder']!,
+                ),
+                SlidableAction(
+                  onPressed: edit,
+                  backgroundColor: Colors.blue,
+                  foregroundColor: Colors.white,
+                  icon: Icons.edit,
+                  label: strings['edit']!,
+                ),
+              ],
+            )
+          : null,
       endActionPane: ActionPane(
-        motion: const ScrollMotion(),
-        dismissible: DismissiblePane(onDismissed: () { onRemoved(); }),
-        children: [
-          SlidableAction(
-            onPressed: (context) { onRemoved(); },
-            backgroundColor: Colors.red,
-            foregroundColor: Colors.white,
-            icon: Icons.delete,
-            label: strings['remove']!,
-          ),
-        ]
-      ),
+          motion: const ScrollMotion(),
+          dismissible: DismissiblePane(onDismissed: () {
+            onRemoved();
+          }),
+          children: [
+            SlidableAction(
+              onPressed: (context) {
+                onRemoved();
+              },
+              backgroundColor: Colors.red,
+              foregroundColor: Colors.white,
+              icon: Icons.delete,
+              label: strings['remove']!,
+            ),
+          ]),
       child: ListTile(
         leading: CircleAvatar(
           child: Text(symbol),
@@ -146,7 +155,7 @@ class ListItem extends StatelessWidget {
               ? const Icon(Icons.report)
               : Text(
                   number,
-                  style: Theme.of(context).textTheme.caption,
+                  style: Theme.of(context).textTheme.bodySmall,
                 ),
         ),
         onTap: onTap,
@@ -415,7 +424,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   padding: const EdgeInsets.all(8),
                   child: Text(
                     strings['emptyTitle']!,
-                    style: Theme.of(context).textTheme.headline6,
+                    style: Theme.of(context).textTheme.titleLarge,
                   ),
                 ),
                 Text(
