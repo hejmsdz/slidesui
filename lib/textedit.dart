@@ -12,7 +12,7 @@ class TextEditPage extends StatefulWidget {
   _TextEditPageState createState() => _TextEditPageState();
 }
 
-const String TEXT_ITEM_DELIMITER = "'''";
+const String textItemDelimiter = "'''";
 
 class _TextEditPageState extends State<TextEditPage> {
   TextEditingController controller = TextEditingController();
@@ -41,7 +41,7 @@ class _TextEditPageState extends State<TextEditPage> {
           ? ''
           : " [${item.number}]";
       final text = item is TextDeckItem
-          ? "$TEXT_ITEM_DELIMITER${item.contents}$TEXT_ITEM_DELIMITER"
+          ? "$textItemDelimiter${item.contents}$textItemDelimiter"
           : item.title +
               (item.subtitle == null ? '' : (' / ' + item.subtitle!));
       return "${index + 1}. $text$numberSuffix";
@@ -58,12 +58,12 @@ class _TextEditPageState extends State<TextEditPage> {
 
     String? textItem;
     for (var naiveLine in naiveLines) {
-      final hasDelimiter = naiveLine.contains(TEXT_ITEM_DELIMITER);
+      final hasDelimiter = naiveLine.contains(textItemDelimiter);
       if (hasDelimiter) {
         if (textItem == null) {
           textItem = naiveLine + "\n";
 
-          if (naiveLine.endsWith(TEXT_ITEM_DELIMITER)) {
+          if (naiveLine.endsWith(textItemDelimiter)) {
             lines.add(naiveLine);
             textItem = null;
           }
@@ -109,9 +109,9 @@ class _TextEditPageState extends State<TextEditPage> {
             .replaceFirst(RegExp(r"\s[\[\(]\d+\.\d+[\]\)]$"), "")
             .trim();
 
-        if (title.startsWith(TEXT_ITEM_DELIMITER) &&
-            title.endsWith(TEXT_ITEM_DELIMITER)) {
-          const trimChars = TEXT_ITEM_DELIMITER.length;
+        if (title.startsWith(textItemDelimiter) &&
+            title.endsWith(textItemDelimiter)) {
+          const trimChars = textItemDelimiter.length;
           return TextDeckItem(
               title.substring(trimChars, title.length - trimChars));
         }

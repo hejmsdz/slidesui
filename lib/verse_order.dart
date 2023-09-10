@@ -11,17 +11,16 @@ class VerseOrderPage extends StatefulWidget {
   final int itemIndex;
 
   @override
-  State<VerseOrderPage> createState() => _VerseOrderPageState(itemIndex);
+  State<VerseOrderPage> createState() => _VerseOrderPageState();
 }
 
 class _VerseOrderPageState extends State<VerseOrderPage> {
-  _VerseOrderPageState(this.itemIndex);
+  _VerseOrderPageState();
 
-  final int itemIndex;
   bool _isLoading = false;
-  // List<String> _rawVerses = [];
 
   fetchVerses() async {
+    final int itemIndex = widget.itemIndex;
     final state = Provider.of<SlidesModel>(context, listen: false);
     final item = state.items[itemIndex] as SongDeckItem;
 
@@ -63,6 +62,8 @@ class _VerseOrderPageState extends State<VerseOrderPage> {
 
   @override
   Widget build(BuildContext context) {
+    final int itemIndex = widget.itemIndex;
+
     return Scaffold(
         appBar: AppBar(
           title: Text(strings['verseOrder']!),

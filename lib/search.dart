@@ -13,10 +13,7 @@ class SearchPage extends StatefulWidget {
   final int replaceIndex;
 
   @override
-  _SearchPageState createState() => _SearchPageState(
-        query: initialQuery,
-        replaceIndex: replaceIndex,
-      );
+  _SearchPageState createState() => _SearchPageState();
 }
 
 class SearchListItem extends StatelessWidget {
@@ -69,19 +66,22 @@ slugify(String text) {
 }
 
 class _SearchPageState extends State<SearchPage> {
-  _SearchPageState({this.query = "", this.replaceIndex = -1});
+  _SearchPageState();
 
   TextEditingController controller = TextEditingController();
-  String query;
+  String query = "";
   List<Song> _prefilteredItems = [];
   List<Song> _items = [];
   bool _isLoading = false;
   bool _isQueryValid = false;
-  int replaceIndex;
+  int replaceIndex = -1;
 
   @override
   void initState() {
     super.initState();
+
+    query = widget.initialQuery;
+    replaceIndex = widget.replaceIndex;
 
     controller.text = query;
     if (query.isNotEmpty) {

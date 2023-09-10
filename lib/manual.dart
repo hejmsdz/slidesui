@@ -69,7 +69,7 @@ class _ManualPageState extends State<ManualPage> {
                     child: index < manual.steps.length
                         ? Text(
                             "${index + 1}. ${manual.steps[index]}",
-                            style: Theme.of(context).textTheme.subtitle1,
+                            style: Theme.of(context).textTheme.titleMedium,
                           )
                         : Image.network(manual.image),
                   ));

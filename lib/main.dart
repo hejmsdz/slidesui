@@ -267,7 +267,7 @@ class _MyHomePageState extends State<MyHomePage> {
             TextButton(
               child: Text(strings['download']!),
               onPressed: () {
-                launch(appDownloadUrl);
+                launchUrl(Uri.parse(appDownloadUrl));
                 Navigator.of(context).pop();
               },
             ),
