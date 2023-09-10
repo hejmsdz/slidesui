@@ -11,6 +11,8 @@ const strings = {
   'cancel': 'ANULUJ',
   'ok': 'OK',
   'changeDate': 'Zmień datę',
+  'remove': 'Usuń',
+  'edit': 'Edytuj',
   'emptyTitle': 'Nic tu jeszcze nie ma!',
   'emptyDescription':
       'Aby dodać slajdy, użyj wyszukiwarki\nlub wklej plan jako tekst.',

@@ -6,6 +6,7 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_settings_screens/flutter_settings_screens.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import './model.dart';
 import './api.dart';
 import './persistence.dart';
@@ -68,27 +69,69 @@ class ListItem extends StatelessWidget {
       this.subtitle,
       required this.number,
       required this.index,
+      required this.isSong,
       required this.onRemoved,
       required this.onTap})
       : super(key: itemKey);
 
-  final Key itemKey;
+  final ValueKey itemKey;
   final String symbol;
   final String title;
   final String? subtitle;
   final String number;
+  final bool isSong;
   final void Function() onRemoved;
   final void Function() onTap;
   final int index;
 
+  edit(BuildContext context) {
+    String id = itemKey.value.replaceAll('-', '');
+    Uri editUrl = Uri.parse("https://www.notion.so/${id}");
+    launchUrl(editUrl);
+  }
+
+  doNothing(BuildContext context) {
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Dismissible(
+
+    return Slidable(
       key: itemKey,
-      onDismissed: (direction) {
-        onRemoved();
-      },
-      background: Container(color: Colors.red),
+      startActionPane: isSong ? ActionPane(
+        motion: const ScrollMotion(),
+        children: [
+          /*
+          SlidableAction(
+            onPressed: doNothing,
+            backgroundColor: Colors.green,
+            foregroundColor: Colors.white,
+            icon: Icons.reorder,
+            label: 'Kolejność',
+          ),
+          */
+          SlidableAction(
+            onPressed: edit,
+            backgroundColor: Colors.blue,
+            foregroundColor: Colors.white,
+            icon: Icons.edit,
+            label: strings['edit']!,
+          ),
+        ],
+      ) : null,
+      endActionPane: ActionPane(
+        motion: const ScrollMotion(),
+        dismissible: DismissiblePane(onDismissed: () { onRemoved(); }),
+        children: [
+          SlidableAction(
+            onPressed: (context) { onRemoved(); },
+            backgroundColor: Colors.red,
+            foregroundColor: Colors.white,
+            icon: Icons.delete,
+            label: strings['remove']!,
+          ),
+        ]
+      ),
       child: ListTile(
         leading: CircleAvatar(
           child: Text(symbol),
@@ -236,7 +279,7 @@ class _MyHomePageState extends State<MyHomePage> {
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) {
-                  return SearchPage();
+                  return const SearchPage();
                 }),
               );
             },
@@ -248,7 +291,7 @@ class _MyHomePageState extends State<MyHomePage> {
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) {
-                  return TextEditPage();
+                  return const TextEditPage();
                 }),
               );
             },
@@ -394,6 +437,7 @@ class _MyHomePageState extends State<MyHomePage> {
               subtitle: song.subtitle,
               number: song.number,
               index: index,
+              isSong: song is SongDeckItem && !song.isOrdinary,
               onRemoved: () {
                 state.removeItem(index);
                 final snackBar = SnackBar(
