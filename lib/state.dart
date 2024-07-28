@@ -11,7 +11,6 @@ class SlidesModel extends ChangeNotifier implements LiturgyHolder {
   }
 
   DateTime _date = DateTime.now();
-
   List<DeckItem> _items = [];
   DeckItem? _lastRemovedItem;
   int? _lastRemovedIndex;
@@ -46,8 +45,8 @@ class SlidesModel extends ChangeNotifier implements LiturgyHolder {
               return null;
           }
         })
-        .where((item) => item != null)
-        .toList() as List<DeckItem>;
+        .whereType<DeckItem>()
+        .toList();
   }
 
   addItem(DeckItem item) {

@@ -37,6 +37,7 @@ Future<SlidesModel> loadSavedState() async {
       return emptyModel;
     }
     final json = await file.readAsString();
+    print("loading state: $json");
     final state = SlidesModel.fromJson(jsonDecode(json));
 
     if (state.date.isBefore(startOfToday())) {
