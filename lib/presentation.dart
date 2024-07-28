@@ -67,6 +67,9 @@ class _PresentationPageState extends State<PresentationPage> {
       images = (await destinationDir!.list().toList())
           .map((entity) => File(entity.path))
           .toList();
+    } catch (e) {
+      Navigator.of(context).pop();
+      return;
     } finally {
       setIsLoading(false);
     }

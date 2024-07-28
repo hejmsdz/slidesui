@@ -1,7 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:slidesui/presentation.dart';
 import 'package:slidesui/verse_order.dart';
@@ -20,13 +19,9 @@ import './textedit.dart';
 import './manual.dart';
 import './settings.dart';
 
-void downloaderCallback(String id, int status, int progress) {}
-
 void main() async {
   if (!kIsWeb) {
     WidgetsFlutterBinding.ensureInitialized();
-    await FlutterDownloader.initialize(debug: kDebugMode);
-    FlutterDownloader.registerCallback(downloaderCallback);
   }
   final state = await loadSavedState();
   await Settings.init();

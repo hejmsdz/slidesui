@@ -1,10 +1,11 @@
+import 'dart:async';
 import 'dart:io';
+import 'package:background_downloader/background_downloader.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:slidesui/model.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:path_provider/path_provider.dart';
@@ -42,7 +43,7 @@ notifyOnMoved(BuildContext context) {
 }
 
 Future<String> getDownloadDirectory() async {
-  final directory = await getTemporaryDirectory();
+  final directory = await getApplicationDocumentsDirectory();
   if (!(await directory.exists())) {
     await directory.create();
   }
@@ -66,20 +67,27 @@ Future<String> createDeck(BuildContext context, {String format = "pdf"}) async {
   final url = Uri.parse(await postDeck(deckRequest));
 
   if (!kIsWeb && Platform.isAndroid) {
+    // FlutterDownloader.registerCallback(downloaderCallback);
     final destination = await getDownloadDirectory();
     final extension = format.endsWith("zip") ? "zip" : "pdf";
     final fileName =
         '${state.date.toIso8601String().substring(0, 10)}.$extension';
-    final taskId = await FlutterDownloader.enqueue(
+
+    final fullPath = "$destination/$fileName";
+    final file = File(fullPath);
+
+    if (await file.exists()) {
+      await file.delete();
+    }
+
+    final task = DownloadTask(
       url: url.toString(),
-      savedDir: destination,
-      fileName: fileName,
-      showNotification: false,
+      filename: fileName,
     );
 
-    if (taskId != null) {
-      return "$destination/$fileName";
-    }
+    await FileDownloader().download(task);
+
+    return task.filePath();
   } else if (await canLaunchUrl(url)) {
     await launchUrl(url);
 

@@ -22,7 +22,7 @@ class Song {
   Map<String, dynamic> toJson() => {
         'id': id,
         'title': title,
-        'subtitle': title,
+        'subtitle': subtitle,
         'number': number,
         'slug': slug,
         'isOrdinary': isOrdinary,
