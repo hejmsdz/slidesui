@@ -19,7 +19,7 @@ import './textedit.dart';
 import './manual.dart';
 import './settings.dart';
 
-void downloaderCallback(String id, DownloadTaskStatus status, int progress) {}
+void downloaderCallback(String id, int status, int progress) {}
 
 void main() async {
   if (!kIsWeb) {
@@ -39,7 +39,7 @@ void main() async {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   // This widget is the root of your application.
   @override
@@ -47,7 +47,8 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: strings['appTitle']!,
       theme: ThemeData(
-        primarySwatch: Colors.orange,
+        colorSchemeSeed: Colors.orange,
+        appBarTheme: const AppBarTheme(elevation: 1.0),
       ),
       home: MyHomePage(title: strings['appTitle']!),
     );
@@ -55,7 +56,7 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key, required this.title}) : super(key: key);
+  const MyHomePage({super.key, required this.title});
   final String title;
 
   @override
@@ -364,41 +365,41 @@ class _MyHomePageState extends State<MyHomePage> {
                     return [
                       state.hasLiturgy()
                           ? PopupMenuItem(
-                              child: Text(strings['removeLiturgy']!),
                               value: 'REMOVE_LITURGY',
+                              child: Text(strings['removeLiturgy']!),
                             )
                           : PopupMenuItem(
-                              child: Text(strings['addLiturgy']!),
                               value: 'ADD_LITURGY',
+                              child: Text(strings['addLiturgy']!),
                             ),
                       state.hasOrdinary()
                           ? PopupMenuItem(
-                              child: Text(strings['removeOrdinary']!),
                               value: 'REMOVE_ORDINARY',
+                              child: Text(strings['removeOrdinary']!),
                             )
                           : PopupMenuItem(
-                              child: Text(strings['addOrdinary']!),
                               value: 'ADD_ORDINARY',
+                              child: Text(strings['addOrdinary']!),
                             ),
                       PopupMenuItem(
-                        child: Text(strings['addText']!),
                         value: 'ADD_TEXT',
+                        child: Text(strings['addText']!),
                       ),
                       PopupMenuItem(
-                        child: Text(strings['changeDate']!),
                         value: 'CHANGE_DATE',
+                        child: Text(strings['changeDate']!),
                       ),
                       PopupMenuItem(
-                        child: Text(strings['manual']!),
                         value: 'OPEN_MANUAL',
+                        child: Text(strings['manual']!),
                       ),
                       PopupMenuItem(
-                        child: Text(strings['reloadLyrics']!),
                         value: 'RELOAD_LYRICS',
+                        child: Text(strings['reloadLyrics']!),
                       ),
                       PopupMenuItem(
-                        child: Text(strings['settings']!),
                         value: 'OPEN_SETTINGS',
+                        child: Text(strings['settings']!),
                       ),
                     ];
                   })),
