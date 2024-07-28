@@ -115,11 +115,11 @@ class _PresentationPageState extends State<PresentationPage> {
                   )
                   .toList(),
             ),
-            Expanded(child: GestureDetector(
+            GestureDetector(
               onTap: () {
                 SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
               },
-            )),
+            ),
           ]);
         })());
   }
