@@ -35,10 +35,8 @@ const strings = {
   'undo': 'COFNIJ',
   'generateSlides': 'Generuj slajdy',
   'slidesOpeningInBrowser': 'Plik ze slajdami zostanie otwarty w przeglądarce.',
-  'slidesDownloadedInternal':
-      'Plik PDF ze slajdami został pobrany do pamięci telefonu.',
   'move': 'PRZENIEŚ',
-  'slidesMoved': 'Plik PDF ze slajdami został przeniesiony.',
+  'slidesMoved': 'Plik ze slajdami został zapisany.',
   'manual': 'Instrukcja obsługi rzutnika',
   'reloadLyrics': 'Odśwież teksty',
   'newVersionAvailable': 'Nowa wersja jest dostępna',
@@ -54,4 +52,7 @@ const strings = {
   'disabled': 'Wyłączone',
   'fontSize': 'Rozmiar tekstu',
   'aspectRatio': 'Proporcje slajdów',
+  'slidesBehavior': 'Po wygenerowaniu slajdów',
+  'behaviorSave': 'Zapisz do pliku',
+  'behaviorDisplay': 'Wyświetl'
 };

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:slidesui/presentation.dart';
 import 'package:slidesui/verse_order.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -490,7 +491,28 @@ class _MyHomePageState extends State<MyHomePage> {
                 : () async {
                     setIsWorking(true);
                     try {
-                      await createDeck(context);
+                      final shouldDisplay =
+                          Settings.getValue<String>('app.slidesBehavior') ==
+                              'display';
+                      final format = shouldDisplay ? 'png+zip' : 'pdf';
+
+                      final downloadedFile =
+                          await createDeck(context, format: format);
+
+                      if (shouldDisplay) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              fullscreenDialog: true,
+                              builder: (context) {
+                                return PresentationPage(
+                                  zipFilePath: downloadedFile,
+                                );
+                              }),
+                        );
+                      } else {
+                        notifyOnDownloaded(context, downloadedFile);
+                      }
                     } finally {
                       setIsWorking(false);
                     }

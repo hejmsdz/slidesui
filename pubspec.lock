@@ -33,6 +33,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.1"
+  carousel_slider:
+    dependency: "direct main"
+    description:
+      name: carousel_slider
+      sha256: "9c695cc963bf1d04a47bd6021f68befce8970bcd61d24938e1fb0918cf5d9c42"
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.2.1"
   characters:
     dependency: transitive
     description:
@@ -102,6 +110,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_archive:
+    dependency: "direct main"
+    description:
+      name: flutter_archive
+      sha256: "5ca235f304c12bf468979235f400f79846d204169d715939e39197106f5fc970"
+      url: "https://pub.dev"
+    source: hosted
+    version: "6.0.3"
   flutter_downloader:
     dependency: "direct main"
     description:

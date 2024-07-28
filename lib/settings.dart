@@ -10,8 +10,13 @@ const aspectRatios = <String, String>{
   '16:9': '16:9',
 };
 
+final behaviors = <String, String>{
+  'save': strings['behaviorSave']!,
+  'display': strings['behaviorDisplay']!,
+};
+
 class SettingsPage extends StatelessWidget {
-  const SettingsPage({Key? key}) : super(key: key);
+  const SettingsPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -19,36 +24,46 @@ class SettingsPage extends StatelessWidget {
       title: strings['settings']!,
       children: [
         Consumer<SlidesModel>(
-          builder: (context, state, child) => SettingsGroup(
-            title: strings['settingsSectionSlides']!,
-            children: <Widget>[
-              SwitchSettingsTile(
-                settingKey: 'slides.hints',
-                title: strings['hints']!,
-                enabledLabel: strings['enabled']!,
-                disabledLabel: strings['disabled']!,
-                leading: const Icon(Icons.help),
-                defaultValue: false,
-              ),
-              SliderSettingsTile(
-                title: strings['fontSize']!,
-                settingKey: 'slides.fontSize',
-                defaultValue: 36,
-                min: 18,
-                max: 50,
-                step: 1,
-                leading: const Icon(Icons.format_size),
-              ),
-              DropDownSettingsTile<String>(
-                leading: const Icon(Icons.aspect_ratio),
-                title: strings['aspectRatio']!,
-                subtitle: " ",
-                settingKey: 'slides.aspectRatio',
-                values: aspectRatios,
-                selected: "4:3",
-              ),
-            ],
-          ),
+          builder: (context, state, child) => Column(children: [
+            SettingsGroup(
+              title: strings['settingsSectionSlides']!,
+              children: <Widget>[
+                SwitchSettingsTile(
+                  settingKey: 'slides.hints',
+                  title: strings['hints']!,
+                  enabledLabel: strings['enabled']!,
+                  disabledLabel: strings['disabled']!,
+                  leading: const Icon(Icons.help),
+                  defaultValue: false,
+                ),
+                SliderSettingsTile(
+                  title: strings['fontSize']!,
+                  settingKey: 'slides.fontSize',
+                  defaultValue: 36,
+                  min: 18,
+                  max: 50,
+                  step: 1,
+                  leading: const Icon(Icons.format_size),
+                ),
+                DropDownSettingsTile<String>(
+                  leading: const Icon(Icons.aspect_ratio),
+                  title: strings['aspectRatio']!,
+                  subtitle: " ",
+                  settingKey: 'slides.aspectRatio',
+                  values: aspectRatios,
+                  selected: "4:3",
+                ),
+                DropDownSettingsTile<String>(
+                  leading: const Icon(Icons.slideshow),
+                  title: strings['slidesBehavior']!,
+                  subtitle: " ",
+                  settingKey: 'app.slidesBehavior',
+                  values: behaviors,
+                  selected: 'save',
+                ),
+              ],
+            ),
+          ]),
         )
       ],
     );

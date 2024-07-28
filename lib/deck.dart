@@ -24,25 +24,14 @@ Future<String> moveFile(String source) async {
   }
 }
 
-notifyOnDownloaded(
+Future<void> notifyOnDownloaded(
   BuildContext context,
-  String taskId,
   String destinationFile,
-) {
-  final snackBar = SnackBar(
-    content: Text(strings['slidesDownloadedInternal']!),
-    action: SnackBarAction(
-      label: strings['move']!,
-      onPressed: () async {
-        FlutterDownloader.remove(taskId: taskId);
-        final moveTarget = await moveFile(destinationFile);
-        if (moveTarget != "") {
-          notifyOnMoved(context);
-        }
-      },
-    ),
-  );
-  ScaffoldMessenger.of(context).showSnackBar(snackBar);
+) async {
+  final moveTarget = await moveFile(destinationFile);
+  if (moveTarget != "") {
+    notifyOnMoved(context);
+  }
 }
 
 notifyOnMoved(BuildContext context) {
@@ -53,10 +42,7 @@ notifyOnMoved(BuildContext context) {
 }
 
 Future<String> getDownloadDirectory() async {
-  final directory = await getExternalStorageDirectory();
-  if (directory == null) {
-    return "";
-  }
+  final directory = await getTemporaryDirectory();
   if (!(await directory.exists())) {
     await directory.create();
   }
@@ -64,7 +50,7 @@ Future<String> getDownloadDirectory() async {
   return directory.path;
 }
 
-createDeck(BuildContext context) async {
+Future<String> createDeck(BuildContext context, {String format = "pdf"}) async {
   if (!kIsWeb && Platform.isAndroid) {
     await Permission.storage.request();
   }
@@ -75,12 +61,15 @@ createDeck(BuildContext context) async {
     hints: Settings.getValue<bool>('slides.hints'),
     ratio: Settings.getValue<String>('slides.aspectRatio'),
     fontSize: Settings.getValue<double>('slides.fontSize')?.toInt(),
+    format: format,
   );
   final url = Uri.parse(await postDeck(deckRequest));
 
   if (!kIsWeb && Platform.isAndroid) {
     final destination = await getDownloadDirectory();
-    final fileName = state.date.toIso8601String().substring(0, 10) + '.pdf';
+    final extension = format.endsWith("zip") ? "zip" : "pdf";
+    final fileName =
+        '${state.date.toIso8601String().substring(0, 10)}.$extension';
     final taskId = await FlutterDownloader.enqueue(
       url: url.toString(),
       savedDir: destination,
@@ -89,7 +78,7 @@ createDeck(BuildContext context) async {
     );
 
     if (taskId != null) {
-      notifyOnDownloaded(context, taskId, "$destination/$fileName");
+      return "$destination/$fileName";
     }
   } else if (await canLaunchUrl(url)) {
     await launchUrl(url);
@@ -98,5 +87,7 @@ createDeck(BuildContext context) async {
       content: Text(strings['slidesOpeningInBrowser']!),
     );
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
-  } else {}
+  }
+
+  return url.toString();
 }

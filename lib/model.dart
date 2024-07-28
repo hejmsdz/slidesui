@@ -72,16 +72,15 @@ class SongDeckItem implements DeckItem {
       return null;
     }
 
-    final _selectedVerses = selectedVerses!;
-    List<int> _order = [];
+    List<int> order = [];
 
-    for (int i = 0; i < _selectedVerses.length; i++) {
-      if (_selectedVerses[i]) {
-        _order.add(i);
+    for (int i = 0; i < selectedVerses!.length; i++) {
+      if (selectedVerses![i]) {
+        order.add(i);
       }
     }
 
-    return _order;
+    return order;
   }
 
   @override
@@ -212,6 +211,7 @@ class DeckRequest {
   final bool? hints;
   final String? ratio;
   final int? fontSize;
+  final String? format;
 
   DeckRequest({
     required this.date,
@@ -219,6 +219,7 @@ class DeckRequest {
     this.hints,
     this.ratio,
     this.fontSize,
+    this.format,
   });
 
   Map<String, dynamic> toJson() => {
@@ -227,6 +228,7 @@ class DeckRequest {
         'hints': hints,
         'ratio': ratio,
         'fontSize': fontSize,
+        'format': format,
       };
 }
 
