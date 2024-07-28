@@ -5,50 +5,12 @@ import 'package:flutter/material.dart';
 import './api.dart';
 import './model.dart';
 
-DateTime nextWeekday(int weekday, DateTime date, [int lastestHour = 24]) {
-  final daysOffset = (weekday - date.weekday) % 7;
-  final nextDate = date.add(Duration(days: daysOffset));
-
-  if (daysOffset == 0 && date.hour > lastestHour) {
-    return nextDate.add(const Duration(days: 7));
-  }
-
-  return nextDate;
-}
-
-bool isAdvent(DateTime date) {
-  if (date.month < 11) {
-    return false;
-  }
-
-  final christmasEve = DateTime(date.year, 12, 24);
-  final firstSundayOfAdvent = christmasEve
-      .subtract(Duration(days: (christmasEve.weekday % 7) + (3 * 7)));
-
-  return date.isAfter(firstSundayOfAdvent) && date.isBefore(christmasEve);
-}
-
-DateTime nextMassDay() {
-  final now = DateTime.now();
-  final nextSunday = nextWeekday(DateTime.sunday, now, 21);
-
-  if (isAdvent(now)) {
-    DateTime nextTuesday = nextWeekday(DateTime.tuesday, now, 8);
-    DateTime nextThursday = nextWeekday(DateTime.thursday, now, 8);
-
-    return [nextSunday, nextTuesday, nextThursday]
-        .reduce((a, b) => a.isBefore(b) ? a : b);
-  }
-
-  return nextSunday;
-}
-
 class SlidesModel extends ChangeNotifier implements LiturgyHolder {
   SlidesModel() {
     updateLiturgy();
   }
 
-  DateTime _date = nextMassDay();
+  DateTime _date = DateTime.now();
 
   List<DeckItem> _items = [];
   DeckItem? _lastRemovedItem;
