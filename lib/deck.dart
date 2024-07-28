@@ -14,7 +14,7 @@ import './strings.dart';
 import './api.dart';
 
 Future<String> moveFile(String source) async {
-  const platform = MethodChannel("com.example.slidesui/filePicker");
+  const platform = MethodChannel("com.mrozwadowski.slidesui/filePicker");
   try {
     return await platform.invokeMethod("moveFile", {
       "source": source,
