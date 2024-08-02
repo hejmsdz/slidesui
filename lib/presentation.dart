@@ -16,6 +16,7 @@ class PresentationPage extends StatefulWidget {
 
 class _PresentationPageState extends State<PresentationPage> {
   bool _isLoading = false;
+  bool _isUiVisible = false;
   List<File>? _images;
   Directory? destinationDir;
 
@@ -118,7 +119,32 @@ class _PresentationPageState extends State<PresentationPage> {
             GestureDetector(
               onTap: () {
                 SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
+                setState(() {
+                  _isUiVisible = !_isUiVisible;
+                });
               },
+            ),
+            Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              child: AnimatedOpacity(
+                duration: Durations.medium1,
+                opacity: _isUiVisible ? 1 : 0,
+                child: AppBar(
+                  backgroundColor: Colors.transparent,
+                  foregroundColor: Colors.white54,
+                  /*
+                  actions: [
+                    IconButton(
+                      icon: const Icon(Icons.cast),
+                      tooltip: "Cast",
+                      onPressed: () {},
+                    )
+                  ],
+                  */
+                ),
+              ),
             ),
           ]);
         })());
