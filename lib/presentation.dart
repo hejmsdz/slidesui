@@ -19,6 +19,7 @@ class _PresentationPageState extends State<PresentationPage> {
   bool _isUiVisible = false;
   List<File>? _images;
   Directory? destinationDir;
+  CarouselController carouselController = CarouselController();
 
   @override
   void initState() {
@@ -99,11 +100,17 @@ class _PresentationPageState extends State<PresentationPage> {
 
           return Stack(children: [
             CarouselSlider(
+              carouselController: carouselController,
               options: CarouselOptions(
                 height: height,
                 viewportFraction: 1.0,
                 enableInfiniteScroll: false,
                 enlargeCenterPage: false,
+                onPageChanged: (i, reason) {
+                  if (reason == CarouselPageChangedReason.manual) {
+                    print(i);
+                  }
+                },
               ),
               items: _images!
                   .map(
@@ -117,7 +124,7 @@ class _PresentationPageState extends State<PresentationPage> {
                   .toList(),
             ),
             GestureDetector(
-              onTap: () {
+              onDoubleTap: () {
                 SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
                 setState(() {
                   _isUiVisible = !_isUiVisible;
