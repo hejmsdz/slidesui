@@ -489,10 +489,8 @@ class _MyHomePageState extends State<MyHomePage> {
                       final shouldDisplay =
                           Settings.getValue<String>('app.slidesBehavior') ==
                               'display';
-                      final format = shouldDisplay ? 'png+zip' : 'pdf';
 
-                      final downloadedFile =
-                          await createDeck(context, format: format);
+                      final downloadedFile = await createDeck(context);
 
                       if (shouldDisplay) {
                         Navigator.push(
@@ -501,7 +499,7 @@ class _MyHomePageState extends State<MyHomePage> {
                               fullscreenDialog: true,
                               builder: (context) {
                                 return PresentationPage(
-                                  zipFilePath: downloadedFile,
+                                  filePath: downloadedFile,
                                 );
                               }),
                         );
