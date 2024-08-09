@@ -1,4 +1,3 @@
-import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_archive/flutter_archive.dart';
@@ -32,7 +31,7 @@ class _PresentationPageState extends State<PresentationPage> {
   List<File>? _images;
   Directory? destinationDir;
   PresentationController controller = PresentationController();
-  CarouselController carouselController = CarouselController();
+  final PageController _pageController = PageController();
 
   @override
   void initState() {
@@ -50,7 +49,11 @@ class _PresentationPageState extends State<PresentationPage> {
   }
 
   handleSlideChange() {
-    carouselController.animateToPage(controller.currentPage);
+    final isUserTriggeredChange =
+        _pageController.page == _pageController.page?.truncate();
+    if (isUserTriggeredChange) {
+      _pageController.jumpToPage(controller.currentPage);
+    }
   }
 
   @override
@@ -120,29 +123,22 @@ class _PresentationPageState extends State<PresentationPage> {
           final double height = MediaQuery.of(context).size.height;
 
           return Stack(children: [
-            CarouselSlider(
-              carouselController: carouselController,
-              options: CarouselOptions(
-                height: height,
-                viewportFraction: 1.0,
-                enableInfiniteScroll: false,
-                enlargeCenterPage: false,
-                initialPage: controller.currentPage,
-                onPageChanged: (i, reason) {
+            PageView.builder(
+                controller: _pageController,
+                itemCount: _images?.length ?? 0,
+                allowImplicitScrolling: true,
+                onPageChanged: (i) {
                   controller.setCurrentPage(i);
                 },
-              ),
-              items: _images!
-                  .map(
-                    (image) => Center(
-                        child: Image.file(
-                      image,
+                itemBuilder: (context, index) {
+                  return Center(
+                    child: Image.file(
+                      _images![index],
                       fit: BoxFit.cover,
                       height: height,
-                    )),
-                  )
-                  .toList(),
-            ),
+                    ),
+                  );
+                }),
             GestureDetector(
               onDoubleTap: () {
                 SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
