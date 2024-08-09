@@ -39,9 +39,9 @@ class SettingsPage extends StatelessWidget {
                 SliderSettingsTile(
                   title: strings['fontSize']!,
                   settingKey: 'slides.fontSize',
-                  defaultValue: 36,
-                  min: 18,
-                  max: 50,
+                  defaultValue: 42,
+                  min: 36,
+                  max: 72,
                   step: 1,
                   leading: const Icon(Icons.format_size),
                 ),
@@ -51,7 +51,7 @@ class SettingsPage extends StatelessWidget {
                   subtitle: " ",
                   settingKey: 'slides.aspectRatio',
                   values: aspectRatios,
-                  selected: "4:3",
+                  selected: "16:9",
                 ),
                 DropDownSettingsTile<String>(
                   leading: const Icon(Icons.slideshow),
