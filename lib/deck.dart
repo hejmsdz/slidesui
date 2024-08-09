@@ -51,17 +51,25 @@ Future<String> getDownloadDirectory() async {
   return directory.path;
 }
 
-Future<String> createDeck(BuildContext context, {String format = "pdf"}) async {
-  if (!kIsWeb && Platform.isAndroid) {
-    await Permission.storage.request();
-  }
-  final state = Provider.of<SlidesModel>(context, listen: false);
-  final deckRequest = DeckRequest(
+DeckRequest buildDeckRequestFromState(SlidesModel state,
+    {String format = "pdf"}) {
+  return DeckRequest(
     date: state.date,
     items: state.items,
     hints: Settings.getValue<bool>('slides.hints'),
     ratio: Settings.getValue<String>('slides.aspectRatio'),
     fontSize: Settings.getValue<double>('slides.fontSize')?.toInt(),
+    format: format,
+  );
+}
+
+Future<String> createDeck(BuildContext context, {String format = "pdf"}) async {
+  if (!kIsWeb && Platform.isAndroid) {
+    await Permission.storage.request();
+  }
+  final state = Provider.of<SlidesModel>(context, listen: false);
+  final deckRequest = buildDeckRequestFromState(
+    state,
     format: format,
   );
   final url = Uri.parse(await postDeck(deckRequest));

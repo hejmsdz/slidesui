@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Slides</title>
+  <style>
+    body {
+      background: #000;
+      margin: 0;
+      padding: 0;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    canvas {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      transition: 0.5s opacity;
+    }
+
+    canvas.inactive {
+      opacity: 0;
+    }
+
+    #loader {
+      color: rgba(255, 255, 255, 0.5);
+      transition: 0.5s opacity;
+    }
+
+    body.ready #loader {
+      opacity: 0;
+    }
+
+    #loader,
+    #loader:after {
+      box-sizing: border-box;
+    }
+
+    #loader {
+      display: inline-block;
+      width: 80px;
+      height: 80px;
+    }
+
+    #loader:after {
+      content: " ";
+      display: block;
+      width: 64px;
+      height: 64px;
+      margin: 8px;
+      border-radius: 50%;
+      border: 6.4px solid currentColor;
+      border-color: currentColor transparent currentColor transparent;
+      animation: spin 1.2s linear infinite;
+    }
+
+    @keyframes spin {
+      from {
+        transform: rotate(0deg);
+      }
+
+      to {
+        transform: rotate(360deg);
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="loader"></div>
+  <canvas id="canvas0" class="inactive"></canvas>
+  <canvas id="canvas1" class="inactive"></canvas>
+
+  <script src="//www.gstatic.com/cast/sdk/libs/caf_receiver/v3/cast_receiver_framework.js"></script>
+  <script src="./pdf.js"></script>
+  <!--
+  <script src="https://chii.mrozwadowski.com/target.js"></script>
+  <script src="./screenlog.min.js"></script>
+  <script>screenLog.init();</script>
+  -->
+  <script>
+    pdfjsLib.GlobalWorkerOptions.workerSrc = './pdf.worker.js';
+
+    const loader = document.getElementById('loader');
+    const canvases = [0, 1].map((i) => {
+      const canvas = document.getElementById(`canvas${i}`);
+      const ctx = canvas.getContext('2d');
+
+      return { canvas, ctx };
+    });
+
+    let pdfDoc;
+    let currentPage = 1; // 1-based indexing
+    let activeCanvasIndex = 0;
+    let isRendering = false;
+
+    function switchCanvases() {
+      activeCanvasIndex = getInactiveCanvasIndex();
+
+      canvases.forEach(({ canvas }, i) => {
+        canvas.className = (i === activeCanvasIndex) ? 'active' : 'inactive';
+      });
+    }
+
+    async function renderPage(num) {
+      if (isRendering) {
+        return;
+      }
+
+      try {
+        isRendering = true;
+
+        const page = await pdfDoc.getPage(num);
+        const [, , width, height] = page.view;
+        const scale = Math.min(window.innerWidth / width, window.innerHeight / height) * window.devicePixelRatio;
+        const viewport = page.getViewport({ scale });
+
+        const { canvas, ctx } = canvases[getInactiveCanvasIndex()];
+        canvas.height = viewport.height;
+        canvas.width = viewport.width;
+
+        await page.render({
+          canvasContext: ctx,
+          viewport,
+        }).promise;
+
+        switchCanvases();
+      } finally {
+        isRendering = false;
+      }
+    }
+
+    function getInactiveCanvasIndex() {
+      return 1 - activeCanvasIndex;
+    }
+
+    function goToPrevPage() {
+      if (currentPage <= 1) {
+        return;
+      }
+
+      currentPage--;
+      renderPage(currentPage);
+      sendCurrentPageToSender();
+    }
+
+    function goToNextPage() {
+      if (currentPage >= pdfDoc.numPages) {
+        return;
+      }
+
+      currentPage++;
+      renderPage(currentPage);
+      sendCurrentPageToSender();
+    }
+
+    function goToPage(page) {
+      if (page <= 1 || page >= pdfDoc.numPages) {
+        return;
+      }
+
+      currentPage = page;
+      renderPage(currentPage);
+    }
+
+    async function loadSlides(deckArgs, {
+      initialPage = 1,
+      handleArrowKeys = true,
+    } = {}) {
+      currentPage = initialPage;
+
+      const response = await fetch(`https://slajdy.swro.ch/v2/deck`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json; charset=UTF-8' },
+        body: JSON.stringify(deckArgs),
+      });
+      const { url: pdfUrl } = await response.json();
+
+      pdfDoc = await pdfjsLib.getDocument(pdfUrl).promise;
+      await renderPage(currentPage);
+
+      document.body.className = 'ready';
+
+      window.addEventListener('keydown', (event) => {
+        if (event.key === 'ArrowLeft') {
+          goToPrevPage();
+        }
+
+        if (event.key === 'ArrowRight') {
+          goToNextPage();
+        }
+      });
+    }
+
+    const context = cast.framework.CastReceiverContext.getInstance();
+    const playerManager = context.getPlayerManager();
+
+    const namespace = 'urn:x-cast:com.mrozwadowski.slidesui';
+
+    context.addCustomMessageListener(`${namespace}.start`, (event) => {
+      const { data } = event;
+      loadSlides(data.deckArgs, {
+        initialPage: data.currentPage + 1,
+      });
+    });
+
+    context.addCustomMessageListener(`${namespace}.changePage`, (event) => {
+      const { data } = event;
+      goToPage(data.page + 1);
+    });
+
+    function sendCurrentPageToSender() {
+      context.sendCustomMessage(`${namespace}.changePage`, undefined, { page: currentPage - 1 });
+    }
+
+    context.start();
+  </script>
+</body>
+
+</html>

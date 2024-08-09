@@ -5,6 +5,18 @@ import 'package:flutter_archive/flutter_archive.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
 
+import 'package:slidesui/cast.dart';
+
+class PresentationController with ChangeNotifier {
+  int _currentPage = 0;
+  int get currentPage => _currentPage;
+
+  void setCurrentPage(int newCurrentPage) {
+    _currentPage = newCurrentPage;
+    notifyListeners();
+  }
+}
+
 class PresentationPage extends StatefulWidget {
   const PresentationPage({super.key, required this.zipFilePath});
 
@@ -19,6 +31,7 @@ class _PresentationPageState extends State<PresentationPage> {
   bool _isUiVisible = false;
   List<File>? _images;
   Directory? destinationDir;
+  PresentationController controller = PresentationController();
   CarouselController carouselController = CarouselController();
 
   @override
@@ -32,10 +45,18 @@ class _PresentationPageState extends State<PresentationPage> {
       DeviceOrientation.landscapeLeft,
     ]);
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
+
+    controller.addListener(handleSlideChange);
+  }
+
+  handleSlideChange() {
+    carouselController.animateToPage(controller.currentPage);
   }
 
   @override
   dispose() {
+    controller.removeListener(handleSlideChange);
+
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     SystemChrome.restoreSystemUIOverlays();
     SystemChrome.setPreferredOrientations([
@@ -106,10 +127,9 @@ class _PresentationPageState extends State<PresentationPage> {
                 viewportFraction: 1.0,
                 enableInfiniteScroll: false,
                 enlargeCenterPage: false,
+                initialPage: controller.currentPage,
                 onPageChanged: (i, reason) {
-                  if (reason == CarouselPageChangedReason.manual) {
-                    print(i);
-                  }
+                  controller.setCurrentPage(i);
                 },
               ),
               items: _images!
@@ -141,15 +161,9 @@ class _PresentationPageState extends State<PresentationPage> {
                 child: AppBar(
                   backgroundColor: Colors.transparent,
                   foregroundColor: Colors.white54,
-                  /*
                   actions: [
-                    IconButton(
-                      icon: const Icon(Icons.cast),
-                      tooltip: "Cast",
-                      onPressed: () {},
-                    )
+                    CastButton(controller: controller),
                   ],
-                  */
                 ),
               ),
             ),
