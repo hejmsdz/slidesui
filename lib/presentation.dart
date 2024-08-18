@@ -5,6 +5,7 @@ import 'package:pdf_image_renderer/pdf_image_renderer.dart';
 import 'dart:io';
 
 import 'package:slidesui/cast.dart';
+import 'package:slidesui/deck.dart';
 
 class PresentationController with ChangeNotifier {
   int _currentPage = 0;
@@ -178,6 +179,12 @@ class _PresentationPageState extends State<PresentationPage> {
                       foregroundColor: Colors.white54,
                       actions: [
                         CastButton(controller: controller),
+                        IconButton(
+                          icon: const Icon(Icons.save_alt),
+                          onPressed: () {
+                            notifyOnDownloaded(context, widget.filePath);
+                          },
+                        ),
                       ],
                     ),
                   ),
