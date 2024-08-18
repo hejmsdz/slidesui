@@ -84,7 +84,7 @@ class ListItem extends StatelessWidget {
 
   edit(BuildContext context) {
     String id = itemKey.value.replaceAll('-', '');
-    Uri editUrl = Uri.parse("https://www.notion.so/$id");
+    Uri editUrl = Uri.parse("notion://www.notion.so/$id");
     launchUrl(editUrl);
   }
 
