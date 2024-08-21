@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#000" />
     <title>Slides</title>
     <style>
         body {
@@ -198,6 +199,14 @@
         sse.addEventListener('changePage', (event) => {
             const { page } = JSON.parse(event.data);
             goToPage(page + 1);
+        });
+
+        document.body.addEventListener('dblclick', () => {
+            if (document.fullscreenElement) {
+                document.exitFullscreen();
+            } else {
+                document.body.requestFullscreen({ navigationUI: 'hide' })
+            }
         });
     </script>
 </body>
