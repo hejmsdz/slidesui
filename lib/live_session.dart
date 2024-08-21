@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:slidesui/api.dart';
 import 'package:slidesui/deck.dart';
+import 'package:slidesui/model.dart';
 import 'package:slidesui/presentation.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -39,10 +41,15 @@ class _LiveSessionButtonState extends State<LiveSessionButton> {
       }),
     );
     if (response.statusCode == 200 && mounted) {
-      /*
-      ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('Live session started')));
-          */
+      final liveResponse = LiveResponse.fromJson(jsonDecode(response.body));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Live session started at ${liveResponse.url}'),
+        action: SnackBarAction(
+            label: "SHARE LINK",
+            onPressed: () {
+              Share.share(liveResponse.url);
+            }),
+      ));
     }
 
     setState(() {

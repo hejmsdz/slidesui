@@ -274,3 +274,11 @@ class Liturgy {
         acclamation = json['acclamation'],
         acclamationVerse = json['acclamationVerse'];
 }
+
+class LiveResponse {
+  final String url;
+
+  LiveResponse(this.url);
+
+  LiveResponse.fromJson(Map<String, dynamic> json) : url = json['url'];
+}
