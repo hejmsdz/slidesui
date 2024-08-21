@@ -51,10 +51,10 @@ class _LiveSessionButtonState extends State<LiveSessionButton> {
     widget.controller.addListener(handleSlideChange);
   }
 
-  disconnect() {
+  disconnect({bool shouldUpdateState = true}) {
     // http.get(picastURL('close'));
     widget.controller.removeListener(handleSlideChange);
-    if (mounted) {
+    if (shouldUpdateState) {
       setState(() {
         _isConnected = false;
       });
@@ -63,8 +63,8 @@ class _LiveSessionButtonState extends State<LiveSessionButton> {
 
   @override
   void dispose() {
+    disconnect(shouldUpdateState: false);
     super.dispose();
-    disconnect();
   }
 
   @override
