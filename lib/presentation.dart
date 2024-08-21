@@ -6,6 +6,7 @@ import 'dart:io';
 
 import 'package:slidesui/cast.dart';
 import 'package:slidesui/deck.dart';
+import 'package:slidesui/live_session.dart';
 
 class PresentationController with ChangeNotifier {
   int _currentPage = 0;
@@ -179,6 +180,7 @@ class _PresentationPageState extends State<PresentationPage> {
                       foregroundColor: Colors.white54,
                       actions: [
                         CastButton(controller: controller),
+                        LiveSessionButton(controller: controller),
                         IconButton(
                           icon: const Icon(Icons.save_alt),
                           onPressed: () {
