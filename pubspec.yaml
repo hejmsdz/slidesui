@@ -42,6 +42,7 @@ dependencies:
   pdf_image_renderer: ^0.7.0
   mutex: ^3.1.0
   cast: ^2.0.0
+  share_plus: ^10.0.2
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.

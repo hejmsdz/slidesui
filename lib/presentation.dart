@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mutex/mutex.dart';
 import 'package:pdf_image_renderer/pdf_image_renderer.dart';
+import 'package:share_plus/share_plus.dart';
 import 'dart:io';
 
 import 'package:slidesui/cast.dart';
@@ -181,6 +182,12 @@ class _PresentationPageState extends State<PresentationPage> {
                       actions: [
                         CastButton(controller: controller),
                         LiveSessionButton(controller: controller),
+                        IconButton(
+                          icon: const Icon(Icons.share),
+                          onPressed: () {
+                            Share.shareXFiles([XFile(widget.filePath)]);
+                          },
+                        ),
                         IconButton(
                           icon: const Icon(Icons.save_alt),
                           onPressed: () {
