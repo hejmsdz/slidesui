@@ -78,14 +78,14 @@
   <canvas id="canvas1" class="inactive"></canvas>
 
   <script src="//www.gstatic.com/cast/sdk/libs/caf_receiver/v3/cast_receiver_framework.js"></script>
-  <script src="./pdf.js"></script>
+  <script src="../pdfjs/pdf.js"></script>
   <!--
   <script src="https://chii.mrozwadowski.com/target.js"></script>
   <script src="./screenlog.min.js"></script>
   <script>screenLog.init();</script>
   -->
   <script>
-    pdfjsLib.GlobalWorkerOptions.workerSrc = './pdf.worker.js';
+    pdfjsLib.GlobalWorkerOptions.workerSrc = '../pdfjs/pdf.worker.js';
 
     const loader = document.getElementById('loader');
     const canvases = [0, 1].map((i) => {
@@ -161,7 +161,7 @@
     }
 
     function goToPage(page) {
-      if (page <= 1 || page >= pdfDoc.numPages) {
+      if (page < 1 || page > pdfDoc.numPages) {
         return;
       }
 
