@@ -8,6 +8,7 @@ import 'dart:io';
 import 'package:slidesui/cast.dart';
 import 'package:slidesui/deck.dart';
 import 'package:slidesui/live_session.dart';
+import 'package:slidesui/model.dart';
 
 class PresentationController with ChangeNotifier {
   int _currentPage = 0;
@@ -20,9 +21,10 @@ class PresentationController with ChangeNotifier {
 }
 
 class PresentationPage extends StatefulWidget {
-  const PresentationPage({super.key, required this.filePath});
+  const PresentationPage({super.key, required this.filePath, this.contents});
 
   final String filePath;
+  final List<ContentSlide>? contents;
 
   @override
   State<PresentationPage> createState() => _PresentationPageState();
@@ -132,6 +134,39 @@ class _PresentationPageState extends State<PresentationPage> {
     });
   }
 
+  jumpToFirstSlideOfCurrentItem() {
+    if (widget.contents == null) {
+      return;
+    }
+
+    final contents = widget.contents!;
+    final currentItemIndex = contents[controller.currentPage].itemIndex;
+    final index = contents.indexWhere((cs) =>
+        cs.type == "verse" &&
+        cs.itemIndex == currentItemIndex &&
+        cs.verseIndex == 0 &&
+        cs.chunkIndex == 0);
+
+    if (index >= 0) {
+      controller.setCurrentPage(index);
+    }
+  }
+
+  jumpToLastSlideOfCurrentItem() {
+    if (widget.contents == null) {
+      return;
+    }
+
+    final contents = widget.contents!;
+    final currentItemIndex = contents[controller.currentPage].itemIndex;
+    final index = contents.indexWhere(
+        (cs) => cs.type == "blank" && cs.itemIndex == currentItemIndex);
+
+    if (index >= 0) {
+      controller.setCurrentPage(index);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -161,13 +196,30 @@ class _PresentationPageState extends State<PresentationPage> {
                         },
                       );
                     }),
-                GestureDetector(
-                  onDoubleTap: () {
-                    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
-                    setState(() {
-                      _isUiVisible = !_isUiVisible;
-                    });
-                  },
+                Row(
+                  children: [
+                    Expanded(
+                        flex: 1,
+                        child: GestureDetector(
+                          onDoubleTap: jumpToFirstSlideOfCurrentItem,
+                        )),
+                    Expanded(
+                        flex: 3,
+                        child: GestureDetector(
+                          onDoubleTap: () {
+                            SystemChrome.setEnabledSystemUIMode(
+                                SystemUiMode.immersive);
+                            setState(() {
+                              _isUiVisible = !_isUiVisible;
+                            });
+                          },
+                        )),
+                    Expanded(
+                        flex: 1,
+                        child: GestureDetector(
+                          onDoubleTap: jumpToLastSlideOfCurrentItem,
+                        )),
+                  ],
                 ),
                 Positioned(
                   top: 0,

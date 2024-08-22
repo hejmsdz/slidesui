@@ -51,8 +51,11 @@ Future<String> getDownloadDirectory() async {
   return directory.path;
 }
 
-DeckRequest buildDeckRequestFromState(SlidesModel state,
-    {String format = "pdf"}) {
+DeckRequest buildDeckRequestFromState(
+  SlidesModel state, {
+  String format = "pdf",
+  bool contents = false,
+}) {
   return DeckRequest(
     date: state.date,
     items: state.items,
@@ -60,10 +63,15 @@ DeckRequest buildDeckRequestFromState(SlidesModel state,
     ratio: Settings.getValue<String>('slides.aspectRatio'),
     fontSize: Settings.getValue<double>('slides.fontSize')?.toInt(),
     format: format,
+    contents: contents,
   );
 }
 
-Future<String> createDeck(BuildContext context, {String format = "pdf"}) async {
+Future<DeckResponse> createDeck(
+  BuildContext context, {
+  String format = "pdf",
+  bool contents = false,
+}) async {
   if (!kIsWeb && Platform.isAndroid) {
     await Permission.storage.request();
   }
@@ -71,11 +79,12 @@ Future<String> createDeck(BuildContext context, {String format = "pdf"}) async {
   final deckRequest = buildDeckRequestFromState(
     state,
     format: format,
+    contents: contents,
   );
-  final url = Uri.parse(await postDeck(deckRequest));
+  final response = await postDeck(deckRequest);
+  final url = Uri.parse(response.url);
 
-  if (!kIsWeb && Platform.isAndroid) {
-    // FlutterDownloader.registerCallback(downloaderCallback);
+  if (!kIsWeb) {
     final destination = await getDownloadDirectory();
     final extension = format.endsWith("zip") ? "zip" : "pdf";
     final fileName =
@@ -95,7 +104,10 @@ Future<String> createDeck(BuildContext context, {String format = "pdf"}) async {
 
     await FileDownloader().download(task);
 
-    return task.filePath();
+    return DeckResponse(
+      await task.filePath(),
+      response.contents,
+    );
   } else if (await canLaunchUrl(url)) {
     await launchUrl(url);
 
@@ -105,5 +117,5 @@ Future<String> createDeck(BuildContext context, {String format = "pdf"}) async {
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
-  return url.toString();
+  return response;
 }

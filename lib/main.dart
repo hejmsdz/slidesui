@@ -490,7 +490,8 @@ class _MyHomePageState extends State<MyHomePage> {
                           Settings.getValue<String>('app.slidesBehavior') ==
                               'display';
 
-                      final downloadedFile = await createDeck(context);
+                      final result =
+                          await createDeck(context, contents: shouldDisplay);
 
                       if (shouldDisplay) {
                         Navigator.push(
@@ -499,12 +500,13 @@ class _MyHomePageState extends State<MyHomePage> {
                               fullscreenDialog: true,
                               builder: (context) {
                                 return PresentationPage(
-                                  filePath: downloadedFile,
+                                  filePath: result.url,
+                                  contents: result.contents,
                                 );
                               }),
                         );
                       } else {
-                        notifyOnDownloaded(context, downloadedFile);
+                        notifyOnDownloaded(context, result.url);
                       }
                     } finally {
                       setIsWorking(false);

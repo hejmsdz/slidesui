@@ -35,7 +35,7 @@ Future<List<String>> getLyrics(String songId, {bool raw = false}) async {
   return json.map((itemJson) => itemJson.toString()).toList();
 }
 
-Future<String> postDeck(deckRequest) async {
+Future<DeckResponse> postDeck(deckRequest) async {
   final response = await http.post(
     apiURL('v2/deck'),
     headers: <String, String>{
@@ -45,7 +45,7 @@ Future<String> postDeck(deckRequest) async {
   );
   final deckResponse = DeckResponse.fromJson(jsonDecode(response.body));
 
-  return deckResponse.url;
+  return deckResponse;
 }
 
 Future<Manual> getManual() async {

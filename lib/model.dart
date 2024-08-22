@@ -212,6 +212,7 @@ class DeckRequest {
   final String? ratio;
   final int? fontSize;
   final String? format;
+  final bool? contents;
 
   DeckRequest({
     required this.date,
@@ -220,6 +221,7 @@ class DeckRequest {
     this.ratio,
     this.fontSize,
     this.format,
+    this.contents,
   });
 
   Map<String, dynamic> toJson() => {
@@ -229,15 +231,37 @@ class DeckRequest {
         'ratio': ratio,
         'fontSize': fontSize,
         'format': format,
+        'contents': contents,
       };
 }
 
 class DeckResponse {
   final String url;
+  final List<ContentSlide>? contents;
 
-  DeckResponse(this.url);
+  DeckResponse(this.url, this.contents);
 
-  DeckResponse.fromJson(Map<String, dynamic> json) : url = json['url'];
+  DeckResponse.fromJson(Map<String, dynamic> json)
+      : url = json['url'],
+        contents = json['contents'] == null
+            ? null
+            : List<ContentSlide>.from(
+                json['contents'].map((cs) => ContentSlide.fromJson(cs)));
+}
+
+class ContentSlide {
+  final String type;
+  final int itemIndex;
+  final int verseIndex;
+  final int chunkIndex;
+
+  ContentSlide(this.type, this.itemIndex, this.verseIndex, this.chunkIndex);
+
+  ContentSlide.fromJson(Map<String, dynamic> json)
+      : type = json['t'],
+        itemIndex = json['i'],
+        verseIndex = json['v'],
+        chunkIndex = json['c'];
 }
 
 class Manual {

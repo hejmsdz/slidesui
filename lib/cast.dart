@@ -120,6 +120,8 @@ class _CastButtonState extends State<CastButton> {
 
     session.messageStream.listen((message) {
       print('received message: $message');
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text("$message")));
       if (message['namespace'] == '$namespace.changePage') {
         Map<String, dynamic> data = jsonDecode(message['data']);
         int page = data['page'];
@@ -140,8 +142,8 @@ class _CastButtonState extends State<CastButton> {
 
   @override
   void dispose() {
-    super.dispose();
     disconnect();
+    super.dispose();
   }
 
   @override
