@@ -119,14 +119,8 @@ class _CastButtonState extends State<CastButton> {
     });
 
     session.messageStream.listen((message) {
-      print('received message: $message');
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text("$message")));
-      if (message['namespace'] == '$namespace.changePage') {
-        Map<String, dynamic> data = jsonDecode(message['data']);
-        int page = data['page'];
-        print('going to page: $page');
-        widget.controller.setCurrentPage(page);
+      if (message.containsKey("page")) {
+        widget.controller.setCurrentPage(message["page"]);
       }
     });
 
