@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_settings_screens/flutter_settings_screens.dart';
@@ -54,14 +55,16 @@ class SettingsPage extends StatelessWidget {
                   values: aspectRatios,
                   selected: "16:9",
                 ),
-                DropDownSettingsTile<String>(
-                  leading: const Icon(Icons.slideshow),
-                  title: strings['slidesBehavior']!,
-                  subtitle: " ",
-                  settingKey: 'app.slidesBehavior',
-                  values: behaviors,
-                  selected: 'save',
-                ),
+                kIsWeb
+                    ? Container()
+                    : DropDownSettingsTile<String>(
+                        leading: const Icon(Icons.slideshow),
+                        title: strings['slidesBehavior']!,
+                        subtitle: " ",
+                        settingKey: 'app.slidesBehavior',
+                        values: behaviors,
+                        selected: 'save',
+                      ),
               ],
             ),
           ]),
