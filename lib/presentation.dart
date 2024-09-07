@@ -39,6 +39,7 @@ class _PresentationPageState extends State<PresentationPage> {
   final _pdfMutex = Mutex();
   PresentationController controller = PresentationController();
   final PageController _pageController = PageController();
+  List<Future<MemoryImage>?> _pageCache = [];
 
   @override
   void initState() {
@@ -59,7 +60,8 @@ class _PresentationPageState extends State<PresentationPage> {
     final isUserTriggeredChange =
         _pageController.page == _pageController.page?.truncate();
     if (isUserTriggeredChange) {
-      _pageController.jumpToPage(controller.currentPage);
+      _pageController.animateToPage(controller.currentPage,
+          duration: Durations.medium2, curve: Easing.standard);
     }
   }
 
@@ -93,6 +95,7 @@ class _PresentationPageState extends State<PresentationPage> {
 
       setState(() {
         _numPages = numPages;
+        _pageCache = List.filled(numPages, null);
       });
     } catch (e) {
       Navigator.of(context).pop();
@@ -127,6 +130,14 @@ class _PresentationPageState extends State<PresentationPage> {
       await _pdf!.closePage(pageIndex: pageIndex);
       _pdfMutex.release();
     }
+  }
+
+  Future<MemoryImage> renderPageCached(int pageIndex) async {
+    if (_pageCache[pageIndex] == null) {
+      _pageCache[pageIndex] = renderPage(pageIndex);
+    }
+
+    return _pageCache[pageIndex]!;
   }
 
   setIsLoading(bool isLoading) {
@@ -184,7 +195,7 @@ class _PresentationPageState extends State<PresentationPage> {
                     },
                     itemBuilder: (context, pageIndex) {
                       return FutureBuilder(
-                        future: renderPage(pageIndex),
+                        future: renderPageCached(pageIndex),
                         builder: (context, snapshot) {
                           if (snapshot.hasData) {
                             return Center(
