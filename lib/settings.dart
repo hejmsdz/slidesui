@@ -6,13 +6,14 @@ import './strings.dart';
 import './state.dart';
 
 const aspectRatios = <String, String>{
-  '4:3': '4:3',
   '16:9': '16:9',
+  '4:3': '4:3',
 };
 
 final behaviors = <String, String>{
-  'save': strings['behaviorSave']!,
   'display': strings['behaviorDisplay']!,
+  'save': strings['behaviorSave']!,
+  'share': strings['behaviorShare']!,
 };
 
 class SettingsPage extends StatelessWidget {

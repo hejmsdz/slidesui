@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:slidesui/presentation.dart';
 import 'package:slidesui/verse_order.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -486,27 +487,31 @@ class _MyHomePageState extends State<MyHomePage> {
                 : () async {
                     setIsWorking(true);
                     try {
-                      final shouldDisplay =
-                          Settings.getValue<String>('app.slidesBehavior') ==
-                              'display';
+                      final behavior =
+                          Settings.getValue<String>('app.slidesBehavior');
+                      final result = await createDeck(context,
+                          contents: behavior == 'display');
 
-                      final result =
-                          await createDeck(context, contents: shouldDisplay);
-
-                      if (shouldDisplay) {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              fullscreenDialog: true,
-                              builder: (context) {
-                                return PresentationPage(
-                                  filePath: result.url,
-                                  contents: result.contents,
-                                );
-                              }),
-                        );
-                      } else {
-                        notifyOnDownloaded(context, result.url);
+                      switch (behavior) {
+                        case 'display':
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                fullscreenDialog: true,
+                                builder: (context) {
+                                  return PresentationPage(
+                                    filePath: result.url,
+                                    contents: result.contents,
+                                  );
+                                }),
+                          );
+                          break;
+                        case 'share':
+                          Share.shareXFiles([XFile(result.url)]);
+                          break;
+                        default:
+                          notifyOnDownloaded(context, result.url);
+                          break;
                       }
                     } finally {
                       setIsWorking(false);
