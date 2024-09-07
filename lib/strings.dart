@@ -54,5 +54,16 @@ const strings = {
   'aspectRatio': 'Proporcje slajdów',
   'slidesBehavior': 'Po wygenerowaniu slajdów',
   'behaviorSave': 'Zapisz do pliku',
-  'behaviorDisplay': 'Wyświetl'
+  'behaviorDisplay': 'Wyświetl',
+  'cast': 'Przesyłanie (Chromecast)',
+  'castSelectDevice': 'Połącz się z urządzeniem',
+  'castNoDevicesFound': 'Nie znaleziono urządzeń.',
+  'castError': 'Błąd: {error}',
+  'castConnected': 'Połączono z urządzeniem.',
+  'castDisconnected': 'Odłączono od urządzenia.',
+  'liveSession': 'Pokaz na żywo',
+  'liveSessionStarted': 'Pokaz na żywo jest dostępny pod adresem {url}.',
+  'shareLink': 'UDOSTĘPNIJ LINK',
+  'shareSlides': 'Udostępnij slajdy',
+  'saveToFile': 'Zapisz slajdy do pliku',
 };

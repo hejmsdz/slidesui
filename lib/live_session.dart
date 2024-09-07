@@ -7,8 +7,8 @@ import 'package:slidesui/model.dart';
 import 'package:slidesui/presentation.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-
 import 'package:slidesui/state.dart';
+import 'package:slidesui/strings.dart';
 
 class LiveSessionButton extends StatefulWidget {
   const LiveSessionButton({super.key, required this.controller});
@@ -37,15 +37,16 @@ class _LiveSessionButtonState extends State<LiveSessionButton> {
         "deck": buildDeckRequestFromState(
                 Provider.of<SlidesModel>(context, listen: false))
             .toJson(),
-        "currentPage": widget.controller.currentPage
+        "currentPage": widget.controller.currentPage,
       }),
     );
     if (response.statusCode == 200 && mounted) {
       final liveResponse = LiveResponse.fromJson(jsonDecode(response.body));
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Live session started at ${liveResponse.url}'),
+        content: Text(strings['liveSessionStarted']!
+            .replaceFirst('{url}', liveResponse.url)),
         action: SnackBarAction(
-            label: "SHARE LINK",
+            label: strings['shareLink']!,
             onPressed: () {
               Share.share(liveResponse.url);
             }),
@@ -59,7 +60,6 @@ class _LiveSessionButtonState extends State<LiveSessionButton> {
   }
 
   disconnect({bool shouldUpdateState = true}) {
-    // http.get(picastURL('close'));
     widget.controller.removeListener(handleSlideChange);
     if (shouldUpdateState) {
       setState(() {
@@ -79,7 +79,7 @@ class _LiveSessionButtonState extends State<LiveSessionButton> {
     return IconButton(
       icon:
           Icon(_isConnected ? Icons.pause_presentation : Icons.present_to_all),
-      tooltip: "Live session",
+      tooltip: strings['liveSession']!,
       onPressed: () async {
         if (_isConnected) {
           disconnect();

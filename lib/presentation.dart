@@ -9,6 +9,7 @@ import 'package:slidesui/cast.dart';
 import 'package:slidesui/deck.dart';
 import 'package:slidesui/live_session.dart';
 import 'package:slidesui/model.dart';
+import 'package:slidesui/strings.dart';
 
 class PresentationController with ChangeNotifier {
   int _currentPage = 0;
@@ -236,12 +237,14 @@ class _PresentationPageState extends State<PresentationPage> {
                         LiveSessionButton(controller: controller),
                         IconButton(
                           icon: const Icon(Icons.share),
+                          tooltip: strings['shareSlides'],
                           onPressed: () {
                             Share.shareXFiles([XFile(widget.filePath)]);
                           },
                         ),
                         IconButton(
                           icon: const Icon(Icons.save_alt),
+                          tooltip: strings['saveToFile'],
                           onPressed: () {
                             notifyOnDownloaded(context, widget.filePath);
                           },

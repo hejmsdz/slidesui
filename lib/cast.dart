@@ -1,11 +1,10 @@
-import 'dart:convert';
-
 import 'package:cast/cast.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:slidesui/deck.dart';
 import 'package:slidesui/presentation.dart';
 import 'package:slidesui/state.dart';
+import 'package:slidesui/strings.dart';
 
 const castAppId = 'E34D7CD2';
 const namespace = 'urn:x-cast:com.mrozwadowski.slidesui';
@@ -28,9 +27,8 @@ class _CastButtonState extends State<CastButton> {
     if (snapshot.hasError) {
       return [
         Center(
-          child: Text(
-            'Error: ${snapshot.error.toString()}',
-          ),
+          child: Text(strings['castError']!
+              .replaceFirst('{error}', snapshot.error.toString())),
         )
       ];
     }
@@ -38,17 +36,20 @@ class _CastButtonState extends State<CastButton> {
     if (!snapshot.hasData) {
       return [
         const Center(
-          child: CircularProgressIndicator(),
+          child: Padding(
+            padding: EdgeInsets.all(8),
+            child: CircularProgressIndicator(),
+          ),
         )
       ];
     }
 
     if (snapshot.data!.isEmpty) {
       return [
-        const Column(
+        Column(
           children: [
             Center(
-              child: Text('No Chromecast devices found.'),
+              child: Text(strings['castNoDevicesFound']!),
             ),
           ],
         )
@@ -75,7 +76,7 @@ class _CastButtonState extends State<CastButton> {
               future: devices,
               builder: (context, snapshot) {
                 return SimpleDialog(
-                  title: const Text('Select receiver device'),
+                  title: Text(strings['castSelectDevice']!),
                   children: buildDeviceDialogContent(snapshot),
                 );
               });
@@ -100,8 +101,8 @@ class _CastButtonState extends State<CastButton> {
           'currentPage': widget.controller.currentPage,
         });
 
-        ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Connected to remote display')));
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(strings['castConnected']!)));
         setState(() {
           _isConnected = true;
         });
@@ -109,7 +110,7 @@ class _CastButtonState extends State<CastButton> {
         widget.controller.addListener(handleSlideChange);
       } else if (state == CastSessionState.closed) {
         ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Remote display disconnected')));
+            SnackBar(content: Text(strings['castDisconnected']!)));
         setState(() {
           _isConnected = false;
         });
@@ -144,7 +145,7 @@ class _CastButtonState extends State<CastButton> {
   Widget build(BuildContext context) {
     return IconButton(
       icon: Icon(_isConnected ? Icons.cast_connected : Icons.cast),
-      tooltip: "Cast",
+      tooltip: strings['cast']!,
       onPressed: () async {
         if (_isConnected) {
           disconnect();
