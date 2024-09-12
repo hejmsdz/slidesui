@@ -5,7 +5,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:slidesui/model.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:path_provider/path_provider.dart';
@@ -72,9 +71,6 @@ Future<DeckResponse> createDeck(
   String format = "pdf",
   bool contents = false,
 }) async {
-  if (!kIsWeb && Platform.isAndroid) {
-    await Permission.storage.request();
-  }
   final state = Provider.of<SlidesModel>(context, listen: false);
   final deckRequest = buildDeckRequestFromState(
     state,

@@ -32,7 +32,6 @@ dependencies:
   http: ^1.2.2
   provider: ^6.0.2
   background_downloader: ^8.5.2
-  permission_handler: ^11.3.1
   url_launcher: ^6.0.2
   path_provider: ^2.0.1
   package_info_plus: ^8.0.0
