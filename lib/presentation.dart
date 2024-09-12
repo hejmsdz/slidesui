@@ -34,6 +34,7 @@ class PresentationPage extends StatefulWidget {
 class _PresentationPageState extends State<PresentationPage> {
   bool _isLoading = false;
   bool _isUiVisible = false;
+  bool _isPageViewAnimating = false;
   PdfImageRendererPdf? _pdf;
   int _numPages = 0;
   final _pdfMutex = Mutex();
@@ -56,12 +57,17 @@ class _PresentationPageState extends State<PresentationPage> {
     controller.addListener(handleSlideChange);
   }
 
-  handleSlideChange() {
+  handleSlideChange() async {
     final isUserTriggeredChange =
         _pageController.page == _pageController.page?.truncate();
     if (isUserTriggeredChange) {
-      _pageController.animateToPage(controller.currentPage,
-          duration: Durations.medium2, curve: Easing.standard);
+      _isPageViewAnimating = true;
+      await _pageController.animateToPage(
+        controller.currentPage,
+        duration: Durations.medium2,
+        curve: Easing.standard,
+      );
+      _isPageViewAnimating = false;
     }
   }
 
@@ -191,7 +197,9 @@ class _PresentationPageState extends State<PresentationPage> {
                     itemCount: _numPages,
                     allowImplicitScrolling: true,
                     onPageChanged: (i) {
-                      controller.setCurrentPage(i);
+                      if (!_isPageViewAnimating) {
+                        controller.setCurrentPage(i);
+                      }
                     },
                     itemBuilder: (context, pageIndex) {
                       return FutureBuilder(
