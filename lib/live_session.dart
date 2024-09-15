@@ -21,8 +21,13 @@ class LiveSessionButton extends StatefulWidget {
 
 class _LiveSessionButtonState extends State<LiveSessionButton> {
   bool _isConnected = false;
+  bool _isPaused = false;
 
   void handleSlideChange() {
+    if (_isPaused) {
+      return;
+    }
+
     http.post(apiURL(
         'v2/live/session/page', {'page': "${widget.controller.currentPage}"}));
   }
@@ -77,16 +82,22 @@ class _LiveSessionButtonState extends State<LiveSessionButton> {
   @override
   Widget build(BuildContext context) {
     return IconButton(
-      icon:
-          Icon(_isConnected ? Icons.pause_presentation : Icons.present_to_all),
+      icon: Icon((_isConnected && !_isPaused)
+          ? Icons.pause_presentation
+          : Icons.present_to_all),
       tooltip: strings['liveSession']!,
       onPressed: () async {
         if (_isConnected) {
-          disconnect();
-          return;
-        }
+          setState(() {
+            _isPaused = !_isPaused;
+          });
 
-        connectToDevice();
+          if (!_isPaused) {
+            handleSlideChange();
+          }
+        } else {
+          connectToDevice();
+        }
       },
     );
   }
