@@ -20,16 +20,20 @@ class LiveSessionButton extends StatefulWidget {
 }
 
 class _LiveSessionButtonState extends State<LiveSessionButton> {
+  bool _shouldReconnect = false;
+
   @override
   void initState() {
     super.initState();
 
-    /*
     final state = Provider.of<SlidesModel>(context, listen: false);
-    if (state.live != null) {
+    if (state.live != null && !state.isLivePaused) {
       connectToDevice();
+    } else if (state.live != null && state.isLivePaused) {
+      setState(() {
+        _shouldReconnect = true;
+      });
     }
-    */
   }
 
   void handleSlideChange() {
@@ -89,8 +93,11 @@ class _LiveSessionButtonState extends State<LiveSessionButton> {
           }),
     ));
 
-    handleSlideChange();
     widget.controller.addListener(handleSlideChange);
+
+    setState(() {
+      _shouldReconnect = false;
+    });
   }
 
   disconnect() {
@@ -119,7 +126,9 @@ class _LiveSessionButtonState extends State<LiveSessionButton> {
             if (isConnected) {
               state.setIsLivePaused(!isPaused);
 
-              if (!state.isLivePaused) {
+              if (_shouldReconnect) {
+                connectToDevice();
+              } else if (!state.isLivePaused) {
                 handleSlideChange();
               }
             } else {
