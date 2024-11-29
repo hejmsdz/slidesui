@@ -21,6 +21,9 @@ class SlidesModel extends ChangeNotifier implements LiturgyHolder {
   @override
   Liturgy? liturgy;
 
+  bool isLivePaused = false;
+  LiveResponse? live;
+
   Map<String, dynamic> toJson() => {
         'date': _date.toIso8601String().substring(0, 10),
         'items': _items.map((item) => item.toFullJson()).toList(),
@@ -192,5 +195,15 @@ class SlidesModel extends ChangeNotifier implements LiturgyHolder {
   bool isValid() {
     return _items.isNotEmpty &&
         !_items.any((item) => item is UnresolvedDeckItem);
+  }
+
+  setIsLivePaused(bool isPaused) {
+    isLivePaused = isPaused;
+    notifyListeners();
+  }
+
+  setLiveSession(LiveResponse live) {
+    this.live = live;
+    notifyListeners();
   }
 }

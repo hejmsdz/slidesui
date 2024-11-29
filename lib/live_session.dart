@@ -20,91 +20,113 @@ class LiveSessionButton extends StatefulWidget {
 }
 
 class _LiveSessionButtonState extends State<LiveSessionButton> {
-  bool _isConnected = false;
-  bool _isPaused = false;
-  String id = "";
-  String token = "";
+  @override
+  void initState() {
+    super.initState();
+
+    /*
+    final state = Provider.of<SlidesModel>(context, listen: false);
+    if (state.live != null) {
+      connectToDevice();
+    }
+    */
+  }
 
   void handleSlideChange() {
-    if (_isPaused) {
+    final state = Provider.of<SlidesModel>(context, listen: false);
+    if (state.isLivePaused || state.live == null) {
       return;
     }
 
-    http.post(apiURL('v2/live/$id/page', {
+    http.post(apiURL('v2/live/${state.live?.id}/page', {
       'page': "${widget.controller.currentPage}",
-      'token': token,
+      'token': state.live?.token,
     }));
   }
 
   Future<void> connectToDevice() async {
-    final response = await http.post(
-      apiURL('v2/live'),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode({
-        "deck": buildDeckRequestFromState(
-                Provider.of<SlidesModel>(context, listen: false))
-            .toJson(),
-        "currentPage": widget.controller.currentPage,
-      }),
-    );
-    if (response.statusCode == 200 && mounted) {
-      final liveResponse = LiveResponse.fromJson(jsonDecode(response.body));
-      id = liveResponse.id;
-      token = liveResponse.token;
+    final state = Provider.of<SlidesModel>(context, listen: false);
+    final headers = <String, String>{
+      'Content-Type': 'application/json; charset=UTF-8',
+    };
+    final body = jsonEncode({
+      "deck": buildDeckRequestFromState(state).toJson(),
+      "currentPage": widget.controller.currentPage,
+    });
 
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text(strings['liveSessionStarted']!
-            .replaceFirst('{url}', liveResponse.url)),
-        action: SnackBarAction(
-            label: strings['shareLink']!,
-            onPressed: () {
-              Share.share(liveResponse.url);
-            }),
-      ));
+    http.Response? response;
+    if (state.live != null) {
+      response = await http.put(
+        apiURL('v2/live/${state.live?.id}', {'token': state.live?.token}),
+        headers: headers,
+        body: body,
+      );
     }
 
-    setState(() {
-      _isConnected = true;
-    });
+    if (response == null || response.statusCode != 200) {
+      response = await http.post(
+        apiURL('v2/live'),
+        headers: headers,
+        body: body,
+      );
+    }
+
+    if (response.statusCode != 200 || !mounted) {
+      return;
+    }
+
+    final liveResponse = LiveResponse.fromJson(jsonDecode(response.body));
+    Provider.of<SlidesModel>(context, listen: false)
+        .setLiveSession(liveResponse);
+
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text(strings['liveSessionStarted']!
+          .replaceFirst('{url}', liveResponse.url)),
+      action: SnackBarAction(
+          label: strings['shareLink']!,
+          onPressed: () {
+            Share.share(liveResponse.url);
+          }),
+    ));
+
+    handleSlideChange();
     widget.controller.addListener(handleSlideChange);
   }
 
-  disconnect({bool shouldUpdateState = true}) {
+  disconnect() {
     widget.controller.removeListener(handleSlideChange);
-    if (shouldUpdateState) {
-      setState(() {
-        _isConnected = false;
-      });
-    }
   }
 
   @override
   void dispose() {
-    disconnect(shouldUpdateState: false);
+    disconnect();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return IconButton(
-      icon: Icon((_isConnected && !_isPaused)
-          ? Icons.pause_presentation
-          : Icons.present_to_all),
-      tooltip: strings['liveSession']!,
-      onPressed: () async {
-        if (_isConnected) {
-          setState(() {
-            _isPaused = !_isPaused;
-          });
+    return Consumer<SlidesModel>(
+      builder: (context, state, child) {
+        final isConnected = state.live != null;
+        final isPaused = state.isLivePaused;
 
-          if (!_isPaused) {
-            handleSlideChange();
-          }
-        } else {
-          connectToDevice();
-        }
+        return IconButton(
+          icon: Icon(!isConnected || isPaused
+              ? Icons.present_to_all
+              : Icons.pause_presentation),
+          tooltip: strings['liveSession']!,
+          onPressed: () async {
+            if (isConnected) {
+              state.setIsLivePaused(!isPaused);
+
+              if (!state.isLivePaused) {
+                handleSlideChange();
+              }
+            } else {
+              connectToDevice();
+            }
+          },
+        );
       },
     );
   }
