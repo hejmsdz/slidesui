@@ -22,19 +22,23 @@ class LiveSessionButton extends StatefulWidget {
 class _LiveSessionButtonState extends State<LiveSessionButton> {
   bool _isConnected = false;
   bool _isPaused = false;
+  String id = "";
+  String token = "";
 
   void handleSlideChange() {
     if (_isPaused) {
       return;
     }
 
-    http.post(apiURL(
-        'v2/live/session/page', {'page': "${widget.controller.currentPage}"}));
+    http.post(apiURL('v2/live/$id/page', {
+      'page': "${widget.controller.currentPage}",
+      'token': token,
+    }));
   }
 
   Future<void> connectToDevice() async {
-    final response = await http.put(
-      apiURL('v2/live/session'),
+    final response = await http.post(
+      apiURL('v2/live'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
@@ -47,6 +51,9 @@ class _LiveSessionButtonState extends State<LiveSessionButton> {
     );
     if (response.statusCode == 200 && mounted) {
       final liveResponse = LiveResponse.fromJson(jsonDecode(response.body));
+      id = liveResponse.id;
+      token = liveResponse.token;
+
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text(strings['liveSessionStarted']!
             .replaceFirst('{url}', liveResponse.url)),

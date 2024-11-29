@@ -300,9 +300,14 @@ class Liturgy {
 }
 
 class LiveResponse {
+  final String id;
   final String url;
+  final String token;
 
-  LiveResponse(this.url);
+  LiveResponse(this.id, this.url, this.token);
 
-  LiveResponse.fromJson(Map<String, dynamic> json) : url = json['url'];
+  LiveResponse.fromJson(Map<String, dynamic> json)
+      : id = json['id'],
+        url = json['url'],
+        token = json['token'];
 }

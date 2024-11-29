@@ -187,7 +187,8 @@
             document.body.className = 'ready';
         }
 
-        const sse = new EventSource("https://slajdy.swro.ch/v2/live/session");
+        const sessionId = window.location.hash.slice(1);
+        const sse = new EventSource(`https://slajdy.swro.ch/v2/live/${sessionId}`);
 
         sse.addEventListener('start', (event) => {
             const { deck, currentPage } = JSON.parse(event.data);
