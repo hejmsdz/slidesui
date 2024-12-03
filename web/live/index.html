@@ -18,6 +18,10 @@
             justify-content: center;
         }
 
+        body:fullscreen:not(.mouseMoving) {
+            cursor: none;
+        }
+
         canvas {
             position: absolute;
             width: 100%;
@@ -205,14 +209,31 @@
         let wakeLock;
         document.body.addEventListener('dblclick', async () => {
             if (document.fullscreenElement) {
-                wakeLock?.release();
-                await screen.orientation?.unlock?.();
-                await document.exitFullscreen?.();
+                wakeLock?.release?.();
+                screen.orientation?.unlock?.();
+                document.exitFullscreen?.();
             } else {
-                await document.body.requestFullscreen?.({ navigationUI: 'hide' });
-                await screen.orientation?.lock?.('landscape');
-                wakeLock = navigator.wakeLock?.request();
+                document.body.requestFullscreen?.({ navigationUI: 'hide' });
+                screen.orientation?.lock?.('landscape');
+                wakeLock = navigator.wakeLock?.request?.();
             }
+        });
+
+        let mouseMovingTimeout = null;
+
+        function hideCursor() {
+            document.body.classList.remove('mouseMoving');
+            mouseMovingTimeout = null;
+        }
+
+        document.body.addEventListener('mousemove', () => {
+            document.body.classList.add('mouseMoving');
+
+            if (mouseMovingTimeout) {
+                clearTimeout(mouseMovingTimeout);
+            }
+
+            mouseMovingTimeout = setTimeout(hideCursor, 1000);
         });
     </script>
 </body>
