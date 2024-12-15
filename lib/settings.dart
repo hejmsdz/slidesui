@@ -6,6 +6,8 @@ import 'package:flutter_settings_screens/flutter_settings_screens.dart';
 import './strings.dart';
 import './state.dart';
 
+const defaultFontSize = 42.0;
+
 const aspectRatios = <String, String>{
   '16:9': '16:9',
   '4:3': '4:3',
@@ -43,15 +45,7 @@ class SettingsPage extends StatelessWidget {
                   leading: const Icon(Icons.help),
                   defaultValue: false,
                 ),
-                SliderSettingsTile(
-                  title: strings['fontSize']!,
-                  settingKey: 'slides.fontSize',
-                  defaultValue: 42,
-                  min: 36,
-                  max: 72,
-                  step: 1,
-                  leading: const Icon(Icons.format_size),
-                ),
+                const FontSizeSettingsTile(),
                 DropDownSettingsTile<String>(
                   leading: const Icon(Icons.aspect_ratio),
                   title: strings['aspectRatio']!,
@@ -75,6 +69,62 @@ class SettingsPage extends StatelessWidget {
         ),
       )
     ]);
+  }
+}
+
+class FontSizeSettingsTile extends StatefulWidget {
+  const FontSizeSettingsTile({super.key});
+
+  @override
+  State<FontSizeSettingsTile> createState() => _FontSizeSettingsTileState();
+}
+
+class _FontSizeSettingsTileState extends State<FontSizeSettingsTile> {
+  double? _fontSize;
+  double lineSpacing = 1.3;
+  double pageHeight = 432;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _fontSize = Settings.getValue('slides.fontSize');
+  }
+
+  int linesPerPage() {
+    double fontSize = _fontSize ?? defaultFontSize;
+    double lineHeight = fontSize * lineSpacing;
+    return (pageHeight / lineHeight).floor();
+  }
+
+  String formatLinesPerPage() {
+    int count = linesPerPage();
+    String key = count == 1
+        ? 'linesPerPageOne'
+        : count <= 4
+            ? 'linesPerPageFew'
+            : 'linesPerPageMany';
+
+    return strings[key]!.replaceFirst('{}', '$count');
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SliderSettingsTile(
+      title: strings['fontSize']!,
+      settingKey: 'slides.fontSize',
+      subtitle: "$_fontSize; ${formatLinesPerPage()}",
+      defaultValue: defaultFontSize,
+      min: 36,
+      max: 72,
+      step: 1,
+      leading: const Icon(Icons.format_size),
+      onChange: (value) {
+        setState(() {
+          _fontSize = value;
+        });
+      },
+    );
   }
 }
 
