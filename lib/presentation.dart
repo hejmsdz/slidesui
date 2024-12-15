@@ -37,6 +37,7 @@ class _PresentationPageState extends State<PresentationPage> {
   bool _isPageViewAnimating = false;
   PdfImageRendererPdf? _pdf;
   int _numPages = 0;
+  int _skipRenderingTillPage = -1;
   final _pdfMutex = Mutex();
   PresentationController controller = PresentationController();
   final PageController _pageController = PageController();
@@ -68,6 +69,7 @@ class _PresentationPageState extends State<PresentationPage> {
         curve: Easing.standard,
       );
       _isPageViewAnimating = false;
+      _skipRenderingTillPage = -1;
     }
   }
 
@@ -132,6 +134,8 @@ class _PresentationPageState extends State<PresentationPage> {
       );
 
       return MemoryImage(imageData!);
+    } catch (e) {
+      rethrow;
     } finally {
       await _pdf!.closePage(pageIndex: pageIndex);
       _pdfMutex.release();
@@ -140,6 +144,10 @@ class _PresentationPageState extends State<PresentationPage> {
 
   Future<MemoryImage> renderPageCached(int pageIndex) async {
     if (_pageCache[pageIndex] == null) {
+      if (pageIndex < _skipRenderingTillPage) {
+        return _pageCache[0]!;
+      }
+
       _pageCache[pageIndex] = renderPage(pageIndex);
     }
 
@@ -181,6 +189,7 @@ class _PresentationPageState extends State<PresentationPage> {
         (cs) => cs.type == "blank" && cs.itemIndex == currentItemIndex);
 
     if (index >= 0) {
+      _skipRenderingTillPage = index - 1;
       controller.setCurrentPage(index);
     }
   }
