@@ -33,7 +33,7 @@ class PresentationPage extends StatefulWidget {
 
 class _PresentationPageState extends State<PresentationPage> {
   bool _isLoading = false;
-  bool _isUiVisible = false;
+  bool _isUiVisible = true;
   bool _isPageViewAnimating = false;
   PdfImageRendererPdf? _pdf;
   int _numPages = 0;
