@@ -28,11 +28,10 @@ class SettingsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SettingsScreen(
-      title: strings['settings']!,
-      children: [
-        Consumer<SlidesModel>(
-          builder: (context, state, child) => Column(children: [
+    return SettingsScreen(title: strings['settings']!, children: [
+      Consumer<SlidesModel>(
+        builder: (context, state, child) => Column(
+          children: [
             SettingsGroup(
               title: strings['settingsSectionSlides']!,
               children: <Widget>[
@@ -53,31 +52,29 @@ class SettingsPage extends StatelessWidget {
                   step: 1,
                   leading: const Icon(Icons.format_size),
                 ),
-                const VerticalAlignmentSettingsTile(),
                 DropDownSettingsTile<String>(
                   leading: const Icon(Icons.aspect_ratio),
                   title: strings['aspectRatio']!,
-                  subtitle: " ",
                   settingKey: 'slides.aspectRatio',
                   values: aspectRatios,
                   selected: "16:9",
                 ),
+                const VerticalAlignmentSettingsTile(),
                 kIsWeb
                     ? Container()
                     : DropDownSettingsTile<String>(
                         leading: const Icon(Icons.slideshow),
                         title: strings['slidesBehavior']!,
-                        subtitle: " ",
                         settingKey: 'app.slidesBehavior',
                         values: behaviors,
                         selected: 'save',
                       ),
               ],
             ),
-          ]),
-        )
-      ],
-    );
+          ],
+        ),
+      )
+    ]);
   }
 }
 
