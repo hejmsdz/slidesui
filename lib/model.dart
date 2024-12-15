@@ -211,6 +211,7 @@ class DeckRequest {
   final bool? hints;
   final String? ratio;
   final int? fontSize;
+  final String? verticalAlign;
   final String? format;
   final bool? contents;
 
@@ -220,6 +221,7 @@ class DeckRequest {
     this.hints,
     this.ratio,
     this.fontSize,
+    this.verticalAlign,
     this.format,
     this.contents,
   });
@@ -230,6 +232,7 @@ class DeckRequest {
         'hints': hints,
         'ratio': ratio,
         'fontSize': fontSize,
+        'verticalAlign': verticalAlign,
         'format': format,
         'contents': contents,
       };

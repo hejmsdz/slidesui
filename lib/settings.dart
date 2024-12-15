@@ -11,6 +11,12 @@ const aspectRatios = <String, String>{
   '4:3': '4:3',
 };
 
+final verticalAlignments = <String, String>{
+  'top': strings['verticalAlignTop']!,
+  'center': strings['verticalAlignCenter']!,
+  'bottom': strings['verticalAlignBottom']!,
+};
+
 final behaviors = <String, String>{
   'display': strings['behaviorDisplay']!,
   'save': strings['behaviorSave']!,
@@ -47,6 +53,7 @@ class SettingsPage extends StatelessWidget {
                   step: 1,
                   leading: const Icon(Icons.format_size),
                 ),
+                const VerticalAlignmentSettingsTile(),
                 DropDownSettingsTile<String>(
                   leading: const Icon(Icons.aspect_ratio),
                   title: strings['aspectRatio']!,
@@ -70,6 +77,52 @@ class SettingsPage extends StatelessWidget {
           ]),
         )
       ],
+    );
+  }
+}
+
+class VerticalAlignmentSettingsTile extends StatefulWidget {
+  const VerticalAlignmentSettingsTile({super.key});
+
+  @override
+  State<VerticalAlignmentSettingsTile> createState() =>
+      _VerticalAlignmentSettingsTileState();
+}
+
+class _VerticalAlignmentSettingsTileState
+    extends State<VerticalAlignmentSettingsTile> {
+  String? _verticalAlign;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _verticalAlign = Settings.getValue('slides.verticalAlign');
+  }
+
+  Widget buildIcon() {
+    if (_verticalAlign == 'top') {
+      return const Icon(Icons.align_vertical_top);
+    } else if (_verticalAlign == 'bottom') {
+      return const Icon(Icons.align_vertical_bottom);
+    } else {
+      return const Icon(Icons.align_vertical_center);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return DropDownSettingsTile<String>(
+      leading: buildIcon(),
+      title: strings['verticalAlign']!,
+      settingKey: 'slides.verticalAlign',
+      values: verticalAlignments,
+      selected: 'center',
+      onChange: (value) {
+        setState(() {
+          _verticalAlign = value;
+        });
+      },
     );
   }
 }
