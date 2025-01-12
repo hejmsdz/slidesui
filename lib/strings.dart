@@ -11,6 +11,8 @@ const strings = {
   'cancel': 'ANULUJ',
   'ok': 'OK',
   'changeDate': 'Zmień datę',
+  'liturgyDateError':
+      'Nie udało się pobrać liturgii słowa na dany dzień. Spróbuj wybrać mniej odległą datę lub dodaj teksty ręcznie.',
   'remove': 'Usuń',
   'edit': 'Edytuj',
   'verseOrder': 'Zwrotki',

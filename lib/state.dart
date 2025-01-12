@@ -130,6 +130,7 @@ class SlidesModel extends ChangeNotifier implements LiturgyHolder {
 
     _items.insert(min(_items.length, 1), kyrieItem);
     _items.insertAll(max(0, _items.length - 3), [sanctusItem, agnusItem]);
+    updateLiturgy();
     notifyListeners();
   }
 
@@ -157,10 +158,20 @@ class SlidesModel extends ChangeNotifier implements LiturgyHolder {
     notifyListeners();
   }
 
-  setDate(DateTime date) {
+  Future<bool> setDate(DateTime date) async {
+    final previousDate = _date;
     _date = date;
-    updateLiturgy();
+
+    try {
+      await updateLiturgy();
+    } on ApiError {
+      _date = previousDate;
+      notifyListeners();
+      return false;
+    }
+
     notifyListeners();
+    return true;
   }
 
   updateLiturgy() async {

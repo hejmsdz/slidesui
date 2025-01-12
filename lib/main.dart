@@ -244,6 +244,23 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
+  showDateErrorDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        content: Text(strings['liturgyDateError']!),
+        actions: [
+          TextButton(
+            child: Text(strings['ok']!),
+            onPressed: () async {
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
   showNewVersionDialog(
       String latestVersion, String yourVersion, String appDownloadUrl) {
     showDialog(
@@ -342,7 +359,10 @@ class _MyHomePageState extends State<MyHomePage> {
                           lastDate: lastDate,
                         );
                         if (date != null) {
-                          state.setDate(date);
+                          final ok = await state.setDate(date);
+                          if (!ok) {
+                            showDateErrorDialog();
+                          }
                         }
                         break;
                       case 'OPEN_MANUAL':
