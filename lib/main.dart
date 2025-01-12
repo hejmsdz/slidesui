@@ -47,6 +47,12 @@ class MyApp extends StatelessWidget {
         colorSchemeSeed: Colors.orange,
         appBarTheme: const AppBarTheme(elevation: 1.0),
       ),
+      darkTheme: ThemeData(
+        brightness: Brightness.dark,
+        colorSchemeSeed: Colors.orange,
+        appBarTheme: const AppBarTheme(elevation: 1.0),
+      ),
+      themeMode: ThemeMode.system,
       home: MyHomePage(title: strings['appTitle']!),
     );
   }
