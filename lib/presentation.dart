@@ -1,14 +1,18 @@
+import 'dart:async';
+import 'dart:collection';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:mutex/mutex.dart';
+import 'package:provider/provider.dart';
 import 'package:pdf_image_renderer/pdf_image_renderer.dart';
 import 'package:share_plus/share_plus.dart';
-import 'dart:io';
 
 import 'package:slidesui/cast.dart';
 import 'package:slidesui/deck.dart';
 import 'package:slidesui/live_session.dart';
 import 'package:slidesui/model.dart';
+import 'package:slidesui/state.dart';
 import 'package:slidesui/strings.dart';
 
 class PresentationController with ChangeNotifier {
@@ -35,13 +39,11 @@ class _PresentationPageState extends State<PresentationPage> {
   bool _isLoading = false;
   bool _isUiVisible = true;
   bool _isPageViewAnimating = false;
-  PdfImageRendererPdf? _pdf;
-  int _numPages = 0;
-  int _skipRenderingTillPage = -1;
-  final _pdfMutex = Mutex();
+  PdfRenderQueue? _pdf;
+  int? _skipRenderingTillPage;
+  int? _skipRenderingAfterPage;
   PresentationController controller = PresentationController();
   final PageController _pageController = PageController();
-  List<Future<MemoryImage>?> _pageCache = [];
 
   @override
   void initState() {
@@ -63,13 +65,16 @@ class _PresentationPageState extends State<PresentationPage> {
         _pageController.page == _pageController.page?.truncate();
     if (isUserTriggeredChange) {
       _isPageViewAnimating = true;
+      _skipRenderingTillPage = controller.currentPage - 1;
+      _skipRenderingAfterPage = controller.currentPage + 1;
       await _pageController.animateToPage(
         controller.currentPage,
         duration: Durations.medium2,
         curve: Easing.standard,
       );
       _isPageViewAnimating = false;
-      _skipRenderingTillPage = -1;
+      _skipRenderingTillPage = null;
+      _skipRenderingAfterPage = null;
     }
   }
 
@@ -86,9 +91,7 @@ class _PresentationPageState extends State<PresentationPage> {
       DeviceOrientation.portraitDown,
     ]);
 
-    _pdf?.close().then((_) {
-      File(widget.filePath).delete();
-    });
+    _pdf?.closeAndDeletePdf();
 
     super.dispose();
   }
@@ -96,15 +99,14 @@ class _PresentationPageState extends State<PresentationPage> {
   loadFile() async {
     setIsLoading(true);
     try {
-      final pdf = PdfImageRendererPdf(path: widget.filePath);
-      await pdf.open();
-      final numPages = await pdf.getPageCount();
-      _pdf = pdf;
+      final pdf = PdfRenderQueue(widget.filePath);
+      await pdf.openPdf();
 
       setState(() {
-        _numPages = numPages;
-        _pageCache = List.filled(numPages, null);
+        _pdf = pdf;
       });
+
+      preloadFirstPageOfEachItem();
     } catch (e) {
       Navigator.of(context).pop();
       return;
@@ -113,45 +115,56 @@ class _PresentationPageState extends State<PresentationPage> {
     }
   }
 
-  Future<MemoryImage> renderPage(int pageIndex) async {
-    final height = MediaQuery.of(context).size.height;
-    final dpr = MediaQuery.of(context).devicePixelRatio;
-    final renderHeight = height * dpr;
+  preloadFirstPageOfEachItem() async {
+    if (widget.contents == null) {
+      return;
+    }
 
-    await _pdfMutex.acquire();
-    await _pdf!.openPage(pageIndex: pageIndex);
-    try {
-      final size = await _pdf!.getPageSize(pageIndex: pageIndex);
-      final scale = renderHeight / size.height;
-      final imageData = await _pdf!.renderPage(
-        pageIndex: pageIndex,
-        x: 0,
-        y: 0,
-        width: size.width,
-        height: size.height,
-        scale: scale,
-        background: Colors.black,
-      );
+    final indices = widget.contents!.indexed
+        .where((idxItem) =>
+            idxItem.$2.type == "verse" &&
+            idxItem.$2.verseIndex == 0 &&
+            idxItem.$2.chunkIndex == 0)
+        .map((idxItem) => idxItem.$1);
 
-      return MemoryImage(imageData!);
-    } catch (e) {
-      rethrow;
-    } finally {
-      await _pdf!.closePage(pageIndex: pageIndex);
-      _pdfMutex.release();
+    for (var index in indices) {
+      renderPageCached(index, lowPriority: true);
     }
   }
 
-  Future<MemoryImage> renderPageCached(int pageIndex) async {
-    if (_pageCache[pageIndex] == null) {
-      if (pageIndex < _skipRenderingTillPage) {
-        return _pageCache[0]!;
+  Future<MemoryImage?> renderPageCached(int pageIndex,
+      {bool lowPriority = false}) async {
+    if (!_pdf!.isPageReady(pageIndex)) {
+      if (isBlankPage(pageIndex)) {
+        return null;
       }
 
-      _pageCache[pageIndex] = renderPage(pageIndex);
+      if (_skipRenderingTillPage != null &&
+          pageIndex < _skipRenderingTillPage!) {
+        return null;
+      }
+
+      if (_skipRenderingAfterPage != null &&
+          pageIndex > _skipRenderingAfterPage!) {
+        return null;
+      }
     }
 
-    return _pageCache[pageIndex]!;
+    return _pdf!.getPage(
+      pageIndex,
+      renderHeight: getRenderHeight(),
+      lowPriority: lowPriority,
+    );
+  }
+
+  double getRenderHeight() {
+    final height = MediaQuery.of(context).size.height;
+    final dpr = MediaQuery.of(context).devicePixelRatio;
+    return height * dpr;
+  }
+
+  bool isBlankPage(int pageIndex) {
+    return widget.contents?[pageIndex].type == "blank";
   }
 
   setIsLoading(bool isLoading) {
@@ -189,7 +202,6 @@ class _PresentationPageState extends State<PresentationPage> {
         (cs) => cs.type == "blank" && cs.itemIndex == currentItemIndex);
 
     if (index >= 0) {
-      _skipRenderingTillPage = index - 1;
       controller.setCurrentPage(index);
     }
   }
@@ -198,33 +210,34 @@ class _PresentationPageState extends State<PresentationPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         backgroundColor: Colors.black,
-        body: (_isLoading || _numPages == 0)
+        body: (_isLoading || _pdf?._numPages == 0)
             ? Container()
             : Stack(children: [
                 PageView.builder(
-                    controller: _pageController,
-                    itemCount: _numPages,
-                    allowImplicitScrolling: true,
-                    onPageChanged: (i) {
-                      if (!_isPageViewAnimating) {
-                        controller.setCurrentPage(i);
+                  controller: _pageController,
+                  itemCount: _pdf?._numPages ?? 0,
+                  allowImplicitScrolling: true,
+                  onPageChanged: (i) {
+                    if (!_isPageViewAnimating) {
+                      controller.setCurrentPage(i);
+                    }
+                  },
+                  itemBuilder: (context, pageIndex) => FutureBuilder(
+                    future: renderPageCached(pageIndex),
+                    builder: (context, snapshot) {
+                      if (isBlankPage(pageIndex)) {
+                        return Container();
                       }
+
+                      if (snapshot.hasData) {
+                        return Center(
+                          child: Image(image: snapshot.data!),
+                        );
+                      }
+                      return Container();
                     },
-                    itemBuilder: (context, pageIndex) {
-                      return FutureBuilder(
-                        future: renderPageCached(pageIndex),
-                        builder: (context, snapshot) {
-                          if (snapshot.hasData) {
-                            return Center(
-                              child: Image(
-                                image: snapshot.data!,
-                              ),
-                            );
-                          }
-                          return Container();
-                        },
-                      );
-                    }),
+                  ),
+                ),
                 Row(
                   children: [
                     Expanded(
@@ -244,10 +257,11 @@ class _PresentationPageState extends State<PresentationPage> {
                           },
                         )),
                     Expanded(
-                        flex: 1,
-                        child: GestureDetector(
-                          onDoubleTap: jumpToLastSlideOfCurrentItem,
-                        )),
+                      flex: 1,
+                      child: GestureDetector(
+                        onDoubleTap: jumpToLastSlideOfCurrentItem,
+                      ),
+                    ),
                   ],
                 ),
                 Positioned(
@@ -261,6 +275,11 @@ class _PresentationPageState extends State<PresentationPage> {
                       backgroundColor: Colors.transparent,
                       foregroundColor: Colors.white54,
                       actions: [
+                        widget.contents != null
+                            ? ContentsButton(
+                                controller: controller,
+                                contents: widget.contents!)
+                            : Container(),
                         CastButton(controller: controller),
                         LiveSessionButton(controller: controller),
                         IconButton(
@@ -282,5 +301,153 @@ class _PresentationPageState extends State<PresentationPage> {
                   ),
                 ),
               ]));
+  }
+}
+
+class PdfRenderQueue {
+  final String _pdfPath;
+  final PdfImageRendererPdf _pdf;
+  int _numPages = 0;
+  double _renderHeight = 1080;
+  List<Completer<MemoryImage>?> _renderedPages = [];
+  final Queue<int> _highPriorityQueue = Queue();
+  final Queue<int> _lowPriorityQueue = Queue();
+  bool _isProcessing = false;
+
+  PdfRenderQueue(String pdfPath)
+      : _pdfPath = pdfPath,
+        _pdf = PdfImageRendererPdf(path: pdfPath);
+
+  openPdf() async {
+    await _pdf.open();
+    _numPages = await _pdf.getPageCount();
+    _renderedPages = List.filled(_numPages, null);
+  }
+
+  closeAndDeletePdf() async {
+    await _pdf.close();
+    await File(_pdfPath).delete();
+  }
+
+  bool isPageReady(int pageIndex) {
+    return _renderedPages[pageIndex]?.isCompleted ?? false;
+  }
+
+  int get numPages => _numPages;
+
+  Future<MemoryImage> getPage(
+    int pageIndex, {
+    double? renderHeight,
+    bool lowPriority = false,
+  }) {
+    if (pageIndex >= _numPages || pageIndex < 0) {
+      throw RangeError.range(pageIndex, 0, _numPages);
+    }
+
+    if (_renderedPages[pageIndex] != null) {
+      return _renderedPages[pageIndex]!.future;
+    }
+
+    if (renderHeight != null) {
+      _renderHeight = renderHeight;
+    }
+
+    _renderedPages[pageIndex] = Completer();
+    if (lowPriority) {
+      _lowPriorityQueue.addLast(pageIndex);
+    } else {
+      _highPriorityQueue.addLast(pageIndex);
+    }
+
+    if (!_isProcessing) {
+      _processQueue();
+    }
+
+    return _renderedPages[pageIndex]!.future;
+  }
+
+  _processQueue() async {
+    _isProcessing = true;
+    try {
+      do {
+        if (_highPriorityQueue.isNotEmpty) {
+          await _processRenderTask(_highPriorityQueue.removeFirst());
+        } else if (_lowPriorityQueue.isNotEmpty) {
+          await _processRenderTask(_lowPriorityQueue.removeFirst());
+        } else {
+          break;
+        }
+      } while (true);
+    } finally {
+      _isProcessing = false;
+    }
+  }
+
+  _processRenderTask(int pageIndex) async {
+    final image = await _renderPage(pageIndex);
+    _renderedPages[pageIndex]!.complete(image);
+  }
+
+  Future<MemoryImage> _renderPage(int pageIndex) async {
+    await _pdf.openPage(pageIndex: pageIndex);
+    try {
+      final size = await _pdf.getPageSize(pageIndex: pageIndex);
+      final scale = _renderHeight / size.height;
+      final imageData = await _pdf.renderPage(
+        pageIndex: pageIndex,
+        x: 0,
+        y: 0,
+        width: size.width,
+        height: size.height,
+        scale: scale,
+        background: Colors.black,
+      );
+
+      return MemoryImage(imageData!);
+    } catch (e) {
+      rethrow;
+    } finally {
+      await _pdf.closePage(pageIndex: pageIndex);
+    }
+  }
+}
+
+class ContentsButton extends StatelessWidget {
+  final PresentationController controller;
+  final List<ContentSlide> contents;
+
+  const ContentsButton({
+    super.key,
+    required this.controller,
+    required this.contents,
+  });
+
+  goToItem(int index) {
+    final page = contents.indexWhere(
+        (slide) => slide.type == "verse" && slide.itemIndex == index);
+    controller.setCurrentPage(page);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<SlidesModel>(builder: (context, state, child) {
+      final items = state.items.indexed;
+      return MenuAnchor(
+        menuChildren: items
+            .map(
+              (idxItem) => MenuItemButton(
+                onPressed: () => goToItem(idxItem.$1),
+                child: Text(idxItem.$2.title),
+              ),
+            )
+            .toList(),
+        builder: (_, menuController, child) => IconButton(
+          icon: const Icon(Icons.toc),
+          onPressed: () => menuController.isOpen
+              ? menuController.close()
+              : menuController.open(),
+        ),
+      );
+    });
   }
 }
