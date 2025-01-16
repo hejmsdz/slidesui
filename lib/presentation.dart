@@ -206,13 +206,50 @@ class _PresentationPageState extends State<PresentationPage> {
     }
   }
 
+  Future<bool?> _confirmExit() {
+    return showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(strings['confirmExitTitle']!),
+          content: Text(strings['confirmExit']!),
+          actions: <Widget>[
+            TextButton(
+              child: Text(strings['no']!),
+              onPressed: () {
+                Navigator.pop(context, false);
+              },
+            ),
+            TextButton(
+              child: Text(strings['yes']!),
+              onPressed: () {
+                Navigator.pop(context, true);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Colors.black,
-        body: (_isLoading || _pdf?._numPages == 0)
-            ? Container()
-            : Stack(children: [
+      backgroundColor: Colors.black,
+      body: (_isLoading || _pdf?._numPages == 0)
+          ? Container()
+          : PopScope(
+              canPop:
+                  false, // todo: false only if an external display is connected
+              onPopInvoked: (didPop) async {
+                if (!didPop) {
+                  final shouldPop = await _confirmExit() ?? false;
+                  if (context.mounted && shouldPop) {
+                    Navigator.pop(context);
+                  }
+                }
+              },
+              child: Stack(children: [
                 PageView.builder(
                   controller: _pageController,
                   itemCount: _pdf?._numPages ?? 0,
@@ -300,7 +337,9 @@ class _PresentationPageState extends State<PresentationPage> {
                     ),
                   ),
                 ),
-              ]));
+              ]),
+            ),
+    );
   }
 }
 
