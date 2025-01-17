@@ -345,7 +345,7 @@ class _PresentationPageState extends State<PresentationPage> {
 
 class PdfRenderQueue {
   final String _pdfPath;
-  final PdfImageRendererPdf _pdf;
+  final PdfImageRenderer _pdf;
   int _numPages = 0;
   double _renderHeight = 1080;
   List<Completer<MemoryImage>?> _renderedPages = [];
@@ -355,7 +355,7 @@ class PdfRenderQueue {
 
   PdfRenderQueue(String pdfPath)
       : _pdfPath = pdfPath,
-        _pdf = PdfImageRendererPdf(path: pdfPath);
+        _pdf = PdfImageRenderer(path: pdfPath);
 
   openPdf() async {
     await _pdf.open();
