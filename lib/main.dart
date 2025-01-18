@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:slidesui/external_display.dart';
+import 'package:slidesui/external_display_singleton.dart';
 import 'package:slidesui/presentation.dart';
 import 'package:slidesui/verse_order.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -27,6 +29,14 @@ void main() async {
   final state = await loadSavedState();
   await Settings.init();
   saveStateChanges(state);
+
+  externalDisplay.addStatusListener((status) {
+    if (status) {
+      externalDisplay.connect();
+    }
+  });
+  externalDisplay.connect();
+
   runApp(
     ChangeNotifierProvider(
       create: (context) => state,
@@ -556,4 +566,9 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
     );
   }
+}
+
+@pragma('vm:entry-point')
+void externalDisplayMain() {
+  runApp(const ExternalDisplayApp());
 }

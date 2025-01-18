@@ -8,6 +8,7 @@ import 'package:share_plus/share_plus.dart';
 
 import 'package:slidesui/cast.dart';
 import 'package:slidesui/deck.dart';
+import 'package:slidesui/external_display_singleton.dart';
 import 'package:slidesui/live_session.dart';
 import 'package:slidesui/model.dart';
 import 'package:slidesui/pdf.dart';
@@ -57,6 +58,11 @@ class _PresentationPageState extends State<PresentationPage> {
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
 
     controller.addListener(handleSlideChange);
+
+    externalDisplay.sendParameters(
+      action: "open",
+      value: widget.filePath,
+    );
   }
 
   handleSlideChange() async {
@@ -75,6 +81,11 @@ class _PresentationPageState extends State<PresentationPage> {
       _skipRenderingTillPage = null;
       _skipRenderingAfterPage = null;
     }
+
+    externalDisplay.sendParameters(
+      action: "page",
+      value: controller.currentPage,
+    );
   }
 
   @override
@@ -89,6 +100,8 @@ class _PresentationPageState extends State<PresentationPage> {
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
     ]);
+
+    externalDisplay.sendParameters(action: "close");
 
     _pdf?.closeAndDeletePdf();
 

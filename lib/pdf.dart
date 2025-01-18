@@ -22,8 +22,12 @@ class PdfRenderQueue {
     _renderedPages = List.filled(_numPages, null);
   }
 
-  closeAndDeletePdf() async {
+  close() async {
     await _pdf!.close();
+  }
+
+  closeAndDeletePdf() async {
+    close();
     await File(_pdfPath).delete();
   }
 
