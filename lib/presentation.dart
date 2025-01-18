@@ -4,8 +4,8 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:pdfx/pdfx.dart';
 import 'package:provider/provider.dart';
-import 'package:pdf_image_renderer/pdf_image_renderer.dart';
 import 'package:share_plus/share_plus.dart';
 
 import 'package:slidesui/cast.dart';
@@ -345,7 +345,7 @@ class _PresentationPageState extends State<PresentationPage> {
 
 class PdfRenderQueue {
   final String _pdfPath;
-  final PdfImageRenderer _pdf;
+  PdfDocument? _pdf;
   int _numPages = 0;
   double _renderHeight = 1080;
   List<Completer<MemoryImage>?> _renderedPages = [];
@@ -353,18 +353,16 @@ class PdfRenderQueue {
   final Queue<int> _lowPriorityQueue = Queue();
   bool _isProcessing = false;
 
-  PdfRenderQueue(String pdfPath)
-      : _pdfPath = pdfPath,
-        _pdf = PdfImageRenderer(path: pdfPath);
+  PdfRenderQueue(String pdfPath) : _pdfPath = pdfPath;
 
   openPdf() async {
-    await _pdf.open();
-    _numPages = await _pdf.getPageCount();
+    _pdf = await PdfDocument.openFile(_pdfPath);
+    _numPages = _pdf!.pagesCount;
     _renderedPages = List.filled(_numPages, null);
   }
 
   closeAndDeletePdf() async {
-    await _pdf.close();
+    await _pdf!.close();
     await File(_pdfPath).delete();
   }
 
@@ -428,25 +426,17 @@ class PdfRenderQueue {
   }
 
   Future<MemoryImage> _renderPage(int pageIndex) async {
-    await _pdf.openPage(pageIndex: pageIndex);
+    final page = await _pdf!.getPage(pageIndex + 1);
     try {
-      final size = await _pdf.getPageSize(pageIndex: pageIndex);
-      final scale = _renderHeight / size.height;
-      final imageData = await _pdf.renderPage(
-        pageIndex: pageIndex,
-        x: 0,
-        y: 0,
-        width: size.width,
-        height: size.height,
-        scale: scale,
-        background: Colors.black,
-      );
+      final scale = _renderHeight / page.height;
+      final imageData =
+          await page.render(height: _renderHeight, width: page.width * scale);
 
-      return MemoryImage(imageData!);
+      return MemoryImage(imageData!.bytes);
     } catch (e) {
       rethrow;
     } finally {
-      await _pdf.closePage(pageIndex: pageIndex);
+      page.close();
     }
   }
 }
