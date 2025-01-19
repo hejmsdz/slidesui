@@ -19,9 +19,38 @@ class PresentationController with ChangeNotifier {
   int _currentPage = 0;
   int get currentPage => _currentPage;
 
+  bool _isPaused = false;
+  bool get isPaused => _isPaused;
+
+  Function? internalListener;
+
   void setCurrentPage(int newCurrentPage) {
     _currentPage = newCurrentPage;
+
+    if (!_isPaused) {
+      notifyListeners();
+    }
+
+    if (internalListener != null) {
+      internalListener!();
+    }
+  }
+
+  void pause() {
+    _isPaused = true;
+  }
+
+  void resume() {
+    _isPaused = false;
     notifyListeners();
+  }
+
+  void togglePause() {
+    if (_isPaused) {
+      resume();
+    } else {
+      pause();
+    }
   }
 }
 
@@ -39,6 +68,8 @@ class _PresentationPageState extends State<PresentationPage> {
   bool _isLoading = false;
   bool _isUiVisible = true;
   bool _isPageViewAnimating = false;
+  bool _isBroadcasting = false;
+  final Map<String, bool> _broadcastingState = {};
   PdfRenderQueue? _pdf;
   int? _skipRenderingTillPage;
   int? _skipRenderingAfterPage;
@@ -57,12 +88,19 @@ class _PresentationPageState extends State<PresentationPage> {
     ]);
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
 
-    controller.addListener(handleSlideChange);
+    controller.internalListener = handleSlideChange;
 
     externalDisplay.sendParameters(
       action: "open",
       value: widget.filePath,
     );
+  }
+
+  handleBroadcastChange(String channel, bool isBroadcasting) {
+    setState(() {
+      _broadcastingState[channel] = isBroadcasting;
+      _isBroadcasting = _broadcastingState.values.any((value) => value);
+    });
   }
 
   handleSlideChange() async {
@@ -81,16 +119,11 @@ class _PresentationPageState extends State<PresentationPage> {
       _skipRenderingTillPage = null;
       _skipRenderingAfterPage = null;
     }
-
-    externalDisplay.sendParameters(
-      action: "page",
-      value: controller.currentPage,
-    );
   }
 
   @override
   dispose() {
-    controller.removeListener(handleSlideChange);
+    controller.internalListener = null;
 
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     SystemChrome.restoreSystemUIOverlays();
@@ -246,7 +279,7 @@ class _PresentationPageState extends State<PresentationPage> {
           ? Container()
           : PopScope<Object?>(
               canPop:
-                  false, // todo: false only if an external display is connected
+                  !_isBroadcasting, // todo: false only if an external display is connected
               onPopInvokedWithResult: (didPop, result) async {
                 if (!didPop) {
                   final shouldPop = await _confirmExit() ?? false;
@@ -318,13 +351,35 @@ class _PresentationPageState extends State<PresentationPage> {
                       backgroundColor: Colors.transparent,
                       foregroundColor: Colors.white54,
                       actions: [
-                        widget.contents != null
-                            ? ContentsButton(
-                                controller: controller,
-                                contents: widget.contents!)
+                        _isBroadcasting
+                            ? IconButton(
+                                icon: Icon(controller.isPaused
+                                    ? Icons.play_arrow
+                                    : Icons.pause),
+                                tooltip: controller.isPaused
+                                    ? strings['resume']!
+                                    : strings['pause']!,
+                                onPressed: () {
+                                  setState(() {
+                                    controller.togglePause();
+                                  });
+                                },
+                              )
                             : Container(),
+                        ExternalDisplayBroadcaster(
+                          controller: controller,
+                          filePath: widget.filePath,
+                          onStateChange: handleBroadcastChange,
+                        ),
                         CastButton(controller: controller),
-                        LiveSessionButton(controller: controller),
+                        LiveSessionButton(
+                          controller: controller,
+                          onStateChange: handleBroadcastChange,
+                        ),
+                        ContentsButton(
+                          controller: controller,
+                          contents: widget.contents!,
+                        ),
                         IconButton(
                           icon: const Icon(Icons.share),
                           tooltip: strings['shareSlides'],
@@ -346,6 +401,68 @@ class _PresentationPageState extends State<PresentationPage> {
               ]),
             ),
     );
+  }
+}
+
+class ExternalDisplayBroadcaster extends StatefulWidget {
+  const ExternalDisplayBroadcaster(
+      {super.key,
+      required this.controller,
+      required this.filePath,
+      this.onStateChange});
+
+  final PresentationController controller;
+  final String filePath;
+  final void Function(String, bool)? onStateChange;
+
+  @override
+  State<ExternalDisplayBroadcaster> createState() =>
+      _ExternalDisplayBroadcasterState();
+}
+
+class _ExternalDisplayBroadcasterState
+    extends State<ExternalDisplayBroadcaster> {
+  @override
+  void initState() {
+    super.initState();
+
+    widget.controller.addListener(handlePageChange);
+
+    externalDisplay.sendParameters(
+      action: "open",
+      value: widget.filePath,
+    );
+
+    externalDisplay.addStatusListener(handleDisplayChange);
+  }
+
+  void handleDisplayChange(dynamic status) {
+    widget.onStateChange?.call('externalDisplay', status == true);
+  }
+
+  void handlePageChange() {
+    externalDisplay.sendParameters(
+      action: "page",
+      value: widget.controller.currentPage,
+    );
+  }
+
+  @override
+  void dispose() {
+    widget.controller.removeListener(handlePageChange);
+    externalDisplay.removeStatusListener(handleDisplayChange);
+
+    externalDisplay.sendParameters(
+      action: "close",
+      value: widget.controller.currentPage,
+    );
+
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container();
   }
 }
 

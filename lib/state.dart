@@ -21,7 +21,7 @@ class SlidesModel extends ChangeNotifier implements LiturgyHolder {
   @override
   Liturgy? liturgy;
 
-  bool isLivePaused = false;
+  bool isLiveConnected = false;
   LiveResponse? live;
 
   Map<String, dynamic> toJson() => {
@@ -208,13 +208,14 @@ class SlidesModel extends ChangeNotifier implements LiturgyHolder {
         !_items.any((item) => item is UnresolvedDeckItem);
   }
 
-  setIsLivePaused(bool isPaused) {
-    isLivePaused = isPaused;
+  setIsLiveConnected(bool isConnected) {
+    isLiveConnected = isConnected;
     notifyListeners();
   }
 
   setLiveSession(LiveResponse live) {
     this.live = live;
+    isLiveConnected = true;
     notifyListeners();
   }
 }

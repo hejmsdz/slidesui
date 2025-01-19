@@ -309,6 +309,8 @@ class LiveResponse {
 
   LiveResponse(this.id, this.url, this.token);
 
+  Map<String, dynamic> toJson() => {'id': id, 'url': url, 'token': token};
+
   LiveResponse.fromJson(Map<String, dynamic> json)
       : id = json['id'],
         url = json['url'],

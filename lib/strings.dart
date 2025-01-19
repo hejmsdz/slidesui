@@ -69,6 +69,8 @@ const strings = {
   'confirmExit': 'Czy na pewno chcesz wyjść z prezentacji?',
   'yes': 'Tak',
   'no': 'Nie',
+  'pause': 'Wstrzymaj',
+  'resume': 'Wznów',
   'cast': 'Przesyłanie (Chromecast)',
   'castSelectDevice': 'Połącz się z urządzeniem',
   'castNoDevicesFound': 'Nie znaleziono urządzeń.',
