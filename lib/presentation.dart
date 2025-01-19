@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'dart:collection';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:pdfx/pdfx.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -11,7 +13,6 @@ import 'package:slidesui/deck.dart';
 import 'package:slidesui/external_display_singleton.dart';
 import 'package:slidesui/live_session.dart';
 import 'package:slidesui/model.dart';
-import 'package:slidesui/pdf.dart';
 import 'package:slidesui/state.dart';
 import 'package:slidesui/strings.dart';
 
@@ -70,11 +71,9 @@ class _PresentationPageState extends State<PresentationPage> {
   bool _isPageViewAnimating = false;
   bool _isBroadcasting = false;
   final Map<String, bool> _broadcastingState = {};
-  PdfRenderQueue? _pdf;
-  int? _skipRenderingTillPage;
-  int? _skipRenderingAfterPage;
+  PdfController? _pdf;
+
   PresentationController controller = PresentationController();
-  final PageController _pageController = PageController();
 
   @override
   void initState() {
@@ -92,7 +91,7 @@ class _PresentationPageState extends State<PresentationPage> {
 
     externalDisplay.sendParameters(
       action: "open",
-      value: widget.filePath,
+      value: "${widget.filePath}#0",
     );
   }
 
@@ -104,21 +103,13 @@ class _PresentationPageState extends State<PresentationPage> {
   }
 
   handleSlideChange() async {
-    final isUserTriggeredChange =
-        _pageController.page == _pageController.page?.truncate();
-    if (isUserTriggeredChange) {
-      _isPageViewAnimating = true;
-      _skipRenderingTillPage = controller.currentPage - 1;
-      _skipRenderingAfterPage = controller.currentPage + 1;
-      await _pageController.animateToPage(
-        controller.currentPage,
-        duration: Durations.medium2,
-        curve: Easing.standard,
-      );
-      _isPageViewAnimating = false;
-      _skipRenderingTillPage = null;
-      _skipRenderingAfterPage = null;
-    }
+    _isPageViewAnimating = true;
+    await _pdf!.animateToPage(
+      controller.currentPage + 1,
+      duration: Durations.medium2,
+      curve: Easing.standard,
+    );
+    _isPageViewAnimating = false;
   }
 
   @override
@@ -134,9 +125,8 @@ class _PresentationPageState extends State<PresentationPage> {
       DeviceOrientation.portraitDown,
     ]);
 
-    externalDisplay.sendParameters(action: "close");
-
-    _pdf?.closeAndDeletePdf();
+    _pdf?.dispose();
+    File(widget.filePath).delete();
 
     super.dispose();
   }
@@ -144,62 +134,19 @@ class _PresentationPageState extends State<PresentationPage> {
   loadFile() async {
     setIsLoading(true);
     try {
-      final pdf = PdfRenderQueue(widget.filePath);
-      await pdf.openPdf();
+      final pdf = PdfController(
+        document: PdfDocument.openFile(widget.filePath),
+      );
 
       setState(() {
         _pdf = pdf;
       });
-
-      preloadFirstPageOfEachItem();
     } catch (e) {
       Navigator.of(context).pop();
       return;
     } finally {
       setIsLoading(false);
     }
-  }
-
-  preloadFirstPageOfEachItem() async {
-    if (widget.contents == null) {
-      return;
-    }
-
-    final indices = widget.contents!.indexed
-        .where((idxItem) =>
-            idxItem.$2.type == "verse" &&
-            idxItem.$2.verseIndex == 0 &&
-            idxItem.$2.chunkIndex == 0)
-        .map((idxItem) => idxItem.$1);
-
-    for (var index in indices) {
-      renderPageCached(index, lowPriority: true);
-    }
-  }
-
-  Future<MemoryImage?> renderPageCached(int pageIndex,
-      {bool lowPriority = false}) async {
-    if (!_pdf!.isPageReady(pageIndex)) {
-      if (isBlankPage(pageIndex)) {
-        return null;
-      }
-
-      if (_skipRenderingTillPage != null &&
-          pageIndex < _skipRenderingTillPage!) {
-        return null;
-      }
-
-      if (_skipRenderingAfterPage != null &&
-          pageIndex > _skipRenderingAfterPage!) {
-        return null;
-      }
-    }
-
-    return _pdf!.getPage(
-      pageIndex,
-      renderHeight: getRenderHeight(context),
-      lowPriority: lowPriority,
-    );
   }
 
   bool isBlankPage(int pageIndex) {
@@ -275,7 +222,7 @@ class _PresentationPageState extends State<PresentationPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
-      body: (_isLoading || _pdf?.numPages == 0)
+      body: (_isLoading || _pdf == null || _pdf?.pagesCount == 0)
           ? Container()
           : PopScope<Object?>(
               canPop:
@@ -289,30 +236,14 @@ class _PresentationPageState extends State<PresentationPage> {
                 }
               },
               child: Stack(children: [
-                PageView.builder(
-                  controller: _pageController,
-                  itemCount: _pdf?.numPages ?? 0,
-                  allowImplicitScrolling: true,
-                  onPageChanged: (i) {
+                PdfView(
+                  controller: _pdf!,
+                  onPageChanged: (page) {
                     if (!_isPageViewAnimating) {
-                      controller.setCurrentPage(i);
+                      controller.setCurrentPage(page - 1);
                     }
                   },
-                  itemBuilder: (context, pageIndex) => FutureBuilder(
-                    future: renderPageCached(pageIndex),
-                    builder: (context, snapshot) {
-                      if (isBlankPage(pageIndex)) {
-                        return Container();
-                      }
-
-                      if (snapshot.hasData && snapshot.data != null) {
-                        return Center(
-                          child: Image(image: snapshot.data!),
-                        );
-                      }
-                      return Container();
-                    },
-                  ),
+                  scrollDirection: Axis.horizontal,
                 ),
                 Row(
                   children: [
@@ -427,17 +358,29 @@ class _ExternalDisplayBroadcasterState
     super.initState();
 
     widget.controller.addListener(handlePageChange);
+    handleOpen();
+    externalDisplay.addStatusListener(handleDisplayChange);
 
+    Future.microtask(() {
+      if (externalDisplay.isPlugging) {
+        widget.onStateChange?.call('externalDisplay', true);
+      }
+    });
+  }
+
+  void handleOpen() async {
     externalDisplay.sendParameters(
       action: "open",
-      value: widget.filePath,
+      value: "${widget.filePath}#${widget.controller.currentPage}",
     );
-
-    externalDisplay.addStatusListener(handleDisplayChange);
   }
 
   void handleDisplayChange(dynamic status) {
     widget.onStateChange?.call('externalDisplay', status == true);
+
+    if (status == true) {
+      handleOpen();
+    }
   }
 
   void handlePageChange() {
@@ -454,7 +397,6 @@ class _ExternalDisplayBroadcasterState
 
     externalDisplay.sendParameters(
       action: "close",
-      value: widget.controller.currentPage,
     );
 
     super.dispose();

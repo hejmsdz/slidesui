@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:external_display/transfer_parameters.dart';
-import 'package:slidesui/pdf.dart';
+import 'package:pdfx/pdfx.dart';
 
 class ExternalDisplayApp extends StatefulWidget {
   const ExternalDisplayApp({super.key});
@@ -10,7 +10,7 @@ class ExternalDisplayApp extends StatefulWidget {
 }
 
 class _ExternalDisplayAppState extends State<ExternalDisplayApp> {
-  PdfRenderQueue? _pdf;
+  PdfDocument? _pdf;
   bool _isPresenting = false;
   MemoryImage? _buffer0;
   MemoryImage? _buffer1;
@@ -36,9 +36,11 @@ class _ExternalDisplayAppState extends State<ExternalDisplayApp> {
     });
   }
 
-  handleOpen(String pdfPath) async {
-    _pdf = PdfRenderQueue(pdfPath);
-    await _pdf!.openPdf();
+  handleOpen(String pdfPathWithPage) async {
+    final [pdfPath, pageStr] = pdfPathWithPage.split("#");
+    final page = int.parse(pageStr);
+
+    _pdf = await PdfDocument.openFile(pdfPath);
 
     setState(() {
       _isPresenting = true;
@@ -46,7 +48,7 @@ class _ExternalDisplayAppState extends State<ExternalDisplayApp> {
       _buffer1 = null;
     });
 
-    handlePageChange(0);
+    handlePageChange(page);
   }
 
   handleClose() {
@@ -56,12 +58,28 @@ class _ExternalDisplayAppState extends State<ExternalDisplayApp> {
     _pdf?.close();
   }
 
-  handlePageChange(int pageIndex) async {
-    final image = await _pdf!.getPage(
-      pageIndex,
-      renderHeight: getRenderHeight(context),
-    );
+  double getRenderHeight() {
+    final height = MediaQuery.of(context).size.height;
+    final dpr = MediaQuery.of(context).devicePixelRatio;
+    return height * dpr;
+  }
 
+  Future<MemoryImage> renderPage(int pageIndex) async {
+    final page = await _pdf!.getPage(pageIndex + 1);
+    try {
+      final renderHeight = getRenderHeight();
+      final scale = renderHeight / page.height;
+      final imageData =
+          await page.render(height: renderHeight, width: page.width * scale);
+
+      return MemoryImage(imageData!.bytes);
+    } finally {
+      page.close();
+    }
+  }
+
+  handlePageChange(int pageIndex) async {
+    final image = await renderPage(pageIndex);
     setState(() {
       if (_currentBuffer == 0) {
         _buffer1 = image;

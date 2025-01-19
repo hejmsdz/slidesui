@@ -66,7 +66,7 @@ const strings = {
   'behaviorSave': 'Zapisz do pliku',
   'behaviorShare': 'Udostępnij',
   'confirmExitTitle': 'Potwierdź',
-  'confirmExit': 'Czy na pewno chcesz wyjść z prezentacji?',
+  'confirmExit': 'Czy na pewno chcesz zakończyć prezentację?',
   'yes': 'Tak',
   'no': 'Nie',
   'pause': 'Wstrzymaj',
