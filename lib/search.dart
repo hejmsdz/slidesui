@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:slidesui/utils.dart';
 import './strings.dart';
 import './state.dart';
 import './model.dart';
 import './api.dart';
 
 class SearchPage extends StatefulWidget {
-  const SearchPage({Key? key, this.initialQuery = "", this.replaceIndex = -1})
-      : super(key: key);
+  const SearchPage({super.key, this.initialQuery = "", this.replaceIndex = -1});
 
   final String initialQuery;
   final int replaceIndex;
@@ -39,9 +39,12 @@ class SearchListItem extends StatelessWidget {
       title: Text(title),
       subtitle: subtitle == null ? null : Text(subtitle!),
       leading: isChecked ? const Icon(Icons.check) : const Icon(null),
-      trailing: Text(
-        number,
-        style: Theme.of(context).textTheme.bodySmall,
+      trailing: IfSpecialMode(
+        mode: 'roch',
+        child: Text(
+          number,
+          style: Theme.of(context).textTheme.bodySmall,
+        ),
       ),
       onTap: onTap,
     );
@@ -96,6 +99,11 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   void updateQuery(String newQuery, {bool forceUpdate = false}) async {
+    if (newQuery.startsWith('\$')) {
+      handleCheatCode(newQuery);
+      return;
+    }
+
     final previousQuery = query;
     setState(() {
       query = newQuery;
@@ -127,6 +135,32 @@ class _SearchPageState extends State<SearchPage> {
           .where((item) => item.slug.contains(querySlug))
           .toList();
     });
+  }
+
+  handleCheatCode(String code) {
+    if (code == '\$roch') {
+      final state = Provider.of<SlidesModel>(context, listen: false);
+      if (state.specialMode == "roch") {
+        state.setSpecialMode(null);
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text("Wyłączono tryb DA św. Rocha.")));
+      } else {
+        state.setSpecialMode("roch");
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text("Włączono tryb DA św. Rocha.")));
+      }
+    } else if (code == '\$admin') {
+      final state = Provider.of<SlidesModel>(context, listen: false);
+      if (state.specialMode == "admin") {
+        state.setSpecialMode(null);
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text("Wyłączono tryb administratora tekstów.")));
+      } else {
+        state.setSpecialMode("admin");
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text("Włączono tryb administratora tekstów.")));
+      }
+    }
   }
 
   void resetQuery() {
@@ -172,9 +206,16 @@ class _SearchPageState extends State<SearchPage> {
           builder: (context, state, child) {
             if (!_isQueryValid) {
               return Center(
-                child: Text(
-                  strings['searchStartTyping']!,
-                  style: Theme.of(context).textTheme.bodySmall,
+                child: IfSpecialMode(
+                  mode: 'roch',
+                  elseChild: Text(
+                    strings['searchStartTyping']!,
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                  child: Text(
+                    strings['searchStartTypingWithNumber']!,
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
                 ),
               );
             }

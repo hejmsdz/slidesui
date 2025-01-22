@@ -6,6 +6,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:slidesui/external_display.dart';
 import 'package:slidesui/external_display_singleton.dart';
 import 'package:slidesui/presentation.dart';
+import 'package:slidesui/utils.dart';
 import 'package:slidesui/verse_order.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -129,12 +130,15 @@ class ListItem extends StatelessWidget {
                   icon: Icons.reorder,
                   label: strings['verseOrder']!,
                 ),
-                SlidableAction(
-                  onPressed: edit,
-                  backgroundColor: Colors.blue,
-                  foregroundColor: Colors.white,
-                  icon: Icons.edit,
-                  label: strings['edit']!,
+                IfSpecialMode(
+                  modes: ['roch', 'admin'],
+                  child: SlidableAction(
+                    onPressed: edit,
+                    backgroundColor: Colors.blue,
+                    foregroundColor: Colors.white,
+                    icon: Icons.edit,
+                    label: strings['edit']!,
+                  ),
                 ),
               ],
             )
@@ -167,9 +171,12 @@ class ListItem extends StatelessWidget {
           padding: const EdgeInsets.only(right: kIsWeb ? 24 : 0),
           child: number == '?'
               ? const Icon(Icons.report)
-              : Text(
-                  number,
-                  style: Theme.of(context).textTheme.bodySmall,
+              : IfSpecialMode(
+                  mode: 'roch',
+                  child: Text(
+                    number,
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
                 ),
         ),
         onTap: onTap,
@@ -337,105 +344,108 @@ class _MyHomePageState extends State<MyHomePage> {
             },
           ),
           Consumer<SlidesModel>(
-              builder: (context, state, child) => PopupMenuButton<String>(
+            builder: (context, state, child) => MenuAnchor(
+              builder: (context, controller, widget) {
+                return IconButton(
+                  icon: Icon(Icons.more_vert),
                   tooltip: strings['menu']!,
-                  onSelected: (choice) async {
-                    switch (choice) {
-                      case 'ADD_LITURGY':
-                        state.addLiturgy();
-                        break;
-                      case 'REMOVE_LITURGY':
-                        state.removeLiturgy();
-                        break;
-                      case 'ADD_ORDINARY':
-                        state.addOrdinary();
-                        break;
-                      case 'REMOVE_ORDINARY':
-                        state.removeOrdinary();
-                        break;
-                      case 'ADD_TEXT':
-                        showTextDialog((String contents) {
-                          state.addText(contents);
-                        });
-                        break;
-                      case 'CHANGE_DATE':
-                        final now = DateTime.now();
-                        final firstDate = DateTime(now.year - 1, 1, 1);
-                        final lastDate = DateTime(now.year + 1, 12, 31);
-                        final date = await showDatePicker(
-                          context: context,
-                          initialDate: state.date,
-                          firstDate: firstDate,
-                          lastDate: lastDate,
-                        );
-                        if (date != null) {
-                          final ok = await state.setDate(date);
-                          if (!ok) {
-                            showDateErrorDialog();
-                          }
-                        }
-                        break;
-                      case 'OPEN_MANUAL':
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const ManualPage()),
-                        );
-                        break;
-                      case 'RELOAD_LYRICS':
-                        reloadLyrics();
-                        break;
-                      case 'OPEN_SETTINGS':
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const SettingsPage()),
-                        );
-                        break;
+                  onPressed: () {
+                    controller.open();
+                  },
+                );
+              },
+              menuChildren: [
+                if (state.hasLiturgy())
+                  MenuItemButton(
+                    onPressed: () {
+                      state.removeLiturgy();
+                    },
+                    child: Text(strings['removeLiturgy']!),
+                  )
+                else
+                  MenuItemButton(
+                    onPressed: () {
+                      state.addLiturgy();
+                    },
+                    child: Text(strings['addLiturgy']!),
+                  ),
+                if (state.hasOrdinary())
+                  MenuItemButton(
+                    onPressed: () {
+                      state.removeOrdinary();
+                    },
+                    child: Text(strings['removeOrdinary']!),
+                  )
+                else
+                  MenuItemButton(
+                    onPressed: () {
+                      state.addOrdinary();
+                    },
+                    child: Text(strings['addOrdinary']!),
+                  ),
+                MenuItemButton(
+                  onPressed: () {
+                    showTextDialog((String contents) {
+                      state.addText(contents);
+                    });
+                  },
+                  child: Text(strings['addText']!),
+                ),
+                MenuItemButton(
+                  onPressed: () async {
+                    final now = DateTime.now();
+                    final firstDate = DateTime(now.year - 1, 1, 1);
+                    final lastDate = DateTime(now.year + 1, 12, 31);
+                    final date = await showDatePicker(
+                      context: context,
+                      initialDate: state.date,
+                      firstDate: firstDate,
+                      lastDate: lastDate,
+                    );
+                    if (date != null) {
+                      final ok = await state.setDate(date);
+                      if (!ok) {
+                        showDateErrorDialog();
+                      }
                     }
                   },
-                  itemBuilder: (BuildContext context) {
-                    return [
-                      state.hasLiturgy()
-                          ? PopupMenuItem(
-                              value: 'REMOVE_LITURGY',
-                              child: Text(strings['removeLiturgy']!),
-                            )
-                          : PopupMenuItem(
-                              value: 'ADD_LITURGY',
-                              child: Text(strings['addLiturgy']!),
-                            ),
-                      state.hasOrdinary()
-                          ? PopupMenuItem(
-                              value: 'REMOVE_ORDINARY',
-                              child: Text(strings['removeOrdinary']!),
-                            )
-                          : PopupMenuItem(
-                              value: 'ADD_ORDINARY',
-                              child: Text(strings['addOrdinary']!),
-                            ),
-                      PopupMenuItem(
-                        value: 'ADD_TEXT',
-                        child: Text(strings['addText']!),
-                      ),
-                      PopupMenuItem(
-                        value: 'CHANGE_DATE',
-                        child: Text(strings['changeDate']!),
-                      ),
-                      PopupMenuItem(
-                        value: 'OPEN_MANUAL',
-                        child: Text(strings['manual']!),
-                      ),
-                      PopupMenuItem(
-                        value: 'RELOAD_LYRICS',
-                        child: Text(strings['reloadLyrics']!),
-                      ),
-                      PopupMenuItem(
-                        value: 'OPEN_SETTINGS',
-                        child: Text(strings['settings']!),
-                      ),
-                    ];
-                  })),
+                  child: Text(strings['changeDate']!),
+                ),
+                IfSpecialMode(
+                  mode: 'roch',
+                  child: MenuItemButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const ManualPage()),
+                      );
+                    },
+                    child: Text(strings['manual']!),
+                  ),
+                ),
+                IfSpecialMode(
+                  modes: ['roch', 'admin'],
+                  child: MenuItemButton(
+                    onPressed: () {
+                      reloadLyrics();
+                    },
+                    child: Text(strings['reloadLyrics']!),
+                  ),
+                ),
+                MenuItemButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const SettingsPage()),
+                    );
+                  },
+                  child: Text(strings['settings']!),
+                ),
+              ],
+            ),
+          )
         ],
         bottom: PreferredSize(
           preferredSize: const Size(double.infinity, 1.0),

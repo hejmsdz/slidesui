@@ -22,11 +22,13 @@ class SlidesModel extends ChangeNotifier implements LiturgyHolder {
   Liturgy? liturgy;
 
   bool isLiveConnected = false;
-  LiveResponse? live;
+  String? _specialMode;
+  String? get specialMode => _specialMode;
 
   Map<String, dynamic> toJson() => {
         'date': _date.toIso8601String().substring(0, 10),
         'items': _items.map((item) => item.toFullJson()).toList(),
+        'specialMode': _specialMode,
       };
 
   SlidesModel.fromJson(Map<String, dynamic> json) {
@@ -50,6 +52,8 @@ class SlidesModel extends ChangeNotifier implements LiturgyHolder {
         })
         .whereType<DeckItem>()
         .toList();
+
+    _specialMode = json['specialMode'] as String;
   }
 
   addItem(DeckItem item) {
@@ -208,14 +212,14 @@ class SlidesModel extends ChangeNotifier implements LiturgyHolder {
         !_items.any((item) => item is UnresolvedDeckItem);
   }
 
+  // TODO
   setIsLiveConnected(bool isConnected) {
     isLiveConnected = isConnected;
     notifyListeners();
   }
 
-  setLiveSession(LiveResponse live) {
-    this.live = live;
-    isLiveConnected = true;
+  setSpecialMode(String? mode) {
+    _specialMode = mode;
     notifyListeners();
   }
 }
