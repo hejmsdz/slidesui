@@ -534,7 +534,8 @@ class _MyHomePageState extends State<MyHomePage> {
                     setIsWorking(true);
                     try {
                       final behavior =
-                          Settings.getValue<String>('app.slidesBehavior');
+                          Settings.getValue<String>('app.slidesBehavior') ??
+                              'display';
                       final result = await createDeck(context,
                           contents: behavior == 'display');
 
@@ -555,7 +556,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         case 'share':
                           Share.shareXFiles([XFile(result.url)]);
                           break;
-                        default:
+                        case 'save':
                           notifyOnDownloaded(context, result.url);
                           break;
                       }

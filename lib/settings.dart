@@ -65,7 +65,7 @@ class SettingsPage extends StatelessWidget {
                         title: strings['slidesBehavior']!,
                         settingKey: 'app.slidesBehavior',
                         values: behaviors,
-                        selected: 'save',
+                        selected: 'display',
                       ),
               ],
             ),
