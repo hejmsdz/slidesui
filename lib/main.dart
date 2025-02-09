@@ -332,7 +332,7 @@ class _MyHomePageState extends State<MyHomePage> {
             },
           ),
           IconButton(
-            icon: const Icon(Icons.assignment_outlined),
+            icon: const Icon(Icons.edit_note),
             tooltip: strings['editAsText']!,
             onPressed: () {
               Navigator.push(

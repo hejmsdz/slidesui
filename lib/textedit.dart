@@ -6,7 +6,7 @@ import './model.dart';
 import './api.dart';
 
 class TextEditPage extends StatefulWidget {
-  const TextEditPage({Key? key}) : super(key: key);
+  const TextEditPage({super.key});
 
   @override
   _TextEditPageState createState() => _TextEditPageState();
@@ -33,17 +33,19 @@ class _TextEditPageState extends State<TextEditPage> {
 
   String getSlidesAsText() {
     final state = Provider.of<SlidesModel>(context, listen: false);
+    final isRoch = state.specialMode == "roch";
 
     return state.items.asMap().entries.map((entry) {
       final item = entry.value;
       final index = entry.key;
-      final numberSuffix = (item.number.isEmpty || item.number == '?')
-          ? ''
-          : " [${item.number}]";
+      final numberSuffix =
+          (!isRoch || item.number.isEmpty || item.number == '?')
+              ? ''
+              : " [${item.number}]";
       final text = item is TextDeckItem
           ? "$textItemDelimiter${item.contents}$textItemDelimiter"
           : item.title +
-              (item.subtitle == null ? '' : (' / ' + item.subtitle!));
+              (item.subtitle == null ? '' : (' / ${item.subtitle!}'));
       return "${index + 1}. $text$numberSuffix";
     }).join("\n");
   }
@@ -61,14 +63,14 @@ class _TextEditPageState extends State<TextEditPage> {
       final hasDelimiter = naiveLine.contains(textItemDelimiter);
       if (hasDelimiter) {
         if (textItem == null) {
-          textItem = naiveLine + "\n";
+          textItem = "$naiveLine\n";
 
           if (naiveLine.endsWith(textItemDelimiter)) {
             lines.add(naiveLine);
             textItem = null;
           }
         } else {
-          textItem += naiveLine + "\n";
+          textItem += "$naiveLine\n";
           lines.add(textItem);
           textItem = null;
         }
@@ -76,7 +78,7 @@ class _TextEditPageState extends State<TextEditPage> {
         if (textItem == null) {
           lines.add(naiveLine);
         } else {
-          textItem += naiveLine + "\n";
+          textItem += "$naiveLine\n";
         }
       }
     }
@@ -212,6 +214,7 @@ class _TextEditPageState extends State<TextEditPage> {
         decoration: const InputDecoration(
           contentPadding: EdgeInsets.symmetric(vertical: 16, horizontal: 8),
         ),
+        autofocus: true,
       ),
     );
   }

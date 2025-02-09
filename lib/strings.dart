@@ -16,9 +16,9 @@ const strings = {
   'remove': 'Usuń',
   'edit': 'Edytuj',
   'verseOrder': 'Zwrotki',
-  'emptyTitle': 'Nic tu jeszcze nie ma!',
+  'emptyTitle': 'Co dzisiaj śpiewamy?',
   'emptyDescription':
-      'Aby dodać slajdy, użyj wyszukiwarki\nlub wklej plan jako tekst.',
+      'Aby dodać slajdy, użyj wyszukiwarki\nlub naciśnij ikonę edycji tekstu i wklej listę pieśni.',
   'searchSongs': 'Wyszukaj pieśni',
   'editAsText': 'Edytuj jako tekst',
   'menu': 'Pokaż menu',
