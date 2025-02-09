@@ -117,7 +117,7 @@ class _FontSizeSettingsTileState extends State<FontSizeSettingsTile> {
     return SliderSettingsTile(
       title: strings['fontSize']!,
       settingKey: 'slides.fontSize',
-      subtitle: "$_fontSize; ${formatLinesPerPage()}",
+      subtitle: "${_fontSize ?? defaultFontSize}; ${formatLinesPerPage()}",
       defaultValue: defaultFontSize,
       min: 36,
       max: 72,
