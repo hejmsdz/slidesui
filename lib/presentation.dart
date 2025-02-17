@@ -113,7 +113,9 @@ class _PresentationPageState extends State<PresentationPage> {
   }
 
   @override
-  dispose() {
+  dispose() async {
+    super.dispose();
+
     controller.internalListener = null;
 
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
@@ -126,9 +128,7 @@ class _PresentationPageState extends State<PresentationPage> {
     ]);
 
     _pdf?.dispose();
-    File(widget.filePath).delete();
-
-    super.dispose();
+    await File(widget.filePath).delete();
   }
 
   loadFile() async {
@@ -302,7 +302,10 @@ class _PresentationPageState extends State<PresentationPage> {
                           filePath: widget.filePath,
                           onStateChange: handleBroadcastChange,
                         ),
-                        CastButton(controller: controller),
+                        CastButton(
+                          controller: controller,
+                          onStateChange: handleBroadcastChange,
+                        ),
                         LiveSessionButton(
                           controller: controller,
                           onStateChange: handleBroadcastChange,

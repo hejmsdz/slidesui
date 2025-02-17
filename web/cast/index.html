@@ -140,26 +140,6 @@
       return 1 - activeCanvasIndex;
     }
 
-    function goToPrevPage() {
-      if (currentPage <= 1) {
-        return;
-      }
-
-      currentPage--;
-      renderPage(currentPage);
-      sendCurrentPageToSender();
-    }
-
-    function goToNextPage() {
-      if (currentPage >= pdfDoc.numPages) {
-        return;
-      }
-
-      currentPage++;
-      renderPage(currentPage);
-      sendCurrentPageToSender();
-    }
-
     function goToPage(page) {
       if (page < 1 || page > pdfDoc.numPages) {
         return;
@@ -186,16 +166,6 @@
       await renderPage(currentPage);
 
       document.body.className = 'ready';
-
-      window.addEventListener('keydown', (event) => {
-        if (event.key === 'ArrowLeft') {
-          goToPrevPage();
-        }
-
-        if (event.key === 'ArrowRight') {
-          goToNextPage();
-        }
-      });
     }
 
     const context = cast.framework.CastReceiverContext.getInstance();
@@ -214,10 +184,6 @@
       const { data } = event;
       goToPage(data.page + 1);
     });
-
-    function sendCurrentPageToSender() {
-      context.sendCustomMessage(`${namespace}.changePage`, undefined, { page: currentPage - 1 });
-    }
 
     context.start();
   </script>

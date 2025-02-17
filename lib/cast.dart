@@ -1,6 +1,7 @@
 import 'package:cast/cast.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:slidesui/cast_service.dart';
 import 'package:slidesui/deck.dart';
 import 'package:slidesui/presentation.dart';
 import 'package:slidesui/state.dart';
@@ -10,17 +11,57 @@ const castAppId = 'E34D7CD2';
 const namespace = 'urn:x-cast:com.mrozwadowski.slidesui';
 
 class CastButton extends StatefulWidget {
-  const CastButton({super.key, required this.controller});
+  const CastButton({
+    super.key,
+    required this.controller,
+    this.onStateChange,
+  });
 
   final PresentationController controller;
+  final void Function(String, bool)? onStateChange;
 
   @override
   State<CastButton> createState() => _CastButtonState();
 }
 
 class _CastButtonState extends State<CastButton> {
-  bool _isConnected = false;
-  CastSession? _session;
+  CastService? _castService;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    final castService = context.read<CastService>();
+    _castService ??= castService;
+
+    castService.addListener(handleCastServiceChange);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      handleCastServiceChange(isInitial: true);
+    });
+
+    if (castService.isConnected) {
+      startPresentation();
+    }
+  }
+
+  @override
+  initState() {
+    super.initState();
+  }
+
+  void handleCastServiceChange({bool isInitial = false}) {
+    final isConnected = _castService?.isConnected ?? false;
+    widget.onStateChange?.call("cast", isConnected);
+
+    if (!isInitial) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(isConnected
+            ? strings['castConnected']!
+            : strings['castDisconnected']!),
+      ));
+    }
+  }
 
   List<Widget> buildDeviceDialogContent(
       AsyncSnapshot<List<CastDevice>> snapshot) {
@@ -70,7 +111,7 @@ class _CastButtonState extends State<CastButton> {
     return showDialog<CastDevice>(
         context: context,
         builder: (BuildContext context) {
-          final devices = CastDiscoveryService().search();
+          final devices = _castService!.searchDevices();
 
           return FutureBuilder(
               future: devices,
@@ -83,80 +124,101 @@ class _CastButtonState extends State<CastButton> {
         });
   }
 
-  Future<void> connectToDevice(CastDevice device) async {
-    final session = await CastSessionManager().startSession(device);
-
-    void handleSlideChange() {
-      session.sendMessage('$namespace.changePage', {
-        'page': widget.controller.currentPage,
-      });
-    }
-
-    session.stateStream.listen((state) {
-      if (state == CastSessionState.connected) {
-        session.sendMessage('$namespace.start', {
-          'deckArgs': buildDeckRequestFromState(
-                  Provider.of<SlidesModel>(context, listen: false))
-              .toJson(),
-          'currentPage': widget.controller.currentPage,
-        });
-
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text(strings['castConnected']!)));
-        setState(() {
-          _isConnected = true;
-        });
-        _session = session;
-        widget.controller.addListener(handleSlideChange);
-      } else if (state == CastSessionState.closed) {
-        ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(strings['castDisconnected']!)));
-        setState(() {
-          _isConnected = false;
-        });
-        _session = null;
-        widget.controller.removeListener(handleSlideChange);
-      }
-    });
-
-    session.messageStream.listen((message) {
-      if (message.containsKey("page")) {
-        widget.controller.setCurrentPage(message["page"]);
-      }
-    });
-
-    session.sendMessage(CastSession.kNamespaceReceiver, {
-      'type': 'LAUNCH',
-      'appId': castAppId,
-    });
+  showConnectionErrorDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        content: Text(strings['castConnectionFailed']!),
+        actions: [
+          TextButton(
+            child: Text(strings['ok']!),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+      ),
+    );
   }
 
-  disconnect() {
-    _session?.close();
+  handleSlideChange() {
+    _castService?.requestSlideChange(widget.controller.currentPage);
+  }
+
+  startPresentation() {
+    final deck = buildDeckRequestFromState(context.read<SlidesModel>());
+    _castService?.startPresentation(deck, widget.controller.currentPage);
+    widget.controller.addListener(handleSlideChange);
+  }
+
+  endPresentation() {
+    widget.controller.removeListener(handleSlideChange);
+    _castService?.endPresentation();
+  }
+
+  Future<void> confirmDisconnect() async {
+    final isConfirmed = await showDialog<bool>(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text(strings['castDisconnect']!),
+              content: Text(strings['castDisconnectMessage']!),
+              actions: <Widget>[
+                TextButton(
+                  child: Text(strings['no']!),
+                  onPressed: () {
+                    Navigator.pop(context, false);
+                  },
+                ),
+                TextButton(
+                  child: Text(strings['yes']!),
+                  onPressed: () {
+                    Navigator.pop(context, true);
+                  },
+                ),
+              ],
+            );
+          },
+        ) ??
+        false;
+
+    if (isConfirmed) {
+      _castService?.disconnect();
+    }
   }
 
   @override
   void dispose() {
-    disconnect();
+    _castService?.removeListener(handleCastServiceChange);
+    endPresentation();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return IconButton(
-      icon: Icon(_isConnected ? Icons.cast_connected : Icons.cast),
-      tooltip: strings['cast']!,
-      onPressed: () async {
-        if (_isConnected) {
-          disconnect();
-          return;
-        }
+    return Consumer<CastService>(builder: (context, cast, child) {
+      final isConnected = cast.isConnected;
+      return IconButton(
+        icon: Icon(isConnected ? Icons.cast_connected : Icons.cast),
+        tooltip: strings['cast']!,
+        onPressed: () async {
+          if (isConnected) {
+            confirmDisconnect();
+            return;
+          }
 
-        final device = await chooseDevice();
-        if (device != null) {
-          connectToDevice(device);
-        }
-      },
-    );
+          final device = await chooseDevice();
+          if (device != null) {
+            try {
+              await cast.connectToDevice(device);
+              startPresentation();
+            } catch (e) {
+              print(e);
+              showConnectionErrorDialog();
+            }
+          }
+        },
+      );
+    });
   }
 }
