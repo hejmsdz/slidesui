@@ -33,20 +33,15 @@ class _TextEditPageState extends State<TextEditPage> {
 
   String getSlidesAsText() {
     final state = Provider.of<SlidesModel>(context, listen: false);
-    final isRoch = state.specialMode == "roch";
 
     return state.items.asMap().entries.map((entry) {
       final item = entry.value;
       final index = entry.key;
-      final numberSuffix =
-          (!isRoch || item.number.isEmpty || item.number == '?')
-              ? ''
-              : " [${item.number}]";
       final text = item is TextDeckItem
           ? "$textItemDelimiter${item.contents}$textItemDelimiter"
           : item.title +
               (item.subtitle == null ? '' : (' / ${item.subtitle!}'));
-      return "${index + 1}. $text$numberSuffix";
+      return "${index + 1}. $text";
     }).join("\n");
   }
 

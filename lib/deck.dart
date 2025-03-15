@@ -58,7 +58,6 @@ DeckRequest buildDeckRequestFromState(
   return DeckRequest(
     date: state.date,
     items: state.items,
-    hints: Settings.getValue<bool>('slides.hints'),
     ratio: Settings.getValue<String>('slides.aspectRatio'),
     fontSize: Settings.getValue<double>('slides.fontSize')?.toInt(),
     verticalAlign: Settings.getValue<String>('slides.verticalAlign'),

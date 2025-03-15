@@ -21,7 +21,6 @@ import './state.dart';
 import './deck.dart';
 import './search.dart';
 import './textedit.dart';
-import './manual.dart';
 import './settings.dart';
 
 void main() async {
@@ -87,9 +86,9 @@ class ListItem extends StatelessWidget {
       required this.symbol,
       required this.title,
       this.subtitle,
-      required this.number,
       required this.index,
       required this.isSong,
+      required this.isUnresolved,
       required this.onRemoved,
       required this.onTap})
       : super(key: itemKey);
@@ -98,8 +97,8 @@ class ListItem extends StatelessWidget {
   final String symbol;
   final String title;
   final String? subtitle;
-  final String number;
   final bool isSong;
+  final bool isUnresolved;
   final void Function() onRemoved;
   final void Function() onTap;
   final int index;
@@ -135,7 +134,7 @@ class ListItem extends StatelessWidget {
                   label: strings['verseOrder']!,
                 ),
                 IfSpecialMode(
-                  modes: ['roch', 'admin'],
+                  modes: ['admin'],
                   child: SlidableAction(
                     onPressed: edit,
                     backgroundColor: Colors.blue,
@@ -173,15 +172,7 @@ class ListItem extends StatelessWidget {
             : Text(subtitle!, overflow: TextOverflow.ellipsis),
         trailing: Padding(
           padding: const EdgeInsets.only(right: kIsWeb ? 24 : 0),
-          child: number == '?'
-              ? const Icon(Icons.report)
-              : IfSpecialMode(
-                  mode: 'roch',
-                  child: Text(
-                    number,
-                    style: Theme.of(context).textTheme.bodySmall,
-                  ),
-                ),
+          child: isUnresolved ? const Icon(Icons.report) : null,
         ),
         onTap: onTap,
       ),
@@ -218,15 +209,6 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
       _isWorking = isWorking;
     });
-  }
-
-  reloadLyrics() async {
-    setIsWorking(true);
-    try {
-      await postReload();
-    } finally {
-      setIsWorking(false);
-    }
   }
 
   showTextDialog(Function(String) callback, [String initialValue = ""]) {
@@ -415,28 +397,6 @@ class _MyHomePageState extends State<MyHomePage> {
                   },
                   child: Text(strings['changeDate']!),
                 ),
-                IfSpecialMode(
-                  mode: 'roch',
-                  child: MenuItemButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const ManualPage()),
-                      );
-                    },
-                    child: Text(strings['manual']!),
-                  ),
-                ),
-                IfSpecialMode(
-                  modes: ['roch', 'admin'],
-                  child: MenuItemButton(
-                    onPressed: () {
-                      reloadLyrics();
-                    },
-                    child: Text(strings['reloadLyrics']!),
-                  ),
-                ),
                 MenuItemButton(
                   onPressed: () {
                     Navigator.push(
@@ -492,9 +452,9 @@ class _MyHomePageState extends State<MyHomePage> {
               symbol: "${index + 1}",
               title: song.title,
               subtitle: song.subtitle,
-              number: song.number,
               index: index,
               isSong: song is SongDeckItem && !song.isOrdinary,
+              isUnresolved: song is UnresolvedDeckItem,
               onRemoved: () {
                 state.removeItem(index);
                 final snackBar = SnackBar(

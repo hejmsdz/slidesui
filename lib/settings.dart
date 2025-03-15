@@ -38,17 +38,6 @@ class SettingsPage extends StatelessWidget {
             SettingsGroup(
               title: strings['settingsSectionSlides']!,
               children: <Widget>[
-                IfSpecialMode(
-                  mode: 'roch',
-                  child: SwitchSettingsTile(
-                    settingKey: 'slides.hints',
-                    title: strings['hints']!,
-                    enabledLabel: strings['enabled']!,
-                    disabledLabel: strings['disabled']!,
-                    leading: const Icon(Icons.help),
-                    defaultValue: false,
-                  ),
-                ),
                 const FontSizeSettingsTile(),
                 DropDownSettingsTile<String>(
                   leading: const Icon(Icons.aspect_ratio),

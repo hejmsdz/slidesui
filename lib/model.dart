@@ -4,18 +4,16 @@ class Song {
   final String id;
   final String title;
   final String? subtitle;
-  final String number;
   final String slug;
   final bool isOrdinary;
 
-  Song(this.id, this.title, this.subtitle, this.number, this.slug,
+  Song(this.id, this.title, this.subtitle, this.slug,
       [this.isOrdinary = false]);
 
   Song.fromJson(Map<String, dynamic> json)
       : id = json['id'],
         title = json['title'],
         subtitle = json['subtitle'],
-        number = json['number'],
         slug = json['slug'],
         isOrdinary = json['isOrdinary'] ?? false;
 
@@ -23,26 +21,24 @@ class Song {
         'id': id,
         'title': title,
         'subtitle': subtitle,
-        'number': number,
         'slug': slug,
         'isOrdinary': isOrdinary,
       };
 }
 
 abstract class OrdinaryItems {
-  static Song kyrie = Song(
-      'a583dc8a31c94d2f9f5272ec7fa46710', 'Kyrie eleison', null, '', '', true);
+  static Song kyrie =
+      Song('a583dc8a31c94d2f9f5272ec7fa46710', 'Kyrie eleison', null, '', true);
   static Song sanctus =
-      Song('a48d891417ee457aaa32218834128eab', 'Sanctus', null, '', '', true);
+      Song('a48d891417ee457aaa32218834128eab', 'Sanctus', null, '', true);
   static Song agnus =
-      Song('46d9557071eb45e5bd325c981d46bb09', 'Agnus Dei', null, '', '', true);
+      Song('46d9557071eb45e5bd325c981d46bb09', 'Agnus Dei', null, '', true);
 }
 
 abstract class DeckItem {
   String get id;
   String get title;
   String? get subtitle;
-  String get number;
 
   String get removedMessage;
 
@@ -60,8 +56,6 @@ class SongDeckItem implements DeckItem {
   String get title => song.title;
   @override
   String? get subtitle => song.subtitle;
-  @override
-  String get number => song.number;
   bool get isOrdinary => song.isOrdinary;
 
   List<String>? rawVerses;
@@ -113,8 +107,6 @@ class PsalmDeckItem extends LiturgyDeckItem {
   String get title => strings['psalm']!;
   @override
   String? get subtitle => liturgy?.psalm;
-  @override
-  String get number => '';
 
   @override
   String get removedMessage => strings['itemRemovedPsalm']!;
@@ -136,8 +128,6 @@ class AcclamationDeckItem extends LiturgyDeckItem {
       strings['acclamation']!;
   @override
   String? get subtitle => liturgy?.acclamationVerse.replaceAll("\n", " ");
-  @override
-  String get number => '';
 
   @override
   String get removedMessage => strings['itemRemovedAcclamation']!;
@@ -157,8 +147,6 @@ class UnresolvedDeckItem implements DeckItem {
   String get subtitle => '';
   @override
   String get id => title.hashCode.toString();
-  @override
-  final String number = '?';
   final bool isOrdinary = false;
 
   @override
@@ -182,8 +170,6 @@ class TextDeckItem implements DeckItem {
   String get title => getTitle();
   @override
   String get subtitle => '';
-  @override
-  String get number => '';
 
   @override
   String get removedMessage =>
@@ -208,7 +194,6 @@ class TextDeckItem implements DeckItem {
 class DeckRequest {
   final DateTime date;
   final List<DeckItem> items;
-  final bool? hints;
   final String? ratio;
   final int? fontSize;
   final String? verticalAlign;
@@ -218,7 +203,6 @@ class DeckRequest {
   DeckRequest({
     required this.date,
     required this.items,
-    this.hints,
     this.ratio,
     this.fontSize,
     this.verticalAlign,
@@ -229,7 +213,6 @@ class DeckRequest {
   Map<String, dynamic> toJson() => {
         'date': date.toIso8601String().substring(0, 10),
         'items': items.map((item) => item.toJson()).toList(),
-        'hints': hints,
         'ratio': ratio,
         'fontSize': fontSize,
         'verticalAlign': verticalAlign,
@@ -265,17 +248,6 @@ class ContentSlide {
         itemIndex = json['i'],
         verseIndex = json['v'],
         chunkIndex = json['c'];
-}
-
-class Manual {
-  final List<String> steps;
-  final String image;
-
-  Manual(this.steps, this.image);
-
-  Manual.fromJson(Map<String, dynamic> json)
-      : steps = List<String>.from(json['steps']),
-        image = json['image'];
 }
 
 class BootstrapResponse {

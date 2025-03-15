@@ -48,16 +48,6 @@ Future<DeckResponse> postDeck(deckRequest) async {
   return deckResponse;
 }
 
-Future<Manual> getManual() async {
-  final response = await http.get(apiURL('v2/manual'));
-
-  if (response.statusCode != 200) {
-    throw ApiError();
-  }
-
-  return Manual.fromJson(jsonDecode(response.body));
-}
-
 Future<BootstrapResponse> getBootstrap() async {
   final response = await http.get(apiURL('v2/bootstrap'));
 
@@ -66,10 +56,6 @@ Future<BootstrapResponse> getBootstrap() async {
   }
 
   return BootstrapResponse.fromJson(jsonDecode(response.body));
-}
-
-Future<void> postReload() async {
-  await http.post(apiURL('v2/reload'));
 }
 
 Future<Liturgy> getLiturgy(DateTime date) async {

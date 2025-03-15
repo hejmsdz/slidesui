@@ -21,7 +21,6 @@ class SearchListItem extends StatelessWidget {
       {required this.id,
       required this.title,
       this.subtitle,
-      this.number = "",
       this.isChecked = false,
       this.onTap})
       : super(key: ValueKey(id));
@@ -29,7 +28,6 @@ class SearchListItem extends StatelessWidget {
   final String id;
   final String title;
   final String? subtitle;
-  final String number;
   final bool isChecked;
   final Function()? onTap;
 
@@ -39,13 +37,6 @@ class SearchListItem extends StatelessWidget {
       title: Text(title),
       subtitle: subtitle == null ? null : Text(subtitle!),
       leading: isChecked ? const Icon(Icons.check) : const Icon(null),
-      trailing: IfSpecialMode(
-        mode: 'roch',
-        child: Text(
-          number,
-          style: Theme.of(context).textTheme.bodySmall,
-        ),
-      ),
       onTap: onTap,
     );
   }
@@ -138,18 +129,7 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   handleCheatCode(String code) {
-    if (code == '\$roch') {
-      final state = Provider.of<SlidesModel>(context, listen: false);
-      if (state.specialMode == "roch") {
-        state.setSpecialMode(null);
-        ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("Wyłączono tryb DA św. Rocha.")));
-      } else {
-        state.setSpecialMode("roch");
-        ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("Włączono tryb DA św. Rocha.")));
-      }
-    } else if (code == '\$admin') {
+    if (code == '\$admin') {
       final state = Provider.of<SlidesModel>(context, listen: false);
       if (state.specialMode == "admin") {
         state.setSpecialMode(null);
@@ -206,16 +186,9 @@ class _SearchPageState extends State<SearchPage> {
           builder: (context, state, child) {
             if (!_isQueryValid) {
               return Center(
-                child: IfSpecialMode(
-                  mode: 'roch',
-                  elseChild: Text(
-                    strings['searchStartTyping']!,
-                    style: Theme.of(context).textTheme.bodySmall,
-                  ),
-                  child: Text(
-                    strings['searchStartTypingWithNumber']!,
-                    style: Theme.of(context).textTheme.bodySmall,
-                  ),
+                child: Text(
+                  strings['searchStartTyping']!,
+                  style: Theme.of(context).textTheme.bodySmall,
                 ),
               );
             }
@@ -236,7 +209,6 @@ class _SearchPageState extends State<SearchPage> {
                   id: song.id,
                   title: song.title,
                   subtitle: song.subtitle,
-                  number: song.number,
                   isChecked: isAdded,
                   onTap: () {
                     if (!isAdded) {
