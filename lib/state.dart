@@ -18,6 +18,9 @@ class SlidesModel extends ChangeNotifier implements LiturgyHolder {
   UnmodifiableListView<DeckItem> get items => UnmodifiableListView(_items);
   DateTime get date => _date;
 
+  BootstrapResponse? _bootstrap;
+  BootstrapResponse? get bootstrap => _bootstrap;
+
   @override
   Liturgy? liturgy;
 
@@ -160,6 +163,10 @@ class SlidesModel extends ChangeNotifier implements LiturgyHolder {
     _items.clear();
     _items.addAll(items);
     notifyListeners();
+  }
+
+  setBootstrap(BootstrapResponse bootstrap) {
+    _bootstrap = bootstrap;
   }
 
   Future<bool> setDate(DateTime date) async {

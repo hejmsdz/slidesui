@@ -103,9 +103,11 @@ class ListItem extends StatelessWidget {
   final void Function() onTap;
   final int index;
 
-  edit(BuildContext context) {
-    String id = itemKey.value.replaceAll('-', '');
-    Uri editUrl = Uri.parse("notion://www.notion.so/$id");
+  edit(String editUrlTemplate) {
+    final id = itemKey.value;
+    Uri editUrl = Uri.parse(editUrlTemplate
+        .replaceFirst("{id}", id)
+        .replaceFirst("{id-}", id.replaceAll('-', '')));
     launchUrl(editUrl);
   }
 
@@ -133,16 +135,25 @@ class ListItem extends StatelessWidget {
                   icon: Icons.reorder,
                   label: strings['verseOrder']!,
                 ),
-                IfSpecialMode(
-                  modes: ['admin'],
-                  child: SlidableAction(
-                    onPressed: edit,
-                    backgroundColor: Colors.blue,
-                    foregroundColor: Colors.white,
-                    icon: Icons.edit,
-                    label: strings['edit']!,
-                  ),
-                ),
+                Consumer<SlidesModel>(builder: (context, state, _) {
+                  final editUrl = state.bootstrap?.songEditUrl;
+                  if (editUrl == null) {
+                    return Container();
+                  }
+
+                  return IfSpecialMode(
+                    modes: ['admin'],
+                    child: SlidableAction(
+                      onPressed: (_) {
+                        edit(editUrl);
+                      },
+                      backgroundColor: Colors.blue,
+                      foregroundColor: Colors.white,
+                      icon: Icons.edit,
+                      label: strings['edit']!,
+                    ),
+                  );
+                }),
               ],
             )
           : null,
@@ -192,6 +203,10 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void checkVersion() async {
     final bootstrap = await getBootstrap();
+    if (mounted) {
+      context.read<SlidesModel>().setBootstrap(bootstrap);
+    }
+
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     final localVersion = packageInfo.version;
     SharedPreferences prefs = await SharedPreferences.getInstance();

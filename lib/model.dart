@@ -253,12 +253,14 @@ class ContentSlide {
 class BootstrapResponse {
   final String currentVersion;
   final String appDownloadUrl;
+  final String songEditUrl;
 
-  BootstrapResponse(this.currentVersion, this.appDownloadUrl);
+  BootstrapResponse(this.currentVersion, this.appDownloadUrl, this.songEditUrl);
 
   BootstrapResponse.fromJson(Map<String, dynamic> json)
       : currentVersion = json['currentVersion'],
-        appDownloadUrl = json['appDownloadUrl'];
+        appDownloadUrl = json['appDownloadUrl'],
+        songEditUrl = json['songEditUrl'];
 }
 
 class Liturgy {
