@@ -2,12 +2,11 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_settings_screens/flutter_settings_screens.dart';
-import 'package:slidesui/utils.dart';
 
 import './strings.dart';
 import './state.dart';
 
-const defaultFontSize = 42.0;
+const defaultFontSize = 52.0;
 
 const aspectRatios = <String, String>{
   '16:9': '16:9',
