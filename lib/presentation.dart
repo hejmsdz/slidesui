@@ -225,8 +225,7 @@ class _PresentationPageState extends State<PresentationPage> {
       body: (_isLoading || _pdf == null || _pdf?.pagesCount == 0)
           ? Container()
           : PopScope<Object?>(
-              canPop:
-                  !_isBroadcasting, // todo: false only if an external display is connected
+              canPop: !_isBroadcasting,
               onPopInvokedWithResult: (didPop, result) async {
                 if (!didPop) {
                   final shouldPop = await _confirmExit() ?? false;

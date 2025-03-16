@@ -55,11 +55,13 @@ class _CastButtonState extends State<CastButton> {
     widget.onStateChange?.call("cast", isConnected);
 
     if (!isInitial) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text(isConnected
-            ? strings['castConnected']!
-            : strings['castDisconnected']!),
-      ));
+      ScaffoldMessenger.of(context)
+        ..removeCurrentSnackBar()
+        ..showSnackBar(SnackBar(
+          content: Text(isConnected
+              ? strings['castConnected']!
+              : strings['castDisconnected']!),
+        ));
     }
   }
 

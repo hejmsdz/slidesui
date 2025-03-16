@@ -122,18 +122,21 @@ class _LiveSessionButtonState extends State<LiveSessionButton> {
       return;
     }
 
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text(
-          strings['liveSessionStarted']!.replaceFirst('{url}', _live!.url)),
-      action: SnackBarAction(
-          label: strings['shareLink']!,
-          onPressed: () {
-            Share.share(_live!.url);
-          }),
-    ));
+    ScaffoldMessenger.of(context)
+      ..removeCurrentSnackBar()
+      ..showSnackBar(SnackBar(
+        content: Text(
+            strings['liveSessionStarted']!.replaceFirst('{url}', _live!.url)),
+        action: SnackBarAction(
+            label: strings['shareLink']!,
+            onPressed: () {
+              Share.share(_live!.url);
+            }),
+      ));
   }
 
   Future<void> disconnect() async {
+    ScaffoldMessenger.of(context).removeCurrentSnackBar();
     await broadcastSlideChange(page: 0);
     setState(() {
       _isConnected = false;
