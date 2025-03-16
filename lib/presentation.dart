@@ -3,10 +3,12 @@ import 'dart:collection';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:pdfx/pdfx.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:slidesui/cast.dart';
 import 'package:slidesui/deck.dart';
@@ -92,6 +94,41 @@ class _PresentationPageState extends State<PresentationPage> {
     externalDisplay.sendParameters(
       action: "open",
       value: "${widget.filePath}#0",
+    );
+
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      showOnboardingDialog();
+    });
+  }
+
+  showOnboardingDialog() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    if (prefs.getBool("presentationModeOnboardingSeen") ?? false) {
+      return;
+    }
+
+    if (!mounted) {
+      return;
+    }
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+          title: Text(strings['presentationMode']!),
+          // title: Text("Tryb prezentacji"),
+          content: SingleChildScrollView(
+              scrollDirection: Axis.vertical,
+              child: Flexible(
+                  child: Text(strings['presentationModeOnboarding']!))),
+          actions: [
+            TextButton(
+              child: Text(strings['ok']!),
+              onPressed: () async {
+                prefs.setBool("presentationModeOnboardingSeen", true);
+                Navigator.of(context).pop();
+              },
+            )
+          ]),
     );
   }
 

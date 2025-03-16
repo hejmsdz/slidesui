@@ -64,6 +64,19 @@ const strings = {
   'behaviorDisplay': 'Wyświetl',
   'behaviorSave': 'Zapisz do pliku',
   'behaviorShare': 'Udostępnij',
+  'presentationMode': 'Tryb prezentacji',
+  'presentationModeOnboarding':
+      """Jesteś w trybie prezentacji, w którym możesz podejrzeć slajdy i wyświetlić je na zewnętrznym ekranie.
+
+• Na początku, na końcu i między pieśniami znajduje się zawsze pusty slajd.
+• Przesuwaj palcem w lewo lub w prawo, aby przełączać slajdy.
+• Aby wrócić na początek pieśni, stuknij dwa razy przy lewej krawędzi ekranu.
+• Aby zakończyć pieśń szybciej, stuknij dwa razy przy prawej krawędzi ekranu.
+
+• U góry znajdziesz przyciski, dzięki którym wyświetlisz prezentację na zewnętrznym ekranie, przez Chromecasta lub w przeglądarce internetowej.
+• Możesz też podłączyć swój telefon bezpośrednio z telewizorem lub rzutnikiem: przewodowo za pomocą przejściówki USB-C/HDMI albo bezprzewodowo, korzystając z funkcji “Smart View”, “Klonowanie ekranu”, “Bezprzewodowy wyświetlacz” (nazwa może różnić się w zależności od modelu telefonu) w panelu szybkich ustawień.
+
+• Możesz też zapisać plik ze slajdami jako PDF i udostępnić go lub pobrać, żeby wyświetlić w tradycyjny sposób.""",
   'confirmExitTitle': 'Potwierdź',
   'confirmExit': 'Czy na pewno chcesz zakończyć prezentację?',
   'yes': 'Tak',
