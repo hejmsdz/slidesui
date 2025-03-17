@@ -115,11 +115,10 @@ class _PresentationPageState extends State<PresentationPage> {
       context: context,
       builder: (context) => AlertDialog(
           title: Text(strings['presentationMode']!),
-          // title: Text("Tryb prezentacji"),
           content: SingleChildScrollView(
-              scrollDirection: Axis.vertical,
-              child: Flexible(
-                  child: Text(strings['presentationModeOnboarding']!))),
+            scrollDirection: Axis.vertical,
+            child: Text(strings['presentationModeOnboarding']!),
+          ),
           actions: [
             TextButton(
               child: Text(strings['ok']!),

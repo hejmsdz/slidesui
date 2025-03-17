@@ -74,7 +74,7 @@ const strings = {
 • Aby zakończyć pieśń szybciej (przeskoczyć na koniec), stuknij dwa razy przy prawej krawędzi ekranu.
 
 • U góry znajdziesz przyciski, dzięki którym wyświetlisz prezentację na zewnętrznym ekranie, przez Chromecasta lub w przeglądarce internetowej.
-• Możesz też podłączyć swój telefon bezpośrednio z telewizorem lub rzutnikiem: przewodowo za pomocą przejściówki USB-C/HDMI albo bezprzewodowo, korzystając z funkcji “Smart View”, “Klonowanie ekranu”, “Bezprzewodowy wyświetlacz” (nazwa może różnić się w zależności od modelu telefonu) w panelu szybkich ustawień.
+• Możesz też podłączyć telefon bezpośrednio z telewizorem lub rzutnikiem: przewodowo za pomocą przejściówki USB-C/HDMI albo bezprzewodowo, korzystając z funkcji “Smart View”, “Bezprzewodowy wyświetlacz” lub “Klonowanie ekranu” (nazwa może różnić się w zależności od modelu) w panelu szybkich ustawień telefonu.
 
 • Możesz też zapisać plik ze slajdami jako PDF i udostępnić go lub pobrać, żeby wyświetlić w tradycyjny sposób.""",
   'confirmExitTitle': 'Potwierdź',
