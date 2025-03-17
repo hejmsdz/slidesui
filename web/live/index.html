@@ -140,26 +140,6 @@
             return 1 - activeCanvasIndex;
         }
 
-        function goToPrevPage() {
-            if (currentPage <= 1) {
-                return;
-            }
-
-            currentPage--;
-            renderPage(currentPage);
-            sendCurrentPageToSender();
-        }
-
-        function goToNextPage() {
-            if (currentPage >= pdfDoc.numPages) {
-                return;
-            }
-
-            currentPage++;
-            renderPage(currentPage);
-            sendCurrentPageToSender();
-        }
-
         function goToPage(page) {
             if (!pdfDoc || page < 1 || page > pdfDoc.numPages) {
                 return;
@@ -169,12 +149,14 @@
             renderPage(currentPage);
         }
 
+        const apiUrl = location.origin;
+
         async function loadSlides(deckArgs, {
             initialPage = 1,
         } = {}) {
             currentPage = initialPage;
 
-            const response = await fetch(`https://slajdy.swro.ch/v2/deck`, {
+            const response = await fetch(`${apiUrl}/v2/deck`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json; charset=UTF-8' },
                 body: JSON.stringify(deckArgs),
@@ -192,7 +174,7 @@
         }
 
         const sessionId = window.location.hash.slice(1);
-        const sse = new EventSource(`https://slajdy.swro.ch/v2/live/${sessionId}`);
+        const sse = new EventSource(`${apiUrl}/v2/live/${sessionId}`);
 
         sse.addEventListener('start', (event) => {
             const { deck, currentPage } = JSON.parse(event.data);
@@ -204,6 +186,11 @@
         sse.addEventListener('changePage', (event) => {
             const { page } = JSON.parse(event.data);
             goToPage(page + 1);
+        });
+
+        sse.addEventListener('error', () => {
+            console.log('disconnected from server');
+            goToPage(1);
         });
 
         let wakeLock;
