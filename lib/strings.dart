@@ -49,8 +49,8 @@ const strings = {
   'skipVersion': 'POMIŃ',
   'settings': 'Ustawienia',
   'settingsSectionSlides': 'Slajdy',
-  'enabled': 'Włączone',
-  'disabled': 'Wyłączone',
+  'hints': 'Podpowiedzi',
+  'hintsDescription': 'Wyświetl skrót tytułu przed każdą pieśnią',
   'fontSize': 'Rozmiar tekstu',
   'linesPerPageOne': '{} linia na stronę',
   'linesPerPageFew': '{} linie na stronę',
@@ -71,7 +71,7 @@ const strings = {
 • Na początku, na końcu i między pieśniami znajduje się zawsze pusty slajd.
 • Przesuwaj palcem w lewo lub w prawo, aby przełączać slajdy.
 • Aby wrócić na początek pieśni, stuknij dwa razy przy lewej krawędzi ekranu.
-• Aby zakończyć pieśń szybciej, stuknij dwa razy przy prawej krawędzi ekranu.
+• Aby zakończyć pieśń szybciej (przeskoczyć na koniec), stuknij dwa razy przy prawej krawędzi ekranu.
 
 • U góry znajdziesz przyciski, dzięki którym wyświetlisz prezentację na zewnętrznym ekranie, przez Chromecasta lub w przeglądarce internetowej.
 • Możesz też podłączyć swój telefon bezpośrednio z telewizorem lub rzutnikiem: przewodowo za pomocą przejściówki USB-C/HDMI albo bezprzewodowo, korzystając z funkcji “Smart View”, “Klonowanie ekranu”, “Bezprzewodowy wyświetlacz” (nazwa może różnić się w zależności od modelu telefonu) w panelu szybkich ustawień.
