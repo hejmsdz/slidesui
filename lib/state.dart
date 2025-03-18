@@ -1,6 +1,7 @@
 import 'dart:collection';
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import './api.dart';
 import './model.dart';
@@ -8,6 +9,7 @@ import './model.dart';
 class SlidesModel extends ChangeNotifier implements LiturgyHolder {
   SlidesModel() {
     updateLiturgy();
+    _loadPreferences();
   }
 
   DateTime _date = DateTime.now();
@@ -31,7 +33,6 @@ class SlidesModel extends ChangeNotifier implements LiturgyHolder {
   Map<String, dynamic> toJson() => {
         'date': _date.toIso8601String().substring(0, 10),
         'items': _items.map((item) => item.toFullJson()).toList(),
-        'specialMode': _specialMode,
       };
 
   SlidesModel.fromJson(Map<String, dynamic> json) {
@@ -55,8 +56,12 @@ class SlidesModel extends ChangeNotifier implements LiturgyHolder {
         })
         .whereType<DeckItem>()
         .toList();
+  }
 
-    _specialMode = json['specialMode'] as String;
+  _loadPreferences() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    setSpecialMode(prefs.getString("specialMode"));
   }
 
   addItem(DeckItem item) {
@@ -225,8 +230,15 @@ class SlidesModel extends ChangeNotifier implements LiturgyHolder {
     notifyListeners();
   }
 
-  setSpecialMode(String? mode) {
+  setSpecialMode(String? mode) async {
     _specialMode = mode;
     notifyListeners();
+
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    if (mode == null) {
+      prefs.remove('specialMode');
+    } else {
+      prefs.setString('specialMode', mode);
+    }
   }
 }
