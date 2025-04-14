@@ -79,9 +79,9 @@ class _LiveSessionButtonState extends State<LiveSessionButton> {
       await broadcastSlideChange();
     } else {
       final state = Provider.of<SlidesModel>(context, listen: false);
-      final headers = <String, String>{
+      final headers = await addAccessToken({
         'Content-Type': 'application/json; charset=UTF-8',
-      };
+      });
       final body = jsonEncode({
         "deck": buildDeckRequestFromState(state).toJson(),
         "currentPage": widget.controller.currentPage,

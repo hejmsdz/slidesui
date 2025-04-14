@@ -97,4 +97,5 @@ const strings = {
   'shareLink': 'UDOSTĘPNIJ LINK',
   'shareSlides': 'Udostępnij slajdy',
   'saveToFile': 'Zapisz slajdy do pliku',
+  'login': 'Zaloguj się',
 };

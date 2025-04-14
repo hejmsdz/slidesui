@@ -4,6 +4,7 @@
 
 list(APPEND FLUTTER_PLUGIN_LIST
   bonsoir_windows
+  flutter_secure_storage_windows
   pdfx
   share_plus
   url_launcher_windows

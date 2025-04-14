@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:slidesui/authentication.dart';
 import 'package:slidesui/cast_service.dart';
 import 'package:slidesui/external_display.dart';
 import 'package:slidesui/external_display_singleton.dart';
@@ -314,6 +315,20 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
+  logInWithGoogle() async {
+    final idToken = await getGoogleIdToken();
+    if (idToken == null) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text('Failed to sign in. Please try again.')));
+
+      return;
+    }
+
+    print("ID TOKEN: $idToken");
+    final tokens = await postAuthGoogle(idToken);
+    print("TOKENS: $tokens");
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -421,6 +436,12 @@ class _MyHomePageState extends State<MyHomePage> {
                     );
                   },
                   child: Text(strings['settings']!),
+                ),
+                MenuItemButton(
+                  onPressed: () {
+                    logInWithGoogle();
+                  },
+                  child: Text(strings['login']!),
                 ),
               ],
             ),
