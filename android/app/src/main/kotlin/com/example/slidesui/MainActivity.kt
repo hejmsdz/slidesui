@@ -1,4 +1,4 @@
-package com.mrozwadowski.slidesui
+package lt.psal.psallite
 
 import android.app.Activity
 import android.content.Intent
@@ -11,7 +11,7 @@ import java.io.File
 
 class MainActivity : FlutterActivity() {
     companion object {
-        const val CHANNEL_NAME = "com.mrozwadowski.slidesui/filePicker"
+        const val CHANNEL_NAME = "lt.psal.psallite/filePicker"
         const val REQUEST_CODE = 54264
     }
 
