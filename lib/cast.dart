@@ -8,7 +8,7 @@ import 'package:slidesui/state.dart';
 import 'package:slidesui/strings.dart';
 
 const castAppId = 'E34D7CD2';
-const namespace = 'urn:x-cast:com.mrozwadowski.slidesui';
+const namespace = 'urn:x-cast:lt.psal.psallite';
 
 class CastButton extends StatefulWidget {
   const CastButton({

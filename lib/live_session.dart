@@ -6,7 +6,7 @@ import 'package:slidesui/api.dart';
 import 'package:slidesui/deck.dart';
 import 'package:slidesui/model.dart';
 import 'package:slidesui/presentation.dart';
-import 'package:http/http.dart' as http;
+import 'package:dio/dio.dart';
 import 'dart:convert';
 import 'package:slidesui/state.dart';
 import 'package:slidesui/strings.dart';
@@ -65,10 +65,13 @@ class _LiveSessionButtonState extends State<LiveSessionButton> {
       return;
     }
 
-    await http.post(apiURL('v2/live/${_live?.id}/page', {
-      'page': "${page ?? widget.controller.currentPage}",
-      'token': _live?.token,
-    }));
+    await apiClient.post(
+      'v2/live/${_live?.id}/page',
+      params: {
+        'page': "${page ?? widget.controller.currentPage}",
+        'token': _live?.token,
+      },
+    );
   }
 
   Future<void> connect({bool isFirstConnection = false}) async {
@@ -79,28 +82,24 @@ class _LiveSessionButtonState extends State<LiveSessionButton> {
       await broadcastSlideChange();
     } else {
       final state = Provider.of<SlidesModel>(context, listen: false);
-      final headers = await addAccessToken({
-        'Content-Type': 'application/json; charset=UTF-8',
-      });
-      final body = jsonEncode({
+      final body = {
         "deck": buildDeckRequestFromState(state).toJson(),
         "currentPage": widget.controller.currentPage,
-      });
+      };
 
-      http.Response? response;
+      Response? response;
       if (_live != null) {
-        response = await http.put(
-          apiURL('v2/live/${_live?.id}', {'token': _live?.token}),
-          headers: headers,
-          body: body,
+        response = await apiClient.put(
+          'v2/live/${_live?.id}',
+          params: {'token': _live?.token},
+          data: body,
         );
       }
 
       if (response == null || response.statusCode != 200) {
-        response = await http.post(
-          apiURL('v2/live'),
-          headers: headers,
-          body: body,
+        response = await apiClient.post(
+          'v2/live',
+          data: body,
         );
       }
 
@@ -108,7 +107,7 @@ class _LiveSessionButtonState extends State<LiveSessionButton> {
         return;
       }
 
-      final liveResponse = LiveResponse.fromJson(jsonDecode(response.body));
+      final liveResponse = LiveResponse.fromJson(response.data);
       setState(() {
         _live = liveResponse;
         _isConnected = true;

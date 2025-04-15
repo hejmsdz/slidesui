@@ -316,17 +316,19 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   logInWithGoogle() async {
-    final idToken = await getGoogleIdToken();
-    if (idToken == null) {
+    setIsWorking(true);
+    try {
+      final idToken = await getGoogleIdToken();
+      final authResponse = await postAuthGoogle(idToken);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Cześć, ${authResponse.name}!')));
+    } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text('Failed to sign in. Please try again.')));
-
-      return;
+          content: Text('Nie udało się zalogować. Spróbuj ponownie później.')));
+    } finally {
+      setIsWorking(false);
     }
-
-    print("ID TOKEN: $idToken");
-    final tokens = await postAuthGoogle(idToken);
-    print("TOKENS: $tokens");
   }
 
   @override
