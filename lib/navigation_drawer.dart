@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
@@ -6,6 +7,7 @@ import 'package:slidesui/authentication.dart';
 import 'package:slidesui/settings.dart';
 import 'package:slidesui/state.dart';
 import 'package:slidesui/strings.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class UserInfo extends StatefulWidget {
   const UserInfo({super.key});
@@ -88,14 +90,28 @@ class AppNavigationDrawer extends StatelessWidget {
               );
             },
           ),
-          ListTile(
-            leading: const Icon(Icons.favorite),
-            title: Text(strings['support']!),
-          ),
-          ListTile(
-            leading: const Icon(Icons.chat),
-            title: Text(strings['contact']!),
-          ),
+          Consumer<SlidesModel>(builder: (context, state, _) {
+            if (state.bootstrap?.supportUrl == null) {
+              return Container();
+            }
+
+            return ListTile(
+              leading: const Icon(Icons.favorite),
+              title: Text(strings['support']!),
+              onTap: () {
+                launchUrl(Uri.parse(state.bootstrap!.supportUrl!));
+              },
+            );
+          }),
+          Consumer<SlidesModel>(builder: (context, state, _) {
+            return ListTile(
+              leading: const Icon(Icons.chat),
+              title: Text(strings['contact']!),
+              onTap: () {
+                launchUrl(Uri.parse(state.bootstrap!.contactUrl!));
+              },
+            );
+          }),
           FutureBuilder(
             future: PackageInfo.fromPlatform(),
             builder: (context, snapshot) {

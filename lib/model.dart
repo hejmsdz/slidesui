@@ -257,13 +257,22 @@ class BootstrapResponse {
   final String currentVersion;
   final String appDownloadUrl;
   final String songEditUrl;
+  final String? contactUrl;
+  final String? supportUrl;
 
-  BootstrapResponse(this.currentVersion, this.appDownloadUrl, this.songEditUrl);
+  BootstrapResponse(
+      {required this.currentVersion,
+      required this.appDownloadUrl,
+      required this.songEditUrl,
+      this.contactUrl,
+      this.supportUrl});
 
   BootstrapResponse.fromJson(Map<String, dynamic> json)
       : currentVersion = json['currentVersion'],
         appDownloadUrl = json['appDownloadUrl'],
-        songEditUrl = json['songEditUrl'];
+        songEditUrl = json['songEditUrl'],
+        contactUrl = json['contactUrl'],
+        supportUrl = json['supportUrl'];
 }
 
 class Liturgy {

@@ -102,6 +102,6 @@ const strings = {
   'logInError': 'Nie udało się zalogować. Spróbuj ponownie później.',
   'myAccount': 'Moje konto',
   'about': 'O aplikacji',
-  'support': 'Wsparcie',
+  'support': 'Wesprzyj',
   'contact': 'Kontakt',
 };
