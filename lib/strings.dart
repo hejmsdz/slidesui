@@ -97,5 +97,11 @@ const strings = {
   'shareLink': 'UDOSTĘPNIJ LINK',
   'shareSlides': 'Udostępnij slajdy',
   'saveToFile': 'Zapisz slajdy do pliku',
-  'login': 'Zaloguj się',
+  'logIn': 'Zaloguj się',
+  'logInSuccess': 'Cześć, {}!',
+  'logInError': 'Nie udało się zalogować. Spróbuj ponownie później.',
+  'myAccount': 'Moje konto',
+  'about': 'O aplikacji',
+  'support': 'Wsparcie',
+  'contact': 'Kontakt',
 };

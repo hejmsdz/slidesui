@@ -22,7 +22,7 @@ import './state.dart';
 import './deck.dart';
 import './search.dart';
 import './textedit.dart';
-import './settings.dart';
+import './navigation_drawer.dart';
 
 void main() async {
   if (!kIsWeb) {
@@ -315,22 +315,6 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  logInWithGoogle() async {
-    setIsWorking(true);
-    try {
-      final idToken = await getGoogleIdToken();
-      final authResponse = await postAuthGoogle(idToken);
-
-      ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Cześć, ${authResponse.name}!')));
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text('Nie udało się zalogować. Spróbuj ponownie później.')));
-    } finally {
-      setIsWorking(false);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -429,22 +413,6 @@ class _MyHomePageState extends State<MyHomePage> {
                   },
                   child: Text(strings['changeDate']!),
                 ),
-                MenuItemButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const SettingsPage()),
-                    );
-                  },
-                  child: Text(strings['settings']!),
-                ),
-                MenuItemButton(
-                  onPressed: () {
-                    logInWithGoogle();
-                  },
-                  child: Text(strings['login']!),
-                ),
               ],
             ),
           )
@@ -459,6 +427,7 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ),
       ),
+      drawer: const AppNavigationDrawer(),
       body: Consumer<SlidesModel>(builder: (context, state, child) {
         if (state.items.isEmpty) {
           return Center(

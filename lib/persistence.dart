@@ -12,11 +12,6 @@ Future<File?> getStateFile() async {
   }
 }
 
-startOfToday() {
-  final now = DateTime.now();
-  return DateTime(now.year, now.month, now.day);
-}
-
 saveStateChanges(SlidesModel state) async {
   final file = await getStateFile();
   if (file == null) {
@@ -30,21 +25,17 @@ saveStateChanges(SlidesModel state) async {
 }
 
 Future<SlidesModel> loadSavedState() async {
-  final emptyModel = SlidesModel();
+  final state = SlidesModel();
   try {
     final file = await getStateFile();
     if (file == null) {
-      return emptyModel;
+      return state;
     }
     final json = await file.readAsString();
-    final state = SlidesModel.fromJson(jsonDecode(json));
+    state.loadFromJson(jsonDecode(json));
 
-    if (state.date.isBefore(startOfToday())) {
-      // discard saved state if it's for a past date
-      return emptyModel;
-    }
     return state;
   } catch (e) {
-    return emptyModel;
+    return state;
   }
 }

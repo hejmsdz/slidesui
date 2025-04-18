@@ -1,9 +1,8 @@
-import 'dart:convert';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:dio/dio.dart';
 import './model.dart';
 
-const rootURL = 'slajdy.swro.ch';
+const rootURL = 'https://api.psal.lt/';
 
 class ApiError implements Exception {}
 
@@ -166,21 +165,9 @@ Future<AuthResponse> postAuthGoogle(String idToken) async {
   return authResponse;
 }
 
-class AuthResponse {
-  final String token;
-  final String refreshToken;
-  final String name;
-
-  AuthResponse(
-      {required this.token, required this.refreshToken, required this.name});
-
-  factory AuthResponse.fromJson(Map<String, dynamic> json) {
-    return AuthResponse(
-      token: json['token'],
-      refreshToken: json['refreshToken'],
-      name: json['name'],
-    );
-  }
+Future<User> getAuthMe() async {
+  final response = await apiClient.get('v2/auth/me');
+  return User.fromJson(response.data);
 }
 
 Future<void> storeAuthResponse(AuthResponse authResponse) async {

@@ -1,6 +1,7 @@
 import 'dart:collection';
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import './api.dart';
@@ -10,6 +11,7 @@ class SlidesModel extends ChangeNotifier implements LiturgyHolder {
   SlidesModel() {
     updateLiturgy();
     _loadPreferences();
+    _loadUser();
   }
 
   DateTime _date = DateTime.now();
@@ -23,6 +25,9 @@ class SlidesModel extends ChangeNotifier implements LiturgyHolder {
   BootstrapResponse? _bootstrap;
   BootstrapResponse? get bootstrap => _bootstrap;
 
+  User? _user;
+  User? get user => _user;
+
   @override
   Liturgy? liturgy;
 
@@ -35,8 +40,17 @@ class SlidesModel extends ChangeNotifier implements LiturgyHolder {
         'items': _items.map((item) => item.toFullJson()).toList(),
       };
 
-  SlidesModel.fromJson(Map<String, dynamic> json) {
-    _date = DateTime.parse(json['date'] as String);
+  loadFromJson(Map<String, dynamic> json) {
+    final date = DateTime.parse(json['date'] as String);
+
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+
+    if (date.isBefore(today)) {
+      return;
+    }
+
+    _date = date;
 
     final items = json['items'] as List;
     _items = items
@@ -56,12 +70,23 @@ class SlidesModel extends ChangeNotifier implements LiturgyHolder {
         })
         .whereType<DeckItem>()
         .toList();
+
+    notifyListeners();
   }
 
   _loadPreferences() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
     setSpecialMode(prefs.getString("specialMode"));
+  }
+
+  _loadUser() async {
+    final storage = FlutterSecureStorage();
+    final hasToken = await storage.containsKey(key: 'accessToken');
+    if (hasToken) {
+      final user = await getAuthMe();
+      setUser(user);
+    }
   }
 
   addItem(DeckItem item) {
@@ -240,5 +265,10 @@ class SlidesModel extends ChangeNotifier implements LiturgyHolder {
     } else {
       prefs.setString('specialMode', mode);
     }
+  }
+
+  setUser(User? user) {
+    _user = user;
+    notifyListeners();
   }
 }
