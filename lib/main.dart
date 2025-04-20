@@ -3,12 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:slidesui/authentication.dart';
 import 'package:slidesui/cast_service.dart';
 import 'package:slidesui/external_display.dart';
 import 'package:slidesui/external_display_singleton.dart';
 import 'package:slidesui/presentation.dart';
-import 'package:slidesui/utils.dart';
 import 'package:slidesui/verse_order.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -138,21 +136,18 @@ class ListItem extends StatelessWidget {
                 ),
                 Consumer<SlidesModel>(builder: (context, state, _) {
                   final editUrl = state.bootstrap?.songEditUrl;
-                  if (editUrl == null) {
+                  if (editUrl == null || state.user == null) {
                     return Container();
                   }
 
-                  return IfSpecialMode(
-                    modes: ['admin'],
-                    child: SlidableAction(
-                      onPressed: (_) {
-                        edit(editUrl);
-                      },
-                      backgroundColor: Colors.blue,
-                      foregroundColor: Colors.white,
-                      icon: Icons.edit,
-                      label: strings['edit']!,
-                    ),
+                  return SlidableAction(
+                    onPressed: (_) {
+                      edit(editUrl);
+                    },
+                    backgroundColor: Colors.blue,
+                    foregroundColor: Colors.white,
+                    icon: Icons.edit,
+                    label: strings['edit']!,
                   );
                 }),
               ],

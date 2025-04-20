@@ -10,7 +10,6 @@ import './model.dart';
 class SlidesModel extends ChangeNotifier implements LiturgyHolder {
   SlidesModel() {
     updateLiturgy();
-    _loadPreferences();
     _loadUser();
   }
 
@@ -28,12 +27,13 @@ class SlidesModel extends ChangeNotifier implements LiturgyHolder {
   User? _user;
   User? get user => _user;
 
+  Team? _currentTeam;
+  Team? get currentTeam => _currentTeam;
+
   @override
   Liturgy? liturgy;
 
   bool isLiveConnected = false;
-  String? _specialMode;
-  String? get specialMode => _specialMode;
 
   Map<String, dynamic> toJson() => {
         'date': _date.toIso8601String().substring(0, 10),
@@ -72,12 +72,6 @@ class SlidesModel extends ChangeNotifier implements LiturgyHolder {
         .toList();
 
     notifyListeners();
-  }
-
-  _loadPreferences() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-
-    setSpecialMode(prefs.getString("specialMode"));
   }
 
   _loadUser() async {
@@ -255,20 +249,18 @@ class SlidesModel extends ChangeNotifier implements LiturgyHolder {
     notifyListeners();
   }
 
-  setSpecialMode(String? mode) async {
-    _specialMode = mode;
+  setUser(User? user) async {
+    _user = user;
     notifyListeners();
 
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    if (mode == null) {
-      prefs.remove('specialMode');
-    } else {
-      prefs.setString('specialMode', mode);
+    final teams = await getTeams();
+    if (teams.isNotEmpty) {
+      setCurrentTeam(teams.first);
     }
   }
 
-  setUser(User? user) {
-    _user = user;
+  setCurrentTeam(Team? team) {
+    _currentTeam = team;
     notifyListeners();
   }
 }

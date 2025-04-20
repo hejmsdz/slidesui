@@ -68,7 +68,6 @@ class ApiClient {
       data: {'refreshToken': refreshToken},
     );
 
-    print("REFRESH RESPONSE: ${response.statusCode}");
     if (response.statusCode != 200 && response.statusCode != 201) {
       throw ApiError();
     }
@@ -170,8 +169,20 @@ Future<User> getAuthMe() async {
   return User.fromJson(response.data);
 }
 
-Future<void> storeAuthResponse(AuthResponse authResponse) async {
+Future<void> storeAuthResponse(AuthResponse? authResponse) async {
   final storage = FlutterSecureStorage();
-  await storage.write(key: 'accessToken', value: authResponse.token);
-  await storage.write(key: 'refreshToken', value: authResponse.refreshToken);
+  if (authResponse == null) {
+    await storage.deleteAll();
+  } else {
+    await storage.write(key: 'accessToken', value: authResponse.token);
+    await storage.write(key: 'refreshToken', value: authResponse.refreshToken);
+  }
+}
+
+Future<List<Team>> getTeams() async {
+  final response = await apiClient.get('v2/teams');
+  print("TEAMS RESPONSE: $response");
+  return (response.data as List)
+      .map((itemJson) => Team.fromJson(itemJson))
+      .toList();
 }

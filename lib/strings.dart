@@ -104,4 +104,5 @@ const strings = {
   'about': 'O aplikacji',
   'support': 'Wesprzyj',
   'contact': 'Kontakt',
+  'logOut': 'Wyloguj się',
 };

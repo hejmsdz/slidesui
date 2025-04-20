@@ -332,3 +332,14 @@ class User {
         email = json['email'],
         displayName = json['displayName'];
 }
+
+class Team {
+  final String id;
+  final String name;
+
+  Team({required this.id, required this.name});
+
+  Team.fromJson(Map<String, dynamic> json)
+      : id = json['id'],
+        name = json['name'];
+}
