@@ -105,4 +105,11 @@ const strings = {
   'support': 'Wesprzyj',
   'contact': 'Kontakt',
   'logOut': 'Wyloguj się',
+  'yourTeams': 'Twoje zespoły',
+  'yourAccount': 'Twoje konto',
+  'selectTeam': 'Wybierz zespół',
+  'addTeam': 'Stwórz nowy zespół',
+  'teamName': 'Nazwa zespołu',
+  'add': 'Dodaj',
+  'addTeamError': 'Nie udało się stworzyć zespołu. Spróbuj ponownie później.',
 };

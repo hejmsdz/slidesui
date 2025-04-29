@@ -106,8 +106,11 @@ class _SearchPageState extends State<SearchPage> {
     if (forceUpdate || (queryPrefixChanged && !_isLoading)) {
       setIsLoading(true);
       try {
-        _prefilteredItems =
-            await getSongs(query.substring(0, queryPrefixLength));
+        final state = context.read<SlidesModel>();
+        _prefilteredItems = await getSongs(
+          query.substring(0, queryPrefixLength),
+          teamId: state.currentTeam?.id,
+        );
       } finally {
         setIsLoading(false);
       }

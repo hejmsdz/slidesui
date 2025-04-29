@@ -38,6 +38,7 @@ class SlidesModel extends ChangeNotifier implements LiturgyHolder {
   Map<String, dynamic> toJson() => {
         'date': _date.toIso8601String().substring(0, 10),
         'items': _items.map((item) => item.toFullJson()).toList(),
+        'currentTeam': _currentTeam?.toJson(),
       };
 
   loadFromJson(Map<String, dynamic> json) {
@@ -70,6 +71,8 @@ class SlidesModel extends ChangeNotifier implements LiturgyHolder {
         })
         .whereType<DeckItem>()
         .toList();
+
+    _currentTeam = Team.fromJson(json['currentTeam']);
 
     notifyListeners();
   }
@@ -104,6 +107,11 @@ class SlidesModel extends ChangeNotifier implements LiturgyHolder {
     if (index >= 0) {
       removeItem(index);
     }
+  }
+
+  removeAllItems() {
+    _items.clear();
+    notifyListeners();
   }
 
   undoRemoveItem() {
@@ -255,7 +263,11 @@ class SlidesModel extends ChangeNotifier implements LiturgyHolder {
 
     final teams = await getTeams();
     if (teams.isNotEmpty) {
-      setCurrentTeam(teams.first);
+      final team = teams.firstWhere(
+        (team) => team.id == _currentTeam?.id,
+        orElse: () => teams.first,
+      );
+      setCurrentTeam(team);
     }
   }
 

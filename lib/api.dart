@@ -90,6 +90,11 @@ class ApiClient {
     return _dio.put(path, queryParameters: params, data: data);
   }
 
+  Future<Response> delete(String path,
+      {Map<String, dynamic>? params, Object? data}) async {
+    return _dio.delete(path, queryParameters: params, data: data);
+  }
+
   void close() {
     _dio.close();
   }
@@ -97,8 +102,11 @@ class ApiClient {
 
 final apiClient = ApiClient();
 
-Future<List<Song>> getSongs(String query) async {
-  final response = await apiClient.get('v2/songs', params: {'query': query});
+Future<List<Song>> getSongs(String query, {String? teamId}) async {
+  final response = await apiClient.get('v2/songs', params: {
+    'query': query,
+    'teamId': teamId,
+  });
 
   if (response.statusCode != 200) {
     throw ApiError();
@@ -164,6 +172,23 @@ Future<AuthResponse> postAuthGoogle(String idToken) async {
   return authResponse;
 }
 
+Future<void> deleteAuthRefresh() async {
+  final storage = FlutterSecureStorage();
+  final refreshToken = await storage.read(key: 'refreshToken');
+  if (refreshToken == null) {
+    return;
+  }
+
+  await apiClient.delete(
+    'v2/auth/refresh',
+    data: {
+      'refreshToken': refreshToken,
+    },
+  );
+
+  await storeAuthResponse(null);
+}
+
 Future<User> getAuthMe() async {
   final response = await apiClient.get('v2/auth/me');
   return User.fromJson(response.data);
@@ -181,8 +206,12 @@ Future<void> storeAuthResponse(AuthResponse? authResponse) async {
 
 Future<List<Team>> getTeams() async {
   final response = await apiClient.get('v2/teams');
-  print("TEAMS RESPONSE: $response");
   return (response.data as List)
       .map((itemJson) => Team.fromJson(itemJson))
       .toList();
+}
+
+Future<Team> postTeam(String name) async {
+  final response = await apiClient.post('v2/teams', data: {'name': name});
+  return Team.fromJson(response.data);
 }

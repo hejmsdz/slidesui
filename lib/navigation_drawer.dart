@@ -112,6 +112,87 @@ class _AppNavigationDrawerState extends State<AppNavigationDrawer> {
     setState(() => _isUserMenuOpen = !_isUserMenuOpen);
   }
 
+  Future<void> openTeamsDialog() async {
+    final state = context.read<SlidesModel>();
+    final teams = await getTeams();
+    if (!mounted) return;
+
+    final team = await showDialog<Team>(
+        context: context,
+        builder: (BuildContext context) {
+          return SimpleDialog(
+            title: Text(strings['selectTeam']!),
+            children: <Widget>[
+              ...teams.map((team) => SimpleDialogOption(
+                    child: Text(team.name),
+                    onPressed: () {
+                      Navigator.pop(context, team);
+                    },
+                  )),
+              const Divider(),
+              SimpleDialogOption(
+                child: Text(strings['addTeam']!),
+                onPressed: () async {
+                  final newTeam = await openAddTeamDialog();
+                  Navigator.pop(context, newTeam);
+                },
+              ),
+            ],
+          );
+        });
+
+    if (team != null && team.id != state.currentTeam?.id) {
+      state.removeAllItems();
+      state.setCurrentTeam(team);
+    }
+  }
+
+  Future<Team?> openAddTeamDialog() async {
+    final teamNameController = TextEditingController();
+    final teamName = await showDialog<String>(
+      context: context,
+      builder: (BuildContext context) => AlertDialog(
+        title: Text(strings['addTeam']!),
+        content: TextField(
+          controller: teamNameController,
+          decoration: InputDecoration(labelText: strings['teamName']!),
+          autofocus: true,
+        ),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context, null);
+            },
+            child: Text(strings['cancel']!),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context, teamNameController.text);
+            },
+            child: Text(strings['add']!.toUpperCase()),
+          ),
+        ],
+      ),
+    );
+
+    if (teamName == null) {
+      return null;
+    }
+
+    try {
+      final newTeam = await postTeam(teamName);
+      print(newTeam);
+      return newTeam;
+    } catch (e) {
+      print(e);
+      if (mounted) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(strings['addTeamError']!)));
+      }
+      return null;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Drawer(
@@ -126,43 +207,28 @@ class _AppNavigationDrawerState extends State<AppNavigationDrawer> {
                 children: [
                   ListTile(
                     leading: const Icon(Icons.group),
-                    title: Text("Wybierz zespół"),
+                    title: Text(strings['yourTeams']!),
                     onTap: () async {
-                      final teams = await getTeams();
-                      if (!mounted) return;
-
-                      showDialog(
-                        context: context,
-                        builder: (context) => AlertDialog(
-                          title: Text("Wybierz zespół"),
-                          content: SizedBox(
-                            width: double.maxFinite,
-                            child: ListView.builder(
-                              shrinkWrap: true,
-                              itemCount: teams.length,
-                              itemBuilder: (context, index) {
-                                final team = teams[index];
-                                return ListTile(
-                                  title: Text(team.name),
-                                  selected: team.id == state.currentTeam?.id,
-                                  onTap: () {
-                                    state.setCurrentTeam(team);
-                                    Navigator.of(context).pop();
-                                  },
-                                );
-                              },
-                            ),
-                          ),
-                        ),
-                      );
+                      await openTeamsDialog();
                     },
                   ),
+                  ListTile(
+                    leading: const Icon(Icons.person),
+                    title: Text(strings['yourAccount']!),
+                    onTap: () {
+                      launchUrl(
+                          Uri.parse("https://psal.lt/dashboard/settings"));
+                    },
+                  ),
+                  const Divider(),
                   ListTile(
                     leading: const Icon(Icons.logout),
                     title: Text(strings['logOut']!),
                     onTap: () {
-                      context.read<SlidesModel>().setUser(null);
-                      storeAuthResponse(null);
+                      state.setUser(null);
+                      deleteAuthRefresh();
+                      state.removeAllItems();
+                      toggleUserMenu();
                     },
                   ),
                 ],
