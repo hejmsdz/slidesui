@@ -1,14 +1,12 @@
 import 'package:cast/cast.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:slidesui/api.dart';
 import 'package:slidesui/cast_service.dart';
 import 'package:slidesui/deck.dart';
 import 'package:slidesui/presentation.dart';
 import 'package:slidesui/state.dart';
 import 'package:slidesui/strings.dart';
-
-const castAppId = 'E34D7CD2';
-const namespace = 'urn:x-cast:lt.psal.psallite';
 
 class CastButton extends StatefulWidget {
   const CastButton({
@@ -147,9 +145,11 @@ class _CastButtonState extends State<CastButton> {
     _castService?.requestSlideChange(widget.controller.currentPage);
   }
 
-  startPresentation() {
-    final deck = buildDeckRequestFromState(context.read<SlidesModel>());
-    _castService?.startPresentation(deck, widget.controller.currentPage);
+  Future<void> startPresentation() async {
+    final deckRequest = buildDeckRequestFromState(context.read<SlidesModel>());
+    final deckResponse = await postDeck(deckRequest);
+    _castService?.startPresentation(
+        deckResponse.url, widget.controller.currentPage);
     widget.controller.addListener(handleSlideChange);
   }
 
