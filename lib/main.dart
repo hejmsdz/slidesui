@@ -8,6 +8,7 @@ import 'package:slidesui/external_display.dart';
 import 'package:slidesui/external_display_singleton.dart';
 import 'package:slidesui/presentation.dart';
 import 'package:slidesui/verse_order.dart';
+import 'package:slidesui/web_view.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_settings_screens/flutter_settings_screens.dart';
@@ -102,12 +103,22 @@ class ListItem extends StatelessWidget {
   final void Function() onTap;
   final int index;
 
-  edit(String editUrlTemplate) {
+  edit(BuildContext context, SlidesModel state) {
     final id = itemKey.value;
-    Uri editUrl = Uri.parse(editUrlTemplate
-        .replaceFirst("{id}", id)
-        .replaceFirst("{id-}", id.replaceAll('-', '')));
-    launchUrl(editUrl);
+    Navigator.of(context).push(
+      MaterialPageRoute(
+          builder: (context) => WebViewPage(
+                path: "dashboard/songs/$id",
+                title: strings['edit']!,
+                onClose: (url) {
+                  String newId = id;
+                  if (url != null) {
+                    newId = url.split("/").last;
+                  }
+                  state.reloadSong(id, newId);
+                },
+              )),
+    );
   }
 
   @override
@@ -135,14 +146,13 @@ class ListItem extends StatelessWidget {
                   label: strings['verseOrder']!,
                 ),
                 Consumer<SlidesModel>(builder: (context, state, _) {
-                  final editUrl = state.bootstrap?.songEditUrl;
-                  if (editUrl == null || state.user == null) {
+                  if (state.currentTeam == null) {
                     return Container();
                   }
 
                   return SlidableAction(
-                    onPressed: (_) {
-                      edit(editUrl);
+                    onPressed: (context) {
+                      edit(context, state);
                     },
                     backgroundColor: Colors.blue,
                     foregroundColor: Colors.white,

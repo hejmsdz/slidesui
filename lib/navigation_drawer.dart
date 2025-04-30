@@ -8,6 +8,7 @@ import 'package:slidesui/settings.dart';
 import 'package:slidesui/state.dart';
 import 'package:slidesui/strings.dart';
 import 'package:slidesui/model.dart';
+import 'package:slidesui/web_view.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class UserInfo extends StatefulWidget {
@@ -216,8 +217,18 @@ class _AppNavigationDrawerState extends State<AppNavigationDrawer> {
                     leading: const Icon(Icons.person),
                     title: Text(strings['yourAccount']!),
                     onTap: () {
-                      launchUrl(
-                          Uri.parse("https://psal.lt/dashboard/settings"));
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                            builder: (context) => WebViewPage(
+                                path: "dashboard/settings",
+                                title: strings['yourAccount']!,
+                                onClose: (_) async {
+                                  await state.loadUser();
+                                  if (state.user == null) {
+                                    toggleUserMenu();
+                                  }
+                                })),
+                      );
                     },
                   ),
                   const Divider(),

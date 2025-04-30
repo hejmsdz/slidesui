@@ -10,7 +10,7 @@ import './model.dart';
 class SlidesModel extends ChangeNotifier implements LiturgyHolder {
   SlidesModel() {
     updateLiturgy();
-    _loadUser();
+    loadUser();
   }
 
   DateTime _date = DateTime.now();
@@ -77,12 +77,17 @@ class SlidesModel extends ChangeNotifier implements LiturgyHolder {
     notifyListeners();
   }
 
-  _loadUser() async {
+  loadUser() async {
     final storage = FlutterSecureStorage();
     final hasToken = await storage.containsKey(key: 'accessToken');
     if (hasToken) {
-      final user = await getAuthMe();
-      setUser(user);
+      try {
+        final user = await getAuthMe();
+        setUser(user);
+      } catch (e) {
+        setUser(null);
+        await storeAuthResponse(null);
+      }
     }
   }
 
@@ -246,6 +251,15 @@ class SlidesModel extends ChangeNotifier implements LiturgyHolder {
     notifyListeners();
   }
 
+  reloadSong(String id, String? newId) async {
+    final index = _items.indexWhere((item) => item.id == id);
+    if (index >= 0) {
+      final song = await getSong(newId ?? id);
+      _items[index] = SongDeckItem(song);
+    }
+    notifyListeners();
+  }
+
   bool isValid() {
     return _items.isNotEmpty &&
         !_items.any((item) => item is UnresolvedDeckItem);
@@ -268,6 +282,8 @@ class SlidesModel extends ChangeNotifier implements LiturgyHolder {
         orElse: () => teams.first,
       );
       setCurrentTeam(team);
+    } else {
+      setCurrentTeam(null);
     }
   }
 

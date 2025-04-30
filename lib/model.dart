@@ -256,21 +256,21 @@ class ContentSlide {
 class BootstrapResponse {
   final String currentVersion;
   final String appDownloadUrl;
-  final String songEditUrl;
+  final String frontendUrl;
   final String? contactUrl;
   final String? supportUrl;
 
   BootstrapResponse(
       {required this.currentVersion,
       required this.appDownloadUrl,
-      required this.songEditUrl,
+      required this.frontendUrl,
       this.contactUrl,
       this.supportUrl});
 
   BootstrapResponse.fromJson(Map<String, dynamic> json)
       : currentVersion = json['currentVersion'],
         appDownloadUrl = json['appDownloadUrl'],
-        songEditUrl = json['songEditUrl'],
+        frontendUrl = json['frontendUrl'],
         contactUrl = json['contactUrl'],
         supportUrl = json['supportUrl'];
 }
@@ -318,6 +318,14 @@ class AuthResponse {
       user: User.fromJson(json['user']),
     );
   }
+}
+
+class NonceResponse {
+  final String nonce;
+
+  NonceResponse({required this.nonce});
+
+  NonceResponse.fromJson(Map<String, dynamic> json) : nonce = json['nonce'];
 }
 
 class User {

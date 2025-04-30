@@ -44,6 +44,7 @@ dependencies:
   external_display: ^0.3.0
   google_sign_in: ^6.3.0
   flutter_secure_storage: ^9.2.4
+  webview_flutter: ^4.11.0
 
 dev_dependencies:
   flutter_test:

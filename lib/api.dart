@@ -62,7 +62,6 @@ class ApiClient {
       throw ApiError();
     }
 
-    print("REFRESHING TOKEN: $refreshToken");
     final response = await _dio.post(
       '/v2/auth/refresh',
       data: {'refreshToken': refreshToken},
@@ -115,6 +114,11 @@ Future<List<Song>> getSongs(String query, {String? teamId}) async {
   return (response.data as List)
       .map((itemJson) => Song.fromJson(itemJson))
       .toList();
+}
+
+Future<Song> getSong(String id) async {
+  final response = await apiClient.get("v2/songs/$id");
+  return Song.fromJson(response.data);
 }
 
 Future<List<String>> getLyrics(String songId, {bool raw = false}) async {
@@ -190,8 +194,13 @@ Future<void> deleteAuthRefresh() async {
 }
 
 Future<User> getAuthMe() async {
-  final response = await apiClient.get('v2/auth/me');
+  final response = await apiClient.get('v2/users/me');
   return User.fromJson(response.data);
+}
+
+Future<NonceResponse> postAuthNonce() async {
+  final response = await apiClient.post('v2/auth/nonce');
+  return NonceResponse.fromJson(response.data);
 }
 
 Future<void> storeAuthResponse(AuthResponse? authResponse) async {

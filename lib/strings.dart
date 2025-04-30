@@ -112,4 +112,6 @@ const strings = {
   'teamName': 'Nazwa zespołu',
   'add': 'Dodaj',
   'addTeamError': 'Nie udało się stworzyć zespołu. Spróbuj ponownie później.',
+  'confirmExitUnsavedChanges':
+      'Masz niezapisane zmiany. Czy na pewno chcesz zakończyć edycję bez zapisywania?',
 };
