@@ -112,6 +112,12 @@ const strings = {
   'teamName': 'Nazwa zespołu',
   'add': 'Dodaj',
   'addTeamError': 'Nie udało się stworzyć zespołu. Spróbuj ponownie później.',
+  'inviteToTeam': 'Zaproś do zespołu',
+  'inviteLinkDescription':
+      'Wyślij poniższy link osobie, którą chcesz zaprosić do zespołu {}.',
+  'linkExpiration': 'Link jest jednorazowy i ważny przez {}.',
+  'copy': 'Kopiuj',
+  'share': 'Udostępnij',
   'confirmExitUnsavedChanges':
       'Masz niezapisane zmiany. Czy na pewno chcesz zakończyć edycję bez zapisywania?',
 };

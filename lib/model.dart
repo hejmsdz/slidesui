@@ -353,3 +353,19 @@ class Team {
 
   Map<String, dynamic> toJson() => {'id': id, 'name': name};
 }
+
+class TeamInvitation {
+  final String url;
+  final DateTime expiresAt;
+
+  TeamInvitation({required this.url, required this.expiresAt});
+
+  TeamInvitation.fromJson(Map<String, dynamic> json)
+      : url = json['url'],
+        expiresAt = DateTime.parse(json['expiresAt']);
+
+  Map<String, dynamic> toJson() => {
+        'url': url,
+        'expiresAt': expiresAt.toIso8601String(),
+      };
+}

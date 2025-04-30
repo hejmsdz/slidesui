@@ -1,7 +1,8 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:slidesui/api.dart';
 import 'package:slidesui/authentication.dart';
 import 'package:slidesui/settings.dart';
@@ -182,16 +183,64 @@ class _AppNavigationDrawerState extends State<AppNavigationDrawer> {
 
     try {
       final newTeam = await postTeam(teamName);
-      print(newTeam);
       return newTeam;
     } catch (e) {
-      print(e);
       if (mounted) {
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text(strings['addTeamError']!)));
       }
       return null;
     }
+  }
+
+  Future<void> _showInvitationDialog(BuildContext context, Team team) async {
+    final invitation = await postTeamInvite(team.id);
+    final invitationLink = invitation.url;
+
+    if (!context.mounted) return;
+
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        final controller = TextEditingController(text: invitationLink);
+
+        return AlertDialog(
+          title: Text(strings['inviteToTeam']!),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(strings['inviteLinkDescription']!
+                  .replaceAll('{}', team.name)),
+              TextField(
+                controller: controller,
+                readOnly: true,
+                onTap: () => controller.selection = TextSelection(
+                    baseOffset: 0, extentOffset: controller.value.text.length),
+              ),
+              Text(
+                strings['linkExpiration']!.replaceAll('{}',
+                    '${(invitation.expiresAt.difference(DateTime.now()).inMinutes / 60.0).round()}h'),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Clipboard.setData(ClipboardData(text: controller.text));
+              },
+              child: Text(strings['copy']!),
+            ),
+            TextButton(
+              onPressed: () async {
+                await Share.share(controller.text);
+              },
+              child: Text(strings['share']!),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -213,8 +262,15 @@ class _AppNavigationDrawerState extends State<AppNavigationDrawer> {
                       await openTeamsDialog();
                     },
                   ),
+                  if (state.currentTeam != null)
+                    ListTile(
+                      leading: const Icon(Icons.person_add),
+                      title: Text(strings['inviteToTeam']!),
+                      onTap: () =>
+                          _showInvitationDialog(context, state.currentTeam!),
+                    ),
                   ListTile(
-                    leading: const Icon(Icons.person),
+                    leading: const Icon(Icons.settings),
                     title: Text(strings['yourAccount']!),
                     onTap: () {
                       Navigator.of(context).push(
