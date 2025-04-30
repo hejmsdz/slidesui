@@ -46,8 +46,10 @@ class _WebViewPageState extends State<WebViewPage> {
           });
         },
         onPageFinished: (url) {
-          controller.runJavaScript(
-              "localStorage.setItem('previewFontSize', '${Settings.getValue<double>('slides.fontSize')}')");
+          if (Settings.containsKey('slides.fontSize') == true) {
+            controller.runJavaScript(
+                "localStorage.setItem('previewFontSize', '${Settings.getValue<double>('slides.fontSize')}')");
+          }
 
           setState(() {
             _isLoading = false;

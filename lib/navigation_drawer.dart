@@ -125,9 +125,11 @@ class _AppNavigationDrawerState extends State<AppNavigationDrawer> {
           return SimpleDialog(
             title: Text(strings['selectTeam']!),
             children: <Widget>[
-              ...teams.map((team) => SimpleDialogOption(
-                    child: Text(team.name),
-                    onPressed: () {
+              ...teams.map((team) => RadioListTile(
+                    title: Text(team.name),
+                    value: team.id,
+                    groupValue: state.currentTeam?.id,
+                    onChanged: (_) {
                       Navigator.pop(context, team);
                     },
                   )),
