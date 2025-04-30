@@ -179,7 +179,7 @@ class _AppNavigationDrawerState extends State<AppNavigationDrawer> {
             onPressed: () {
               Navigator.pop(context, teamNameController.text);
             },
-            child: Text(strings['add']!.toUpperCase()),
+            child: Text(strings['add']!),
           ),
         ],
       ),
