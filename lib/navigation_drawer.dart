@@ -70,14 +70,20 @@ class _UserInfoState extends State<UserInfo> {
   Widget build(BuildContext context) {
     return Consumer<SlidesModel>(builder: (context, state, _) {
       if (state.user != null) {
+        final color = Theme.of(context).colorScheme.onPrimary;
+        final textStyle = TextStyle(color: color);
         return Column(
           children: [
             UserAccountsDrawerHeader(
-              accountName: Text(state.currentTeam?.name ?? ""),
-              accountEmail: Text(state.user!.displayName),
+              accountName:
+                  Text(state.currentTeam?.name ?? "", style: textStyle),
+              accountEmail: Text(state.user!.displayName, style: textStyle),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.primary,
+              ),
+              arrowColor: color,
               onDetailsPressed: () {
                 widget.toggleUserMenu();
-                _loadTeams();
               },
             ),
           ],
