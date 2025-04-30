@@ -15,6 +15,7 @@ import 'package:slidesui/deck.dart';
 import 'package:slidesui/external_display_singleton.dart';
 import 'package:slidesui/live_session.dart';
 import 'package:slidesui/model.dart';
+import 'package:slidesui/presentation_onboarding.dart';
 import 'package:slidesui/state.dart';
 import 'package:slidesui/strings.dart';
 
@@ -74,6 +75,7 @@ class _PresentationPageState extends State<PresentationPage> {
   bool _isBroadcasting = false;
   final Map<String, bool> _broadcastingState = {};
   PdfController? _pdf;
+  bool _isOnboardingVisible = false;
 
   PresentationController controller = PresentationController();
 
@@ -97,11 +99,11 @@ class _PresentationPageState extends State<PresentationPage> {
     );
 
     SchedulerBinding.instance.addPostFrameCallback((_) {
-      showOnboardingDialog();
+      showOnboarding();
     });
   }
 
-  showOnboardingDialog() async {
+  showOnboarding() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     if (prefs.getBool("presentationModeOnboardingSeen") ?? false) {
       return;
@@ -111,24 +113,18 @@ class _PresentationPageState extends State<PresentationPage> {
       return;
     }
 
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-          title: Text(strings['presentationMode']!),
-          content: SingleChildScrollView(
-            scrollDirection: Axis.vertical,
-            child: Text(strings['presentationModeOnboarding']!),
-          ),
-          actions: [
-            TextButton(
-              child: Text(strings['ok']!),
-              onPressed: () async {
-                prefs.setBool("presentationModeOnboardingSeen", true);
-                Navigator.of(context).pop();
-              },
-            )
-          ]),
-    );
+    setState(() {
+      _isOnboardingVisible = true;
+    });
+  }
+
+  handleOnboardingComplete() async {
+    setState(() {
+      _isOnboardingVisible = false;
+    });
+
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setBool("presentationModeOnboardingSeen", true);
   }
 
   handleBroadcastChange(String channel, bool isBroadcasting) {
@@ -280,6 +276,8 @@ class _PresentationPageState extends State<PresentationPage> {
                   },
                   scrollDirection: Axis.horizontal,
                 ),
+                if (_isOnboardingVisible)
+                  PresentationOnboarding(onComplete: handleOnboardingComplete),
                 Row(
                   children: [
                     Expanded(

@@ -64,19 +64,6 @@ const strings = {
   'behaviorDisplay': 'Wyświetl',
   'behaviorSave': 'Zapisz do pliku',
   'behaviorShare': 'Udostępnij',
-  'presentationMode': 'Tryb prezentacji',
-  'presentationModeOnboarding':
-      """Jesteś w trybie prezentacji, w którym możesz podejrzeć slajdy i wyświetlić je na zewnętrznym ekranie.
-
-• Na początku, na końcu i między pieśniami znajduje się zawsze pusty slajd.
-• Przesuwaj palcem w lewo lub w prawo, aby przełączać slajdy.
-• Aby wrócić na początek pieśni, stuknij dwa razy przy lewej krawędzi ekranu.
-• Aby zakończyć pieśń szybciej (przeskoczyć na koniec), stuknij dwa razy przy prawej krawędzi ekranu.
-
-• U góry znajdziesz przyciski, dzięki którym wyświetlisz prezentację na zewnętrznym ekranie, przez Chromecasta lub w przeglądarce internetowej.
-• Możesz też podłączyć telefon bezpośrednio z telewizorem lub rzutnikiem: przewodowo za pomocą przejściówki USB-C/HDMI albo bezprzewodowo, korzystając z funkcji “Smart View”, “Bezprzewodowy wyświetlacz” lub “Klonowanie ekranu” (nazwa może różnić się w zależności od modelu) w panelu szybkich ustawień telefonu.
-
-• Możesz też zapisać plik ze slajdami jako PDF i udostępnić go lub pobrać, żeby wyświetlić w tradycyjny sposób.""",
   'confirmExitTitle': 'Potwierdź',
   'confirmExit': 'Czy na pewno chcesz zakończyć prezentację?',
   'yes': 'Tak',
@@ -120,4 +107,14 @@ const strings = {
   'share': 'Udostępnij',
   'confirmExitUnsavedChanges':
       'Masz niezapisane zmiany. Czy na pewno chcesz zakończyć edycję bez zapisywania?',
+  'onboardingSwipeLeft':
+      'Przesuń palcem w lewo, aby przejść do następnego slajdu.',
+  'onboardingSwipeRight':
+      'Przesuń palcem w prawo, aby wrócić do poprzedniego slajdu.',
+  'onboardingDoubleTapLeft':
+      'Stuknij dwa razy przy lewej krawędzi, aby przeskoczyć na początek pieśni.',
+  'onboardingDoubleTapRight':
+      'Stuknij dwa razy przy prawej krawędzi, aby przeskoczyć na koniec pieśni (do pustego slajdu).',
+  'onboardingDoubleTapCenter':
+      'Stuknij dwa razy na środku ekranu, aby ukryć lub pokazać przyciski.',
 };
