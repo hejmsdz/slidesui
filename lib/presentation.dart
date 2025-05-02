@@ -512,10 +512,15 @@ class _PausePreviewState extends State<PausePreview> {
         document: widget.pdfDocument,
         initialPage: widget.controller.currentPage + 1);
 
-    widget.controller.addListener(() async {
-      await Future.delayed(_duration);
+    widget.controller.addListener(handlePageChange);
+  }
+
+  void handlePageChange() async {
+    await Future.delayed(_duration);
+
+    if (mounted) {
       _pdf!.jumpToPage(widget.controller.currentPage + 1);
-    });
+    }
   }
 
   void setRatio() {
@@ -530,6 +535,13 @@ class _PausePreviewState extends State<PausePreview> {
 
     final parts = deck.ratio!.split(":");
     _ratio = double.parse(parts[0]) / double.parse(parts[1]);
+  }
+
+  @override
+  void dispose() {
+    _pdf!.dispose();
+    widget.controller.removeListener(handlePageChange);
+    super.dispose();
   }
 
   @override
