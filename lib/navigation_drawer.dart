@@ -23,21 +23,6 @@ class UserInfo extends StatefulWidget {
 
 class _UserInfoState extends State<UserInfo> {
   bool _isLoading = false;
-  List<Team>? _teams;
-
-  Future<void> _loadTeams() async {
-    if (_teams != null) return;
-
-    try {
-      final teams = await getTeams();
-      setState(() => _teams = teams);
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text("Error: $e")));
-      }
-    }
-  }
 
   Future<void> _logInWithGoogle() async {
     if (_isLoading) return;
