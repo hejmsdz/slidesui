@@ -129,6 +129,7 @@ class _PresentationPageState extends State<PresentationPage> {
 
   handleBroadcastChange(String channel, bool isBroadcasting) {
     setState(() {
+      controller.resume();
       _broadcastingState[channel] = isBroadcasting;
       _isBroadcasting = _broadcastingState.values.any((value) => value);
     });
@@ -166,12 +167,10 @@ class _PresentationPageState extends State<PresentationPage> {
   loadFile() async {
     setIsLoading(true);
     try {
-      final pdf = PdfController(
-        document: PdfDocument.openFile(widget.filePath),
-      );
+      final document = PdfDocument.openFile(widget.filePath);
 
       setState(() {
-        _pdf = pdf;
+        _pdf = PdfController(document: document);
       });
     } catch (e) {
       Navigator.of(context).pop();
@@ -278,6 +277,9 @@ class _PresentationPageState extends State<PresentationPage> {
                 ),
                 if (_isOnboardingVisible)
                   PresentationOnboarding(onComplete: handleOnboardingComplete),
+                if (_isBroadcasting)
+                  PausePreview(
+                      controller: controller, pdfDocument: _pdf!.document),
                 Row(
                   children: [
                     Expanded(
@@ -481,5 +483,91 @@ class ContentsButton extends StatelessWidget {
         ),
       );
     });
+  }
+}
+
+class PausePreview extends StatefulWidget {
+  final PresentationController controller;
+  final Future<PdfDocument> pdfDocument;
+
+  const PausePreview(
+      {super.key, required this.controller, required this.pdfDocument});
+
+  @override
+  State<PausePreview> createState() => _PausePreviewState();
+}
+
+class _PausePreviewState extends State<PausePreview> {
+  PdfController? _pdf;
+  final Duration _duration = Durations.medium1;
+  double _ratio = 1;
+
+  @override
+  void initState() {
+    super.initState();
+
+    setRatio();
+    _pdf = PdfController(
+        document: widget.pdfDocument,
+        initialPage: widget.controller.currentPage + 1);
+
+    widget.controller.addListener(() async {
+      await Future.delayed(_duration);
+      _pdf!.jumpToPage(widget.controller.currentPage + 1);
+    });
+  }
+
+  void setRatio() {
+    final deck = buildDeckRequestFromState(
+      context.read<SlidesModel>(),
+      format: "pdf",
+      contents: true,
+    );
+    if (deck.ratio == null) {
+      return;
+    }
+
+    final parts = deck.ratio!.split(":");
+    _ratio = double.parse(parts[0]) / double.parse(parts[1]);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedOpacity(
+      opacity: widget.controller.isPaused ? 0.8 : 0,
+      duration: _duration,
+      child: IgnorePointer(
+        ignoring: true,
+        child: Align(
+          alignment: Alignment.bottomLeft,
+          child: Padding(
+            padding: EdgeInsets.all(8),
+            child: Container(
+              decoration: BoxDecoration(
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.white.withAlpha(64),
+                    blurRadius: 16,
+                    offset: Offset(0, 0),
+                  ),
+                ],
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: SizedBox(
+                width: (MediaQuery.of(context).size.height / 3) * _ratio,
+                height: MediaQuery.of(context).size.height / 3,
+                child: PdfView(
+                  backgroundDecoration: BoxDecoration(
+                    color: Colors.black,
+                  ),
+                  controller: _pdf!,
+                  physics: NeverScrollableScrollPhysics(),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
