@@ -46,6 +46,11 @@ class _PresentationOnboardingState extends State<PresentationOnboarding> {
             OnboardingText(text: strings['onboardingDoubleTapCenter']!),
           ],
         ),
+    () => Stack(
+          children: [
+            OnboardingText(text: strings['onboardingButtons']!),
+          ],
+        ),
   ];
 
   @override

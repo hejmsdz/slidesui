@@ -79,10 +79,11 @@ const strings = {
   'castConnectionFailed': 'Nie udało się podłączyć z urządzeniem.',
   'castDisconnect': 'Odłączenie',
   'castDisconnectMessage': 'Czy na pewno chcesz odłączyć Chromecasta?',
-  'liveSession': 'Pokaz na żywo',
+  'liveSession': 'Pokaz na żywo przez internet',
   'liveSessionStarted': 'Pokaz na żywo jest dostępny pod adresem {url}',
   'shareLink': 'UDOSTĘPNIJ LINK',
   'shareSlides': 'Udostępnij slajdy',
+  'contents': 'Spis treści',
   'saveToFile': 'Zapisz slajdy do pliku',
   'logIn': 'Zaloguj się',
   'logInSuccess': 'Cześć, {}!',
@@ -117,4 +118,6 @@ const strings = {
       'Stuknij dwa razy przy prawej krawędzi, aby przeskoczyć na koniec pieśni (do pustego slajdu).',
   'onboardingDoubleTapCenter':
       'Stuknij dwa razy na środku ekranu, aby ukryć lub pokazać przyciski.',
+  'onboardingButtons':
+      'Za pomocą przycisków możesz uruchomić prezentację na zewnętrznym ekranie,\na także udostępnić lub pobrać slajdy jako plik PDF.',
 };

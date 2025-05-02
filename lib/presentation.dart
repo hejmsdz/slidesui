@@ -337,11 +337,11 @@ class _PresentationPageState extends State<PresentationPage> {
                           filePath: widget.filePath,
                           onStateChange: handleBroadcastChange,
                         ),
-                        CastButton(
+                        LiveSessionButton(
                           controller: controller,
                           onStateChange: handleBroadcastChange,
                         ),
-                        LiveSessionButton(
+                        CastButton(
                           controller: controller,
                           onStateChange: handleBroadcastChange,
                         ),
@@ -477,6 +477,7 @@ class ContentsButton extends StatelessWidget {
             .toList(),
         builder: (_, menuController, child) => IconButton(
           icon: const Icon(Icons.toc),
+          tooltip: strings['contents'],
           onPressed: () => menuController.isOpen
               ? menuController.close()
               : menuController.open(),
