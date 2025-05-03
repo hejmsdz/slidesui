@@ -70,9 +70,14 @@ const strings = {
   'no': 'Nie',
   'pause': 'Wstrzymaj',
   'resume': 'Wznów',
-  'cast': 'Przesyłanie (Chromecast)',
-  'castSelectDevice': 'Połącz z Chromecastem',
-  'castNoDevicesFound': 'Nie znaleziono urządzeń.',
+  'cast': 'Przesyłanie (Google Cast)',
+  'castSelectDevice': 'Połącz się z urządzeniem',
+  'castNoDevicesFound': 'Nie znaleziono urządzeń',
+  'castNoDevicesFoundDescription1':
+      'Aby skorzystać z tej funkcji, musisz być w jednej sieci Wi-Fi z urządzeniem Google TV, Android TV lub Chromecast.',
+  'castNoDevicesFoundDescription2':
+      'Jeśli nie masz takiej możliwości, możesz też spróbować użyć opcji „Udostępnianie ekranu” (lub podobna nazwa) w panelu szybkich ustawień telefonu.',
+  'searchAgain': 'Wyszukaj ponownie',
   'castError': 'Błąd: {error}',
   'castConnected': 'Połączono z urządzeniem.',
   'castDisconnected': 'Odłączono od urządzenia.',
