@@ -77,6 +77,8 @@ const strings = {
       'Aby skorzystać z tej funkcji, musisz być w jednej sieci Wi-Fi z urządzeniem Google TV, Android TV lub Chromecast.',
   'castNoDevicesFoundDescription2':
       'Jeśli nie masz takiej możliwości, możesz też spróbować użyć opcji „Udostępnianie ekranu” (lub podobna nazwa) w panelu szybkich ustawień telefonu.',
+  'castNoDevicesFoundDescription2Samsung':
+      'Jeśli nie masz takiej możliwości, możesz też spróbować użyć opcji „Smart View” w panelu szybkich ustawień telefonu.',
   'searchAgain': 'Wyszukaj ponownie',
   'castError': 'Błąd: {error}',
   'castConnected': 'Połączono z urządzeniem.',

@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:cast/cast.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:slidesui/api.dart';
@@ -25,11 +28,28 @@ class CastDeviceDialog extends StatefulWidget {
 class _CastDeviceDialogState extends State<CastDeviceDialog> {
   List<CastDevice> _devices = [];
   bool _isSearching = true;
+  bool _isSamsung = false;
 
   @override
   void initState() {
     super.initState();
+    checkIsSamsung();
     searchDevices();
+  }
+
+  Future<void> checkIsSamsung() async {
+    if (!Platform.isAndroid) {
+      return;
+    }
+
+    final deviceInfo = DeviceInfoPlugin();
+    final androidInfo = await deviceInfo.androidInfo;
+    final isSamsung =
+        androidInfo.manufacturer.toLowerCase().contains('samsung');
+
+    setState(() {
+      _isSamsung = isSamsung;
+    });
   }
 
   Future<void> searchDevices() async {
@@ -64,7 +84,9 @@ class _CastDeviceDialogState extends State<CastDeviceDialog> {
           ),
           Padding(
             padding: const EdgeInsets.all(8),
-            child: Text(strings['castNoDevicesFoundDescription2']!),
+            child: Text(_isSamsung
+                ? strings['castNoDevicesFoundDescription2Samsung']!
+                : strings['castNoDevicesFoundDescription2']!),
           ),
           _buildSearchAgainButton(),
         ],
