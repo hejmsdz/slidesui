@@ -122,7 +122,7 @@ const strings = {
   'onboardingDoubleTapLeft':
       'Stuknij dwa razy przy lewej krawędzi, aby przeskoczyć na początek pieśni.',
   'onboardingDoubleTapRight':
-      'Stuknij dwa razy przy prawej krawędzi, aby przeskoczyć na koniec pieśni (do pustego slajdu).',
+      'Stuknij dwa razy przy prawej krawędzi, aby przeskoczyć na koniec pieśni (wygasić ekran).',
   'onboardingDoubleTapCenter':
       'Stuknij dwa razy na środku ekranu, aby ukryć lub pokazać przyciski.',
   'onboardingButtons':
