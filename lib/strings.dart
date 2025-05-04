@@ -1,5 +1,5 @@
 const strings = {
-  'appTitle': 'Slajdy',
+  'appTitle': 'Psallite',
   'psalm': 'Psalm',
   'acclamation': 'Aklamacja',
   'addLiturgy': 'Dodaj liturgię słowa',
