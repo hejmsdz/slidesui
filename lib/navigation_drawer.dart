@@ -128,20 +128,30 @@ class _AppNavigationDrawerState extends State<AppNavigationDrawer> {
     final team = await showDialog<Team>(
         context: context,
         builder: (BuildContext context) {
-          return SimpleDialog(
+          return AlertDialog(
             title: Text(strings['selectTeam']!),
-            children: <Widget>[
-              ...teams.map((team) => RadioListTile(
-                    title: Text(team.name),
-                    value: team.id,
-                    groupValue: state.currentTeam?.id,
-                    onChanged: (_) {
-                      Navigator.pop(context, team);
-                    },
-                  )),
-              const Divider(),
-              SimpleDialogOption(
-                child: Text(strings['addTeam']!),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                ...teams.map((team) => RadioListTile(
+                      title: Text(team.name),
+                      value: team.id,
+                      groupValue: state.currentTeam?.id,
+                      onChanged: (_) {
+                        Navigator.pop(context, team);
+                      },
+                    )),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context, null);
+                },
+                child: Text(strings['close']!),
+              ),
+              TextButton(
+                child: Text(strings['newTeam']!),
                 onPressed: () async {
                   final newTeam = await openAddTeamDialog();
                   Navigator.pop(context, newTeam);
@@ -242,6 +252,12 @@ class _AppNavigationDrawerState extends State<AppNavigationDrawer> {
           actions: [
             TextButton(
               onPressed: () {
+                Navigator.pop(context, null);
+              },
+              child: Text(strings['close']!),
+            ),
+            TextButton(
+              onPressed: () {
                 Clipboard.setData(ClipboardData(text: controller.text));
               },
               child: Text(strings['copy']!),
@@ -324,12 +340,14 @@ class _AppNavigationDrawerState extends State<AppNavigationDrawer> {
               onTap: () {
                 final state = context.read<SlidesModel>();
                 if (state.currentTeam == null) {
+                  final isLoggedIn = state.user != null;
                   showDialog(
                     context: context,
                     builder: (context) => AlertDialog(
                       title: Text(strings['teamRequired']!),
-                      content:
-                          Text(strings['teamRequiredDescriptionLoggedOut']!),
+                      content: Text(isLoggedIn
+                          ? strings['teamRequiredDescriptionLoggedIn']!
+                          : strings['teamRequiredDescriptionLoggedOut']!),
                       actions: [
                         TextButton(
                           onPressed: () {

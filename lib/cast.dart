@@ -88,16 +88,8 @@ class _CastDeviceDialogState extends State<CastDeviceDialog> {
                 ? strings['castNoDevicesFoundDescription2Samsung']!
                 : strings['castNoDevicesFoundDescription2']!),
           ),
-          _buildSearchAgainButton(),
         ],
       ),
-    );
-  }
-
-  Widget _buildSearchAgainButton() {
-    return TextButton(
-      onPressed: searchDevices,
-      child: Text(strings['searchAgain']!),
     );
   }
 
@@ -110,7 +102,6 @@ class _CastDeviceDialogState extends State<CastDeviceDialog> {
               overflow: TextOverflow.ellipsis,
             ),
           )),
-      _buildSearchAgainButton(),
     ];
   }
 
@@ -118,16 +109,30 @@ class _CastDeviceDialogState extends State<CastDeviceDialog> {
   Widget build(BuildContext context) {
     final hasNoDevicesFound = !_isSearching && _devices.isEmpty;
 
-    return SimpleDialog(
+    return AlertDialog(
       title: Text(hasNoDevicesFound
           ? strings['castNoDevicesFound']!
           : strings['castSelectDevice']!),
-      contentPadding: const EdgeInsets.all(16),
-      children: _isSearching
-          ? [_buildLoadingIndicator()]
+      content: _isSearching
+          ? _buildLoadingIndicator()
           : hasNoDevicesFound
-              ? [_buildNoDevicesFound()]
-              : _buildDeviceList(),
+              ? _buildNoDevicesFound()
+              : Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: _buildDeviceList(),
+                ),
+      actions: [
+        TextButton(
+          child: Text(strings['cancel']!),
+          onPressed: () {
+            Navigator.pop(context, null);
+          },
+        ),
+        TextButton(
+          onPressed: _isSearching ? null : searchDevices,
+          child: Text(strings['searchAgain']!),
+        )
+      ],
     );
   }
 }

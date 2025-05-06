@@ -9,6 +9,7 @@ const strings = {
   'addText': 'Dodaj własny tekst',
   'enterText': 'Wpisz tekst',
   'cancel': 'Anuluj',
+  'close': 'Zamknij',
   'ok': 'OK',
   'changeDate': 'Zmień datę',
   'liturgyDateError':
@@ -17,7 +18,7 @@ const strings = {
   'edit': 'Edytuj',
   'teamRequired': 'Wymagany zespół',
   'teamRequiredDescriptionLoggedIn':
-      'Aby edytować lub dodawać pieśni, musisz należeć do zespołu. Utwórz nowy zespół lub dołącz do istniejącego.',
+      'Aby edytować lub dodawać pieśni, musisz należeć do zespołu. Utwórz nowy zespół lub poproś o zaproszenie do istniejącego.',
   'teamRequiredDescriptionLoggedOut':
       'Aby edytować lub dodawać pieśni, musisz najpierw się zalogować i dołączyć do zespołu.',
   'verseOrder': 'Zwrotki',
