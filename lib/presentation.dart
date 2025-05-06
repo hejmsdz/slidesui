@@ -18,6 +18,7 @@ import 'package:slidesui/model.dart';
 import 'package:slidesui/presentation_onboarding.dart';
 import 'package:slidesui/state.dart';
 import 'package:slidesui/strings.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
 
 class PresentationController with ChangeNotifier {
   int _currentPage = 0;
@@ -101,6 +102,8 @@ class _PresentationPageState extends State<PresentationPage> {
     SchedulerBinding.instance.addPostFrameCallback((_) {
       showOnboarding();
     });
+
+    WakelockPlus.enable();
   }
 
   showOnboarding() async {
@@ -148,6 +151,8 @@ class _PresentationPageState extends State<PresentationPage> {
   @override
   dispose() async {
     super.dispose();
+
+    WakelockPlus.disable();
 
     controller.internalListener = null;
 
