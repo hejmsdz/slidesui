@@ -33,10 +33,18 @@ class _UserInfoState extends State<UserInfo> {
       final authResponse = await postAuthGoogle(idToken);
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text(strings['logInSuccess']!
-                .replaceAll('{}', authResponse.user.displayName))));
-        context.read<SlidesModel>().setUser(authResponse.user);
+        final state = context.read<SlidesModel>();
+        await state.setUser(authResponse.user);
+
+        if (state.currentTeam == null) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              content: Text(strings['logInSuccessNoTeam']!
+                  .replaceAll('{}', authResponse.user.displayName))));
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              content: Text(strings['logInSuccess']!
+                  .replaceAll('{}', authResponse.user.displayName))));
+        }
       }
     } catch (e) {
       if (mounted) {
@@ -57,11 +65,18 @@ class _UserInfoState extends State<UserInfo> {
       if (state.user != null) {
         final color = Theme.of(context).colorScheme.onPrimary;
         final textStyle = TextStyle(color: color);
+        final hasTeam = state.currentTeam != null;
         return Column(
           children: [
             UserAccountsDrawerHeader(
-              accountName:
-                  Text(state.currentTeam?.name ?? "", style: textStyle),
+              accountName: Text(
+                state.currentTeam?.name ?? strings['noTeam']!,
+                style: hasTeam
+                    ? textStyle
+                    : textStyle.copyWith(
+                        color: color.withAlpha(128),
+                      ),
+              ),
               accountEmail: Text(state.user!.displayName, style: textStyle),
               decoration: BoxDecoration(
                 color: Theme.of(context).colorScheme.primary,

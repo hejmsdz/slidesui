@@ -104,7 +104,10 @@ const strings = {
   'saveToFile': 'Zapisz slajdy do pliku',
   'logIn': 'Zaloguj się',
   'logInSuccess': 'Cześć, {}!',
+  'logInSuccessNoTeam':
+      'Cześć, {}! Aby w pełni skorzystać z możliwości aplikacji, załóż zespół lub poproś o zaproszenie do istniejącego.',
   'logInError': 'Nie udało się zalogować. Spróbuj ponownie później.',
+  'noTeam': 'Brak zespołu',
   'myAccount': 'Moje konto',
   'about': 'O aplikacji',
   'support': 'Wesprzyj',
