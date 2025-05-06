@@ -275,7 +275,7 @@ class SlidesModel extends ChangeNotifier implements LiturgyHolder {
     _user = user;
     notifyListeners();
 
-    final teams = await getTeams();
+    final List<Team> teams = user != null ? await getTeams() : [];
     if (teams.isNotEmpty) {
       final team = teams.firstWhere(
         (team) => team.id == _currentTeam?.id,

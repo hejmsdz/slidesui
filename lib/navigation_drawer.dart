@@ -295,6 +295,7 @@ class _AppNavigationDrawerState extends State<AppNavigationDrawer> {
                       state.setUser(null);
                       deleteAuthRefresh();
                       state.removeAllItems();
+                      storeAuthResponse(null);
                       toggleUserMenu();
                     },
                   ),
