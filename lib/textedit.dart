@@ -167,7 +167,8 @@ class _TextEditPageState extends State<TextEditPage> {
     if (titleNormalized == strings['acclamation']!.toLowerCase()) {
       return AcclamationDeckItem(state);
     }
-    final songs = await getSongs(titleNormalized);
+    final songs =
+        await getSongs(titleNormalized, teamId: state.currentTeam?.id);
     if (songs.length == 1) {
       return SongDeckItem(songs[0]);
     } else {
@@ -206,8 +207,9 @@ class _TextEditPageState extends State<TextEditPage> {
         controller: controller,
         keyboardType: TextInputType.multiline,
         maxLines: null,
-        decoration: const InputDecoration(
+        decoration: InputDecoration(
           contentPadding: EdgeInsets.symmetric(vertical: 16, horizontal: 8),
+          hintText: strings['editAsTextHint']!,
         ),
         autofocus: true,
       ),

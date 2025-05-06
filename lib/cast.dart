@@ -1,14 +1,141 @@
+import 'dart:io';
+
 import 'package:cast/cast.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:slidesui/api.dart';
 import 'package:slidesui/cast_service.dart';
 import 'package:slidesui/deck.dart';
 import 'package:slidesui/presentation.dart';
 import 'package:slidesui/state.dart';
 import 'package:slidesui/strings.dart';
 
-const castAppId = 'E34D7CD2';
-const namespace = 'urn:x-cast:com.mrozwadowski.slidesui';
+class CastDeviceDialog extends StatefulWidget {
+  final CastService castService;
+  final void Function(CastDevice) onDeviceSelected;
+
+  const CastDeviceDialog({
+    super.key,
+    required this.castService,
+    required this.onDeviceSelected,
+  });
+
+  @override
+  State<CastDeviceDialog> createState() => _CastDeviceDialogState();
+}
+
+class _CastDeviceDialogState extends State<CastDeviceDialog> {
+  List<CastDevice> _devices = [];
+  bool _isSearching = true;
+  bool _isSamsung = false;
+
+  @override
+  void initState() {
+    super.initState();
+    checkIsSamsung();
+    searchDevices();
+  }
+
+  Future<void> checkIsSamsung() async {
+    if (!Platform.isAndroid) {
+      return;
+    }
+
+    final deviceInfo = DeviceInfoPlugin();
+    final androidInfo = await deviceInfo.androidInfo;
+    final isSamsung =
+        androidInfo.manufacturer.toLowerCase().contains('samsung');
+
+    setState(() {
+      _isSamsung = isSamsung;
+    });
+  }
+
+  Future<void> searchDevices() async {
+    setState(() {
+      _isSearching = true;
+    });
+    final devices = await widget.castService.searchDevices();
+    setState(() {
+      _devices = devices;
+      _isSearching = false;
+    });
+  }
+
+  Widget _buildLoadingIndicator() {
+    return const Center(
+      child: Padding(
+        padding: EdgeInsets.all(8),
+        child: CircularProgressIndicator(),
+      ),
+    );
+  }
+
+  Widget _buildNoDevicesFound() {
+    return ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: 400),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8),
+            child: Text(strings['castNoDevicesFoundDescription1']!),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8),
+            child: Text(_isSamsung
+                ? strings['castNoDevicesFoundDescription2Samsung']!
+                : strings['castNoDevicesFoundDescription2']!),
+          ),
+        ],
+      ),
+    );
+  }
+
+  List<Widget> _buildDeviceList() {
+    return [
+      ..._devices.map((device) => SimpleDialogOption(
+            onPressed: () => widget.onDeviceSelected(device),
+            child: Text(
+              device.name,
+              overflow: TextOverflow.ellipsis,
+            ),
+          )),
+    ];
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final hasNoDevicesFound = !_isSearching && _devices.isEmpty;
+
+    return AlertDialog(
+      title: Text(hasNoDevicesFound
+          ? strings['castNoDevicesFound']!
+          : strings['castSelectDevice']!),
+      content: _isSearching
+          ? _buildLoadingIndicator()
+          : hasNoDevicesFound
+              ? _buildNoDevicesFound()
+              : Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: _buildDeviceList(),
+                ),
+      actions: [
+        TextButton(
+          child: Text(strings['cancel']!),
+          onPressed: () {
+            Navigator.pop(context, null);
+          },
+        ),
+        TextButton(
+          onPressed: _isSearching ? null : searchDevices,
+          child: Text(strings['searchAgain']!),
+        )
+      ],
+    );
+  }
+}
 
 class CastButton extends StatefulWidget {
   const CastButton({
@@ -65,65 +192,18 @@ class _CastButtonState extends State<CastButton> {
     }
   }
 
-  List<Widget> buildDeviceDialogContent(
-      AsyncSnapshot<List<CastDevice>> snapshot) {
-    if (snapshot.hasError) {
-      return [
-        Center(
-          child: Text(strings['castError']!
-              .replaceFirst('{error}', snapshot.error.toString())),
-        )
-      ];
-    }
-
-    if (!snapshot.hasData) {
-      return [
-        const Center(
-          child: Padding(
-            padding: EdgeInsets.all(8),
-            child: CircularProgressIndicator(),
-          ),
-        )
-      ];
-    }
-
-    if (snapshot.data!.isEmpty) {
-      return [
-        Column(
-          children: [
-            Center(
-              child: Text(strings['castNoDevicesFound']!),
-            ),
-          ],
-        )
-      ];
-    }
-
-    return snapshot.requireData
-        .map((device) => SimpleDialogOption(
-              onPressed: () {
-                Navigator.pop(context, device);
-              },
-              child: Text(device.name),
-            ))
-        .toList();
-  }
-
   Future<CastDevice?> chooseDevice() async {
     return showDialog<CastDevice>(
-        context: context,
-        builder: (BuildContext context) {
-          final devices = _castService!.searchDevices();
-
-          return FutureBuilder(
-              future: devices,
-              builder: (context, snapshot) {
-                return SimpleDialog(
-                  title: Text(strings['castSelectDevice']!),
-                  children: buildDeviceDialogContent(snapshot),
-                );
-              });
-        });
+      context: context,
+      builder: (BuildContext context) {
+        return CastDeviceDialog(
+          castService: _castService!,
+          onDeviceSelected: (device) {
+            Navigator.pop(context, device);
+          },
+        );
+      },
+    );
   }
 
   showConnectionErrorDialog() {
@@ -147,9 +227,11 @@ class _CastButtonState extends State<CastButton> {
     _castService?.requestSlideChange(widget.controller.currentPage);
   }
 
-  startPresentation() {
-    final deck = buildDeckRequestFromState(context.read<SlidesModel>());
-    _castService?.startPresentation(deck, widget.controller.currentPage);
+  Future<void> startPresentation() async {
+    final deckRequest = buildDeckRequestFromState(context.read<SlidesModel>());
+    final deckResponse = await postDeck(deckRequest);
+    _castService?.startPresentation(
+        deckResponse.url, widget.controller.currentPage);
     widget.controller.addListener(handleSlideChange);
   }
 

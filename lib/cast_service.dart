@@ -2,10 +2,9 @@ import 'dart:async';
 
 import 'package:cast/cast.dart';
 import 'package:flutter/material.dart';
-import 'package:slidesui/model.dart';
 
-const castAppId = 'E34D7CD2';
-const namespace = 'urn:x-cast:com.mrozwadowski.slidesui';
+const castAppId = 'AD7648A2';
+const namespace = 'urn:x-cast:lt.psal.psallite';
 
 class CastService extends ChangeNotifier {
   bool _isConnected = false;
@@ -54,9 +53,9 @@ class CastService extends ChangeNotifier {
     return completer.future;
   }
 
-  void startPresentation(DeckRequest deck, int currentPage) {
+  void startPresentation(String url, int currentPage) {
     _session!.sendMessage('$namespace.start', {
-      'deckArgs': deck,
+      'url': url,
       'currentPage': currentPage,
     });
   }

@@ -7,8 +7,8 @@ import 'package:slidesui/cast_service.dart';
 import 'package:slidesui/external_display.dart';
 import 'package:slidesui/external_display_singleton.dart';
 import 'package:slidesui/presentation.dart';
-import 'package:slidesui/utils.dart';
 import 'package:slidesui/verse_order.dart';
+import 'package:slidesui/web_view.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_settings_screens/flutter_settings_screens.dart';
@@ -21,7 +21,7 @@ import './state.dart';
 import './deck.dart';
 import './search.dart';
 import './textedit.dart';
-import './settings.dart';
+import './navigation_drawer.dart';
 
 void main() async {
   if (!kIsWeb) {
@@ -103,12 +103,22 @@ class ListItem extends StatelessWidget {
   final void Function() onTap;
   final int index;
 
-  edit(String editUrlTemplate) {
+  edit(BuildContext context, SlidesModel state) {
     final id = itemKey.value;
-    Uri editUrl = Uri.parse(editUrlTemplate
-        .replaceFirst("{id}", id)
-        .replaceFirst("{id-}", id.replaceAll('-', '')));
-    launchUrl(editUrl);
+    Navigator.of(context).push(
+      MaterialPageRoute(
+          builder: (context) => WebViewPage(
+                path: "dashboard/songs/$id",
+                title: strings['edit']!,
+                onClose: (url) {
+                  String newId = id;
+                  if (url != null) {
+                    newId = url.split("/").last;
+                  }
+                  state.reloadSong(id, newId);
+                },
+              )),
+    );
   }
 
   @override
@@ -136,22 +146,35 @@ class ListItem extends StatelessWidget {
                   label: strings['verseOrder']!,
                 ),
                 Consumer<SlidesModel>(builder: (context, state, _) {
-                  final editUrl = state.bootstrap?.songEditUrl;
-                  if (editUrl == null) {
-                    return Container();
-                  }
-
-                  return IfSpecialMode(
-                    modes: ['admin'],
-                    child: SlidableAction(
-                      onPressed: (_) {
-                        edit(editUrl);
-                      },
-                      backgroundColor: Colors.blue,
-                      foregroundColor: Colors.white,
-                      icon: Icons.edit,
-                      label: strings['edit']!,
-                    ),
+                  return SlidableAction(
+                    onPressed: (context) {
+                      if (state.currentTeam == null) {
+                        final isLoggedIn = state.user != null;
+                        showDialog(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                                  title: Text(strings['teamRequired']!),
+                                  content: Text(isLoggedIn
+                                      ? strings[
+                                          'teamRequiredDescriptionLoggedIn']!
+                                      : strings[
+                                          'teamRequiredDescriptionLoggedOut']!),
+                                  actions: [
+                                    TextButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                        child: Text(strings['ok']!))
+                                  ],
+                                ));
+                      } else {
+                        edit(context, state);
+                      }
+                    },
+                    backgroundColor: Colors.blue,
+                    foregroundColor: Colors.white,
+                    icon: Icons.edit,
+                    label: strings['edit']!,
                   );
                 }),
               ],
@@ -412,16 +435,6 @@ class _MyHomePageState extends State<MyHomePage> {
                   },
                   child: Text(strings['changeDate']!),
                 ),
-                MenuItemButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const SettingsPage()),
-                    );
-                  },
-                  child: Text(strings['settings']!),
-                ),
               ],
             ),
           )
@@ -436,6 +449,7 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ),
       ),
+      drawer: const AppNavigationDrawer(),
       body: Consumer<SlidesModel>(builder: (context, state, child) {
         if (state.items.isEmpty) {
           return Center(

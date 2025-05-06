@@ -15,8 +15,10 @@ import 'package:slidesui/deck.dart';
 import 'package:slidesui/external_display_singleton.dart';
 import 'package:slidesui/live_session.dart';
 import 'package:slidesui/model.dart';
+import 'package:slidesui/presentation_onboarding.dart';
 import 'package:slidesui/state.dart';
 import 'package:slidesui/strings.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
 
 class PresentationController with ChangeNotifier {
   int _currentPage = 0;
@@ -74,6 +76,7 @@ class _PresentationPageState extends State<PresentationPage> {
   bool _isBroadcasting = false;
   final Map<String, bool> _broadcastingState = {};
   PdfController? _pdf;
+  bool _isOnboardingVisible = false;
 
   PresentationController controller = PresentationController();
 
@@ -97,11 +100,13 @@ class _PresentationPageState extends State<PresentationPage> {
     );
 
     SchedulerBinding.instance.addPostFrameCallback((_) {
-      showOnboardingDialog();
+      showOnboarding();
     });
+
+    WakelockPlus.enable();
   }
 
-  showOnboardingDialog() async {
+  showOnboarding() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     if (prefs.getBool("presentationModeOnboardingSeen") ?? false) {
       return;
@@ -111,28 +116,23 @@ class _PresentationPageState extends State<PresentationPage> {
       return;
     }
 
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-          title: Text(strings['presentationMode']!),
-          content: SingleChildScrollView(
-            scrollDirection: Axis.vertical,
-            child: Text(strings['presentationModeOnboarding']!),
-          ),
-          actions: [
-            TextButton(
-              child: Text(strings['ok']!),
-              onPressed: () async {
-                prefs.setBool("presentationModeOnboardingSeen", true);
-                Navigator.of(context).pop();
-              },
-            )
-          ]),
-    );
+    setState(() {
+      _isOnboardingVisible = true;
+    });
+  }
+
+  handleOnboardingComplete() async {
+    setState(() {
+      _isOnboardingVisible = false;
+    });
+
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setBool("presentationModeOnboardingSeen", true);
   }
 
   handleBroadcastChange(String channel, bool isBroadcasting) {
     setState(() {
+      controller.resume();
       _broadcastingState[channel] = isBroadcasting;
       _isBroadcasting = _broadcastingState.values.any((value) => value);
     });
@@ -152,6 +152,8 @@ class _PresentationPageState extends State<PresentationPage> {
   dispose() async {
     super.dispose();
 
+    WakelockPlus.disable();
+
     controller.internalListener = null;
 
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
@@ -170,12 +172,10 @@ class _PresentationPageState extends State<PresentationPage> {
   loadFile() async {
     setIsLoading(true);
     try {
-      final pdf = PdfController(
-        document: PdfDocument.openFile(widget.filePath),
-      );
+      final document = PdfDocument.openFile(widget.filePath);
 
       setState(() {
-        _pdf = pdf;
+        _pdf = PdfController(document: document);
       });
     } catch (e) {
       Navigator.of(context).pop();
@@ -234,7 +234,9 @@ class _PresentationPageState extends State<PresentationPage> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text(strings['confirmExitTitle']!),
-          content: Text(strings['confirmExit']!),
+          content: Text(_isBroadcasting
+              ? strings['confirmExitBroadcasting']!
+              : strings['confirmExit']!),
           actions: <Widget>[
             TextButton(
               child: Text(strings['no']!),
@@ -261,7 +263,7 @@ class _PresentationPageState extends State<PresentationPage> {
       body: (_isLoading || _pdf == null || _pdf?.pagesCount == 0)
           ? Container()
           : PopScope<Object?>(
-              canPop: !_isBroadcasting,
+              canPop: false,
               onPopInvokedWithResult: (didPop, result) async {
                 if (!didPop) {
                   final shouldPop = await _confirmExit() ?? false;
@@ -280,6 +282,11 @@ class _PresentationPageState extends State<PresentationPage> {
                   },
                   scrollDirection: Axis.horizontal,
                 ),
+                if (_isOnboardingVisible)
+                  PresentationOnboarding(onComplete: handleOnboardingComplete),
+                if (_isBroadcasting)
+                  PausePreview(
+                      controller: controller, pdfDocument: _pdf!.document),
                 Row(
                   children: [
                     Expanded(
@@ -337,11 +344,11 @@ class _PresentationPageState extends State<PresentationPage> {
                           filePath: widget.filePath,
                           onStateChange: handleBroadcastChange,
                         ),
-                        CastButton(
+                        LiveSessionButton(
                           controller: controller,
                           onStateChange: handleBroadcastChange,
                         ),
-                        LiveSessionButton(
+                        CastButton(
                           controller: controller,
                           onStateChange: handleBroadcastChange,
                         ),
@@ -407,25 +414,32 @@ class _ExternalDisplayBroadcasterState
   }
 
   void handleOpen() async {
-    externalDisplay.sendParameters(
-      action: "open",
-      value: "${widget.filePath}#${widget.controller.currentPage}",
-    );
+    if (externalDisplay.isPlugging) {
+      externalDisplay.sendParameters(
+        action: "open",
+        value: "${widget.filePath}#${widget.controller.currentPage}",
+      );
+    }
   }
 
-  void handleDisplayChange(dynamic status) {
+  void handleDisplayChange(dynamic status) async {
     widget.onStateChange?.call('externalDisplay', status == true);
 
     if (status == true) {
-      handleOpen();
+      await externalDisplay.connect();
+      externalDisplay.waitingTransferParametersReady(onReady: () {
+        handleOpen();
+      });
     }
   }
 
   void handlePageChange() {
-    externalDisplay.sendParameters(
-      action: "page",
-      value: widget.controller.currentPage,
-    );
+    if (externalDisplay.isPlugging) {
+      externalDisplay.sendParameters(
+        action: "page",
+        value: widget.controller.currentPage,
+      );
+    }
   }
 
   @override
@@ -477,11 +491,110 @@ class ContentsButton extends StatelessWidget {
             .toList(),
         builder: (_, menuController, child) => IconButton(
           icon: const Icon(Icons.toc),
+          tooltip: strings['contents'],
           onPressed: () => menuController.isOpen
               ? menuController.close()
               : menuController.open(),
         ),
       );
     });
+  }
+}
+
+class PausePreview extends StatefulWidget {
+  final PresentationController controller;
+  final Future<PdfDocument> pdfDocument;
+
+  const PausePreview(
+      {super.key, required this.controller, required this.pdfDocument});
+
+  @override
+  State<PausePreview> createState() => _PausePreviewState();
+}
+
+class _PausePreviewState extends State<PausePreview> {
+  PdfController? _pdf;
+  final Duration _duration = Durations.medium1;
+  double _ratio = 1;
+
+  @override
+  void initState() {
+    super.initState();
+
+    setRatio();
+    _pdf = PdfController(
+        document: widget.pdfDocument,
+        initialPage: widget.controller.currentPage + 1);
+
+    widget.controller.addListener(handlePageChange);
+  }
+
+  void handlePageChange() async {
+    await Future.delayed(_duration);
+
+    if (mounted) {
+      _pdf!.jumpToPage(widget.controller.currentPage + 1);
+    }
+  }
+
+  void setRatio() {
+    final deck = buildDeckRequestFromState(
+      context.read<SlidesModel>(),
+      format: "pdf",
+      contents: true,
+    );
+    if (deck.ratio == null) {
+      return;
+    }
+
+    final parts = deck.ratio!.split(":");
+    _ratio = double.parse(parts[0]) / double.parse(parts[1]);
+  }
+
+  @override
+  void dispose() {
+    _pdf!.dispose();
+    widget.controller.removeListener(handlePageChange);
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedOpacity(
+      opacity: widget.controller.isPaused ? 0.8 : 0,
+      duration: _duration,
+      child: IgnorePointer(
+        ignoring: true,
+        child: Align(
+          alignment: Alignment.bottomLeft,
+          child: Padding(
+            padding: EdgeInsets.all(8),
+            child: Container(
+              decoration: BoxDecoration(
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.white.withAlpha(64),
+                    blurRadius: 16,
+                    offset: Offset(0, 0),
+                  ),
+                ],
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: SizedBox(
+                width: (MediaQuery.of(context).size.height / 3) * _ratio,
+                height: MediaQuery.of(context).size.height / 3,
+                child: PdfView(
+                  backgroundDecoration: BoxDecoration(
+                    color: Colors.black,
+                  ),
+                  controller: _pdf!,
+                  physics: NeverScrollableScrollPhysics(),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }

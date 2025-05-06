@@ -1,6 +1,7 @@
 import 'dart:collection';
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import './api.dart';
@@ -9,7 +10,7 @@ import './model.dart';
 class SlidesModel extends ChangeNotifier implements LiturgyHolder {
   SlidesModel() {
     updateLiturgy();
-    _loadPreferences();
+    loadUser();
   }
 
   DateTime _date = DateTime.now();
@@ -23,20 +24,34 @@ class SlidesModel extends ChangeNotifier implements LiturgyHolder {
   BootstrapResponse? _bootstrap;
   BootstrapResponse? get bootstrap => _bootstrap;
 
+  User? _user;
+  User? get user => _user;
+
+  Team? _currentTeam;
+  Team? get currentTeam => _currentTeam;
+
   @override
   Liturgy? liturgy;
 
   bool isLiveConnected = false;
-  String? _specialMode;
-  String? get specialMode => _specialMode;
 
   Map<String, dynamic> toJson() => {
         'date': _date.toIso8601String().substring(0, 10),
         'items': _items.map((item) => item.toFullJson()).toList(),
+        'currentTeam': _currentTeam?.toJson(),
       };
 
-  SlidesModel.fromJson(Map<String, dynamic> json) {
-    _date = DateTime.parse(json['date'] as String);
+  loadFromJson(Map<String, dynamic> json) {
+    final date = DateTime.parse(json['date'] as String);
+
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+
+    if (date.isBefore(today)) {
+      return;
+    }
+
+    _date = date;
 
     final items = json['items'] as List;
     _items = items
@@ -56,12 +71,24 @@ class SlidesModel extends ChangeNotifier implements LiturgyHolder {
         })
         .whereType<DeckItem>()
         .toList();
+
+    _currentTeam = Team.fromJson(json['currentTeam']);
+
+    notifyListeners();
   }
 
-  _loadPreferences() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-
-    setSpecialMode(prefs.getString("specialMode"));
+  loadUser() async {
+    final storage = FlutterSecureStorage();
+    final hasToken = await storage.containsKey(key: 'accessToken');
+    if (hasToken) {
+      try {
+        final user = await getAuthMe();
+        setUser(user);
+      } catch (e) {
+        setUser(null);
+        await storeAuthResponse(null);
+      }
+    }
   }
 
   addItem(DeckItem item) {
@@ -85,6 +112,11 @@ class SlidesModel extends ChangeNotifier implements LiturgyHolder {
     if (index >= 0) {
       removeItem(index);
     }
+  }
+
+  removeAllItems() {
+    _items.clear();
+    notifyListeners();
   }
 
   undoRemoveItem() {
@@ -219,6 +251,15 @@ class SlidesModel extends ChangeNotifier implements LiturgyHolder {
     notifyListeners();
   }
 
+  reloadSong(String id, String? newId) async {
+    final index = _items.indexWhere((item) => item.id == id);
+    if (index >= 0) {
+      final song = await getSong(newId ?? id);
+      _items[index] = SongDeckItem(song);
+    }
+    notifyListeners();
+  }
+
   bool isValid() {
     return _items.isNotEmpty &&
         !_items.any((item) => item is UnresolvedDeckItem);
@@ -230,15 +271,24 @@ class SlidesModel extends ChangeNotifier implements LiturgyHolder {
     notifyListeners();
   }
 
-  setSpecialMode(String? mode) async {
-    _specialMode = mode;
+  setUser(User? user) async {
+    _user = user;
     notifyListeners();
 
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    if (mode == null) {
-      prefs.remove('specialMode');
+    final List<Team> teams = user != null ? await getTeams() : [];
+    if (teams.isNotEmpty) {
+      final team = teams.firstWhere(
+        (team) => team.id == _currentTeam?.id,
+        orElse: () => teams.first,
+      );
+      setCurrentTeam(team);
     } else {
-      prefs.setString('specialMode', mode);
+      setCurrentTeam(null);
     }
+  }
+
+  setCurrentTeam(Team? team) {
+    _currentTeam = team;
+    notifyListeners();
   }
 }

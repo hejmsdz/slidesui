@@ -1,5 +1,5 @@
 const strings = {
-  'appTitle': 'Slajdy',
+  'appTitle': 'Psallite',
   'psalm': 'Psalm',
   'acclamation': 'Aklamacja',
   'addLiturgy': 'Dodaj liturgię słowa',
@@ -8,19 +8,27 @@ const strings = {
   'removeOrdinary': 'Usuń części stałe',
   'addText': 'Dodaj własny tekst',
   'enterText': 'Wpisz tekst',
-  'cancel': 'ANULUJ',
+  'cancel': 'Anuluj',
+  'close': 'Zamknij',
   'ok': 'OK',
   'changeDate': 'Zmień datę',
   'liturgyDateError':
       'Nie udało się pobrać liturgii słowa na dany dzień. Spróbuj wybrać mniej odległą datę lub dodaj teksty ręcznie.',
   'remove': 'Usuń',
   'edit': 'Edytuj',
+  'teamRequired': 'Wymagany zespół',
+  'teamRequiredDescriptionLoggedIn':
+      'Aby edytować lub dodawać pieśni, musisz należeć do zespołu. Utwórz nowy zespół lub poproś o zaproszenie do istniejącego.',
+  'teamRequiredDescriptionLoggedOut':
+      'Aby edytować lub dodawać pieśni, musisz najpierw się zalogować i dołączyć do zespołu.',
   'verseOrder': 'Zwrotki',
   'emptyTitle': 'Co dzisiaj śpiewamy?',
   'emptyDescription':
       'Aby dodać slajdy, użyj wyszukiwarki\nlub naciśnij ikonę edycji tekstu i wklej listę pieśni.',
   'searchSongs': 'Wyszukaj pieśni',
   'editAsText': 'Edytuj jako tekst',
+  'editAsTextHint':
+      'Na przykład:\nW: Pieśń o nadziei\nO: Gdzie miłość wzajemna i dobroć\nK: Zbliżam się w pokorze\nU: Niechaj Cię, Panie\nW: O Pani, ufność nasza',
   'menu': 'Pokaż menu',
   'clearText': 'Wyczyść',
   'applyText': 'Wczytaj slajdy',
@@ -44,9 +52,10 @@ const strings = {
   'newVersionAvailable': 'Nowa wersja jest dostępna',
   'newVersionDescription':
       "Czy chcesz pobrać wersję {latestVersion}? Obecnie masz zainstalowaną {yourVersion}.",
-  'download': 'POBIERZ',
-  'notNow': 'PÓŹNIEJ',
-  'skipVersion': 'POMIŃ',
+  'download': 'Pobierz',
+  'notNow': 'Później',
+  'skipVersion': 'Pomiń',
+  'addSong': 'Dodaj pieśń',
   'settings': 'Ustawienia',
   'settingsSectionSlides': 'Slajdy',
   'hints': 'Podpowiedzi',
@@ -64,37 +73,75 @@ const strings = {
   'behaviorDisplay': 'Wyświetl',
   'behaviorSave': 'Zapisz do pliku',
   'behaviorShare': 'Udostępnij',
-  'presentationMode': 'Tryb prezentacji',
-  'presentationModeOnboarding':
-      """Jesteś w trybie prezentacji, w którym możesz podejrzeć slajdy i wyświetlić je na zewnętrznym ekranie.
-
-• Na początku, na końcu i między pieśniami znajduje się zawsze pusty slajd.
-• Przesuwaj palcem w lewo lub w prawo, aby przełączać slajdy.
-• Aby wrócić na początek pieśni, stuknij dwa razy przy lewej krawędzi ekranu.
-• Aby zakończyć pieśń szybciej (przeskoczyć na koniec), stuknij dwa razy przy prawej krawędzi ekranu.
-
-• U góry znajdziesz przyciski, dzięki którym wyświetlisz prezentację na zewnętrznym ekranie, przez Chromecasta lub w przeglądarce internetowej.
-• Możesz też podłączyć telefon bezpośrednio z telewizorem lub rzutnikiem: przewodowo za pomocą przejściówki USB-C/HDMI albo bezprzewodowo, korzystając z funkcji “Smart View”, “Bezprzewodowy wyświetlacz” lub “Klonowanie ekranu” (nazwa może różnić się w zależności od modelu) w panelu szybkich ustawień telefonu.
-
-• Możesz też zapisać plik ze slajdami jako PDF i udostępnić go lub pobrać, żeby wyświetlić w tradycyjny sposób.""",
   'confirmExitTitle': 'Potwierdź',
   'confirmExit': 'Czy na pewno chcesz zakończyć prezentację?',
+  'confirmExitBroadcasting':
+      'Czy na pewno chcesz zakończyć prezentację?\nZewnętrzny ekran zostanie wygaszony.',
   'yes': 'Tak',
   'no': 'Nie',
   'pause': 'Wstrzymaj',
   'resume': 'Wznów',
-  'cast': 'Przesyłanie (Chromecast)',
-  'castSelectDevice': 'Połącz z Chromecastem',
-  'castNoDevicesFound': 'Nie znaleziono urządzeń.',
+  'cast': 'Przesyłanie (Google Cast)',
+  'castSelectDevice': 'Połącz się z urządzeniem',
+  'castNoDevicesFound': 'Nie znaleziono urządzeń',
+  'castNoDevicesFoundDescription1':
+      'Aby skorzystać z tej funkcji, musisz być w jednej sieci Wi-Fi z urządzeniem Google TV, Android TV lub Chromecast.',
+  'castNoDevicesFoundDescription2':
+      'Jeśli nie masz takiej możliwości, możesz też spróbować użyć opcji „Udostępnianie ekranu” (lub podobna nazwa) w panelu szybkich ustawień telefonu.',
+  'castNoDevicesFoundDescription2Samsung':
+      'Jeśli nie masz takiej możliwości, możesz też spróbować użyć opcji „Smart View” w panelu szybkich ustawień telefonu.',
+  'searchAgain': 'Wyszukaj ponownie',
   'castError': 'Błąd: {error}',
   'castConnected': 'Połączono z urządzeniem.',
   'castDisconnected': 'Odłączono od urządzenia.',
   'castConnectionFailed': 'Nie udało się podłączyć z urządzeniem.',
   'castDisconnect': 'Odłączenie',
   'castDisconnectMessage': 'Czy na pewno chcesz odłączyć Chromecasta?',
-  'liveSession': 'Pokaz na żywo',
-  'liveSessionStarted': 'Pokaz na żywo jest dostępny pod adresem {url}.',
+  'liveSession': 'Pokaz na żywo przez internet',
+  'liveSessionStarted': 'Pokaz na żywo jest dostępny pod adresem {url}',
   'shareLink': 'UDOSTĘPNIJ LINK',
   'shareSlides': 'Udostępnij slajdy',
+  'contents': 'Spis treści',
   'saveToFile': 'Zapisz slajdy do pliku',
+  'logIn': 'Zaloguj się',
+  'logInSuccess': 'Cześć, {}!',
+  'logInSuccessNoTeam':
+      'Cześć, {}! Aby w pełni skorzystać z możliwości aplikacji, załóż zespół lub poproś o zaproszenie do istniejącego.',
+  'logInError': 'Nie udało się zalogować. Spróbuj ponownie później.',
+  'noTeam': 'Brak zespołu',
+  'myAccount': 'Moje konto',
+  'about': 'O aplikacji',
+  'support': 'Wesprzyj',
+  'contact': 'Kontakt',
+  'logOut': 'Wyloguj się',
+  'yourTeams': 'Twoje zespoły',
+  'yourAccount': 'Twoje konto',
+  'selectTeam': 'Wybierz zespół',
+  'addTeam': 'Utwórz nowy zespół',
+  'newTeam': 'Nowy zespół',
+  'newTeamDescription':
+      'Utwórz zespół, aby dodawać własne teksty i udostępniać je innym osobom.',
+  'teamName': 'Nazwa zespołu',
+  'add': 'Dodaj',
+  'addTeamError': 'Nie udało się stworzyć zespołu. Spróbuj ponownie później.',
+  'inviteToTeam': 'Zaproś do zespołu',
+  'inviteLinkDescription':
+      'Wyślij poniższy link osobie, którą chcesz zaprosić do zespołu {}.',
+  'linkExpiration': 'Link jest jednorazowy i ważny przez {}.',
+  'copy': 'Kopiuj',
+  'share': 'Udostępnij',
+  'confirmExitUnsavedChanges':
+      'Masz niezapisane zmiany. Czy na pewno chcesz zakończyć edycję bez zapisywania?',
+  'onboardingSwipeLeft':
+      'Przesuń palcem w lewo, aby przejść do następnego slajdu.',
+  'onboardingSwipeRight':
+      'Przesuń palcem w prawo, aby wrócić do poprzedniego slajdu.',
+  'onboardingDoubleTapLeft':
+      'Stuknij dwa razy przy lewej krawędzi, aby przeskoczyć na początek pieśni.',
+  'onboardingDoubleTapRight':
+      'Stuknij dwa razy przy prawej krawędzi, aby przeskoczyć na koniec pieśni (wygasić ekran).',
+  'onboardingDoubleTapCenter':
+      'Stuknij dwa razy na środku ekranu, aby ukryć lub pokazać przyciski.',
+  'onboardingButtons':
+      'Za pomocą przycisków możesz uruchomić prezentację na zewnętrznym ekranie,\na także udostępnić lub pobrać slajdy jako plik PDF.',
 };

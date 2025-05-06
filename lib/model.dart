@@ -256,14 +256,23 @@ class ContentSlide {
 class BootstrapResponse {
   final String currentVersion;
   final String appDownloadUrl;
-  final String songEditUrl;
+  final String frontendUrl;
+  final String? contactUrl;
+  final String? supportUrl;
 
-  BootstrapResponse(this.currentVersion, this.appDownloadUrl, this.songEditUrl);
+  BootstrapResponse(
+      {required this.currentVersion,
+      required this.appDownloadUrl,
+      required this.frontendUrl,
+      this.contactUrl,
+      this.supportUrl});
 
   BootstrapResponse.fromJson(Map<String, dynamic> json)
       : currentVersion = json['currentVersion'],
         appDownloadUrl = json['appDownloadUrl'],
-        songEditUrl = json['songEditUrl'];
+        frontendUrl = json['frontendUrl'],
+        contactUrl = json['contactUrl'],
+        supportUrl = json['supportUrl'];
 }
 
 class Liturgy {
@@ -292,4 +301,71 @@ class LiveResponse {
       : id = json['id'],
         url = json['url'],
         token = json['token'];
+}
+
+class AuthResponse {
+  final String token;
+  final String refreshToken;
+  final User user;
+
+  AuthResponse(
+      {required this.token, required this.refreshToken, required this.user});
+
+  factory AuthResponse.fromJson(Map<String, dynamic> json) {
+    return AuthResponse(
+      token: json['token'],
+      refreshToken: json['refreshToken'],
+      user: User.fromJson(json['user']),
+    );
+  }
+}
+
+class NonceResponse {
+  final String nonce;
+
+  NonceResponse({required this.nonce});
+
+  NonceResponse.fromJson(Map<String, dynamic> json) : nonce = json['nonce'];
+}
+
+class User {
+  final String id;
+  final String email;
+  final String displayName;
+
+  User({required this.id, required this.email, required this.displayName});
+
+  User.fromJson(Map<String, dynamic> json)
+      : id = json['id'],
+        email = json['email'],
+        displayName = json['displayName'];
+}
+
+class Team {
+  final String id;
+  final String name;
+
+  Team({required this.id, required this.name});
+
+  Team.fromJson(Map<String, dynamic> json)
+      : id = json['id'],
+        name = json['name'];
+
+  Map<String, dynamic> toJson() => {'id': id, 'name': name};
+}
+
+class TeamInvitation {
+  final String url;
+  final DateTime expiresAt;
+
+  TeamInvitation({required this.url, required this.expiresAt});
+
+  TeamInvitation.fromJson(Map<String, dynamic> json)
+      : url = json['url'],
+        expiresAt = DateTime.parse(json['expiresAt']);
+
+  Map<String, dynamic> toJson() => {
+        'url': url,
+        'expiresAt': expiresAt.toIso8601String(),
+      };
 }

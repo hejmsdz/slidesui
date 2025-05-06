@@ -14,7 +14,7 @@ import './strings.dart';
 import './api.dart';
 
 Future<String> moveFile(String source) async {
-  const platform = MethodChannel("com.mrozwadowski.slidesui/filePicker");
+  const platform = MethodChannel("lt.psal.psallite/filePicker");
   try {
     return await platform.invokeMethod("moveFile", {
       "source": source,
@@ -58,7 +58,7 @@ DeckRequest buildDeckRequestFromState(
   return DeckRequest(
     date: state.date,
     items: state.items,
-    ratio: Settings.getValue<String>('slides.aspectRatio'),
+    ratio: Settings.getValue<String>('slides.aspectRatio') ?? "16:9",
     fontSize: Settings.getValue<double>('slides.fontSize')?.toInt(),
     verticalAlign: Settings.getValue<String>('slides.verticalAlign'),
     hints: Settings.getValue<bool>('slides.hints'),

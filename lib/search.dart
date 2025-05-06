@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:slidesui/utils.dart';
 import './strings.dart';
 import './state.dart';
 import './model.dart';
@@ -90,11 +89,6 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   void updateQuery(String newQuery, {bool forceUpdate = false}) async {
-    if (newQuery.startsWith('\$')) {
-      handleCheatCode(newQuery);
-      return;
-    }
-
     final previousQuery = query;
     setState(() {
       query = newQuery;
@@ -112,8 +106,11 @@ class _SearchPageState extends State<SearchPage> {
     if (forceUpdate || (queryPrefixChanged && !_isLoading)) {
       setIsLoading(true);
       try {
-        _prefilteredItems =
-            await getSongs(query.substring(0, queryPrefixLength));
+        final state = context.read<SlidesModel>();
+        _prefilteredItems = await getSongs(
+          query.substring(0, queryPrefixLength),
+          teamId: state.currentTeam?.id,
+        );
       } finally {
         setIsLoading(false);
       }
@@ -126,21 +123,6 @@ class _SearchPageState extends State<SearchPage> {
           .where((item) => item.slug.contains(querySlug))
           .toList();
     });
-  }
-
-  handleCheatCode(String code) {
-    if (code == '\$admin') {
-      final state = Provider.of<SlidesModel>(context, listen: false);
-      if (state.specialMode == "admin") {
-        state.setSpecialMode(null);
-        ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("Wyłączono tryb administratora tekstów.")));
-      } else {
-        state.setSpecialMode("admin");
-        ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("Włączono tryb administratora tekstów.")));
-      }
-    }
   }
 
   void resetQuery() {

@@ -79,6 +79,10 @@ class _ExternalDisplayAppState extends State<ExternalDisplayApp> {
   }
 
   handlePageChange(int pageIndex) async {
+    if (_pdf == null) {
+      return;
+    }
+
     final image = await renderPage(pageIndex);
     setState(() {
       if (_currentBuffer == 0) {
@@ -97,14 +101,14 @@ class _ExternalDisplayAppState extends State<ExternalDisplayApp> {
       home: Scaffold(
         backgroundColor: Colors.black,
         body: Stack(children: [
-          _buildBuffer(_buffer0, _isPresenting && _currentBuffer == 0),
-          _buildBuffer(_buffer1, _isPresenting && _currentBuffer == 1),
+          buildBuffer(_buffer0, _isPresenting && _currentBuffer == 0),
+          buildBuffer(_buffer1, _isPresenting && _currentBuffer == 1),
         ]),
       ),
     );
   }
 
-  Widget _buildBuffer(MemoryImage? buffer, bool isVisible) {
+  Widget buildBuffer(MemoryImage? buffer, bool isVisible) {
     return AnimatedOpacity(
       opacity: isVisible ? 1.0 : 0.0,
       duration: Duration(milliseconds: 500),
