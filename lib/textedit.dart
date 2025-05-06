@@ -207,8 +207,9 @@ class _TextEditPageState extends State<TextEditPage> {
         controller: controller,
         keyboardType: TextInputType.multiline,
         maxLines: null,
-        decoration: const InputDecoration(
+        decoration: InputDecoration(
           contentPadding: EdgeInsets.symmetric(vertical: 16, horizontal: 8),
+          hintText: strings['editAsTextHint']!,
         ),
         autofocus: true,
       ),

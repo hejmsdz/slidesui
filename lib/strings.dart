@@ -26,6 +26,8 @@ const strings = {
       'Aby dodać slajdy, użyj wyszukiwarki\nlub naciśnij ikonę edycji tekstu i wklej listę pieśni.',
   'searchSongs': 'Wyszukaj pieśni',
   'editAsText': 'Edytuj jako tekst',
+  'editAsTextHint':
+      'Na przykład:\nW: Pieśń o nadziei\nO: Gdzie miłość wzajemna i dobroć\nK: Zbliżam się w pokorze\nU: Niechaj Cię, Panie\nW: O Pani, ufność nasza',
   'menu': 'Pokaż menu',
   'clearText': 'Wyczyść',
   'applyText': 'Wczytaj slajdy',
