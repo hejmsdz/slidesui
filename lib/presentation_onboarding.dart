@@ -154,13 +154,12 @@ class _SwipeIndicatorState extends State<SwipeIndicator>
       vsync: this,
     )..repeat(reverse: false, period: const Duration(seconds: 2));
 
-    final isLeft = widget.direction == SwipeDirection.left;
     _slideAnimation = Tween<Offset>(
       begin: const Offset(0.0, 0.0),
       end: const Offset(-10.0, 0.0),
     ).animate(CurvedAnimation(
       parent: _controller,
-      curve: isLeft ? Curves.ease : Curves.easeIn,
+      curve: Curves.ease,
     ));
 
     _opacityAnimation = Tween<double>(
