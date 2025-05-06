@@ -234,7 +234,9 @@ class _PresentationPageState extends State<PresentationPage> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text(strings['confirmExitTitle']!),
-          content: Text(strings['confirmExit']!),
+          content: Text(_isBroadcasting
+              ? strings['confirmExitBroadcasting']!
+              : strings['confirmExit']!),
           actions: <Widget>[
             TextButton(
               child: Text(strings['no']!),
@@ -261,7 +263,7 @@ class _PresentationPageState extends State<PresentationPage> {
       body: (_isLoading || _pdf == null || _pdf?.pagesCount == 0)
           ? Container()
           : PopScope<Object?>(
-              canPop: !_isBroadcasting,
+              canPop: false,
               onPopInvokedWithResult: (didPop, result) async {
                 if (!didPop) {
                   final shouldPop = await _confirmExit() ?? false;

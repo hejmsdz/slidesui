@@ -66,6 +66,8 @@ const strings = {
   'behaviorShare': 'Udostępnij',
   'confirmExitTitle': 'Potwierdź',
   'confirmExit': 'Czy na pewno chcesz zakończyć prezentację?',
+  'confirmExitBroadcasting':
+      'Czy na pewno chcesz zakończyć prezentację?\nZewnętrzny ekran zostanie wygaszony.',
   'yes': 'Tak',
   'no': 'Nie',
   'pause': 'Wstrzymaj',
