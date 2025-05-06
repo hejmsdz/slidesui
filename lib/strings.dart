@@ -17,9 +17,9 @@ const strings = {
   'edit': 'Edytuj',
   'teamRequired': 'Wymagany zespół',
   'teamRequiredDescriptionLoggedIn':
-      'Aby edytować teksty, musisz należeć do zespołu. Utwórz nowy zespół lub dołącz do istniejącego. Zrobisz to w menu głównym.',
+      'Aby edytować lub dodawać pieśni, musisz należeć do zespołu. Utwórz nowy zespół lub dołącz do istniejącego.',
   'teamRequiredDescriptionLoggedOut':
-      'Aby edytować teksty, musisz najpierw się zalogować i dołączyć do zespołu. Zrobisz to w menu głównym.',
+      'Aby edytować lub dodawać pieśni, musisz najpierw się zalogować i dołączyć do zespołu.',
   'verseOrder': 'Zwrotki',
   'emptyTitle': 'Co dzisiaj śpiewamy?',
   'emptyDescription':
@@ -54,6 +54,7 @@ const strings = {
   'download': 'Pobierz',
   'notNow': 'Później',
   'skipVersion': 'Pomiń',
+  'addSong': 'Dodaj pieśń',
   'settings': 'Ustawienia',
   'settingsSectionSlides': 'Slajdy',
   'hints': 'Podpowiedzi',

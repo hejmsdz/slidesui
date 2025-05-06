@@ -304,6 +304,42 @@ class _AppNavigationDrawerState extends State<AppNavigationDrawer> {
             }),
           ] else ...[
             ListTile(
+              leading: const Icon(Icons.add),
+              title: Text(strings['addSong']!),
+              onTap: () {
+                final state = context.read<SlidesModel>();
+                if (state.currentTeam == null) {
+                  showDialog(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title: Text(strings['teamRequired']!),
+                      content:
+                          Text(strings['teamRequiredDescriptionLoggedOut']!),
+                      actions: [
+                        TextButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                          child: Text(strings['ok']!),
+                        ),
+                      ],
+                    ),
+                  );
+
+                  return;
+                }
+
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => WebViewPage(
+                      path: "dashboard/songs/new",
+                      title: strings['addSong']!,
+                    ),
+                  ),
+                );
+              },
+            ),
+            ListTile(
               leading: const Icon(Icons.settings),
               title: Text(strings['settings']!),
               onTap: () {
