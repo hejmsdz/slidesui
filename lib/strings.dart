@@ -106,6 +106,9 @@ const strings = {
   'yourAccount': 'Twoje konto',
   'selectTeam': 'Wybierz zespół',
   'addTeam': 'Utwórz nowy zespół',
+  'newTeam': 'Nowy zespół',
+  'newTeamDescription':
+      'Utwórz zespół, aby dodawać własne teksty i udostępniać je innym osobom.',
   'teamName': 'Nazwa zespołu',
   'add': 'Dodaj',
   'addTeamError': 'Nie udało się stworzyć zespołu. Spróbuj ponownie później.',

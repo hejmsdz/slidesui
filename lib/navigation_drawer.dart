@@ -147,11 +147,18 @@ class _AppNavigationDrawerState extends State<AppNavigationDrawer> {
     final teamName = await showDialog<String>(
       context: context,
       builder: (BuildContext context) => AlertDialog(
-        title: Text(strings['addTeam']!),
-        content: TextField(
-          controller: teamNameController,
-          decoration: InputDecoration(labelText: strings['teamName']!),
-          autofocus: true,
+        title: Text(strings['newTeam']!),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(strings['newTeamDescription']!),
+            SizedBox(height: 8),
+            TextField(
+              controller: teamNameController,
+              decoration: InputDecoration(labelText: strings['teamName']!),
+              autofocus: true,
+            )
+          ],
         ),
         actions: <Widget>[
           TextButton(
