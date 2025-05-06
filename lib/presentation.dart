@@ -412,25 +412,32 @@ class _ExternalDisplayBroadcasterState
   }
 
   void handleOpen() async {
-    externalDisplay.sendParameters(
-      action: "open",
-      value: "${widget.filePath}#${widget.controller.currentPage}",
-    );
+    if (externalDisplay.isPlugging) {
+      externalDisplay.sendParameters(
+        action: "open",
+        value: "${widget.filePath}#${widget.controller.currentPage}",
+      );
+    }
   }
 
-  void handleDisplayChange(dynamic status) {
+  void handleDisplayChange(dynamic status) async {
     widget.onStateChange?.call('externalDisplay', status == true);
 
     if (status == true) {
-      handleOpen();
+      await externalDisplay.connect();
+      externalDisplay.waitingTransferParametersReady(onReady: () {
+        handleOpen();
+      });
     }
   }
 
   void handlePageChange() {
-    externalDisplay.sendParameters(
-      action: "page",
-      value: widget.controller.currentPage,
-    );
+    if (externalDisplay.isPlugging) {
+      externalDisplay.sendParameters(
+        action: "page",
+        value: widget.controller.currentPage,
+      );
+    }
   }
 
   @override

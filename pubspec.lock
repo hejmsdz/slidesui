@@ -189,10 +189,10 @@ packages:
     dependency: "direct main"
     description:
       name: external_display
-      sha256: "9cd43a1c89baf4d3c74a0f5aeb749c8f665efb694b69d899e9c96d6bea03c8db"
+      sha256: "465212777241a3d1d08a9b22bf78c1958eedf45a9d6027a315891960792645fb"
       url: "https://pub.dev"
     source: hosted
-    version: "0.3.0"
+    version: "0.3.1"
   fake_async:
     dependency: transitive
     description:
