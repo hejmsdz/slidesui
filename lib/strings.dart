@@ -15,6 +15,11 @@ const strings = {
       'Nie udało się pobrać liturgii słowa na dany dzień. Spróbuj wybrać mniej odległą datę lub dodaj teksty ręcznie.',
   'remove': 'Usuń',
   'edit': 'Edytuj',
+  'teamRequired': 'Wymagany zespół',
+  'teamRequiredDescriptionLoggedIn':
+      'Aby edytować teksty, musisz należeć do zespołu. Utwórz nowy zespół lub dołącz do istniejącego. Zrobisz to w menu głównym.',
+  'teamRequiredDescriptionLoggedOut':
+      'Aby edytować teksty, musisz najpierw się zalogować i dołączyć do zespołu. Zrobisz to w menu głównym.',
   'verseOrder': 'Zwrotki',
   'emptyTitle': 'Co dzisiaj śpiewamy?',
   'emptyDescription':

@@ -146,13 +146,30 @@ class ListItem extends StatelessWidget {
                   label: strings['verseOrder']!,
                 ),
                 Consumer<SlidesModel>(builder: (context, state, _) {
-                  if (state.currentTeam == null) {
-                    return Container();
-                  }
-
                   return SlidableAction(
                     onPressed: (context) {
-                      edit(context, state);
+                      if (state.currentTeam == null) {
+                        final isLoggedIn = state.user != null;
+                        showDialog(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                                  title: Text(strings['teamRequired']!),
+                                  content: Text(isLoggedIn
+                                      ? strings[
+                                          'teamRequiredDescriptionLoggedIn']!
+                                      : strings[
+                                          'teamRequiredDescriptionLoggedOut']!),
+                                  actions: [
+                                    TextButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                        child: Text(strings['ok']!))
+                                  ],
+                                ));
+                      } else {
+                        edit(context, state);
+                      }
                     },
                     backgroundColor: Colors.blue,
                     foregroundColor: Colors.white,
