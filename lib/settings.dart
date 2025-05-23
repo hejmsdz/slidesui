@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -21,7 +23,7 @@ final verticalAlignments = <String, String>{
 
 final behaviors = <String, String>{
   'display': strings['behaviorDisplay']!,
-  'save': strings['behaviorSave']!,
+  if (Platform.isAndroid) 'save': strings['behaviorSave']!,
   'share': strings['behaviorShare']!,
 };
 

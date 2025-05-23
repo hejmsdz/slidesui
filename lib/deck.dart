@@ -14,6 +14,10 @@ import './strings.dart';
 import './api.dart';
 
 Future<String> moveFile(String source) async {
+  if (!Platform.isAndroid) {
+    return "";
+  }
+
   const platform = MethodChannel("lt.psal.psallite/filePicker");
   try {
     return await platform.invokeMethod("moveFile", {

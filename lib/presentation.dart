@@ -363,13 +363,14 @@ class _PresentationPageState extends State<PresentationPage> {
                             Share.shareXFiles([XFile(widget.filePath)]);
                           },
                         ),
-                        IconButton(
-                          icon: const Icon(Icons.save_alt),
-                          tooltip: strings['saveToFile'],
-                          onPressed: () {
-                            notifyOnDownloaded(context, widget.filePath);
-                          },
-                        ),
+                        if (Platform.isAndroid)
+                          IconButton(
+                            icon: const Icon(Icons.save_alt),
+                            tooltip: strings['saveToFile'],
+                            onPressed: () {
+                              notifyOnDownloaded(context, widget.filePath);
+                            },
+                          ),
                       ],
                     ),
                   ),

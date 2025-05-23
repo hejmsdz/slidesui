@@ -90,6 +90,8 @@ const strings = {
       'Jeśli nie masz takiej możliwości, możesz też spróbować użyć opcji „Udostępnianie ekranu” (lub podobna nazwa) w panelu szybkich ustawień telefonu.',
   'castNoDevicesFoundDescription2Samsung':
       'Jeśli nie masz takiej możliwości, możesz też spróbować użyć opcji „Smart View” w panelu szybkich ustawień telefonu.',
+  'castNoDevicesFoundDescription2Apple':
+      'Jeśli nie masz takiej możliwości, możesz też spróbować użyć opcji „Klonowanie ekranu” w centrum sterowania telefonu.',
   'searchAgain': 'Wyszukaj ponownie',
   'castError': 'Błąd: {error}',
   'castConnected': 'Połączono z urządzeniem.',

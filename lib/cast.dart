@@ -84,9 +84,11 @@ class _CastDeviceDialogState extends State<CastDeviceDialog> {
           ),
           Padding(
             padding: const EdgeInsets.all(8),
-            child: Text(_isSamsung
-                ? strings['castNoDevicesFoundDescription2Samsung']!
-                : strings['castNoDevicesFoundDescription2']!),
+            child: Text(Platform.isIOS
+                ? strings['castNoDevicesFoundDescription2Apple']!
+                : _isSamsung
+                    ? strings['castNoDevicesFoundDescription2Samsung']!
+                    : strings['castNoDevicesFoundDescription2']!),
           ),
         ],
       ),
