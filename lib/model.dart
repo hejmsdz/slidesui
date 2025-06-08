@@ -254,7 +254,7 @@ class ContentSlide {
 }
 
 class BootstrapResponse {
-  final String currentVersion;
+  final String? currentVersion;
   final String appDownloadUrl;
   final String frontendUrl;
   final String? contactUrl;

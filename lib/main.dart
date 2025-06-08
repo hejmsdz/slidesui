@@ -243,6 +243,10 @@ class _MyHomePageState extends State<MyHomePage> {
       context.read<SlidesModel>().setBootstrap(bootstrap);
     }
 
+    if (bootstrap.currentVersion == null) {
+      return;
+    }
+
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     final localVersion = packageInfo.version;
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -250,7 +254,7 @@ class _MyHomePageState extends State<MyHomePage> {
     final latestVersion = bootstrap.currentVersion;
     final isSkipped = prefs.getString("skippedVersion") == latestVersion;
 
-    if (latestVersion != localVersion && !isSkipped) {
+    if (latestVersion != localVersion && !isSkipped && latestVersion != null) {
       showNewVersionDialog(
           latestVersion, localVersion, bootstrap.appDownloadUrl);
     }
