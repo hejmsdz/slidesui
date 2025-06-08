@@ -172,9 +172,17 @@ class SlidesModel extends ChangeNotifier implements LiturgyHolder {
     final sanctusItem = SongDeckItem(OrdinaryItems.sanctus);
     final agnusItem = SongDeckItem(OrdinaryItems.agnus);
 
-    _items.insert(min(_items.length, 1), kyrieItem);
-    _items.insertAll(max(0, _items.length - 3), [sanctusItem, agnusItem]);
-    updateLiturgy();
+    final numItems = _items.length;
+
+    if (numItems <= 1) {
+      _items.insertAll(numItems, [kyrieItem, sanctusItem, agnusItem]);
+    } else if (numItems < 5) {
+      _items.insert(1, kyrieItem);
+      _items.insertAll(3, [sanctusItem, agnusItem]);
+    } else {
+      _items.insert(1, kyrieItem);
+      _items.insertAll(_items.length - 3, [sanctusItem, agnusItem]);
+    }
     notifyListeners();
   }
 
