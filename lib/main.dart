@@ -418,12 +418,11 @@ class _MyHomePageState extends State<MyHomePage> {
                 MenuItemButton(
                   onPressed: () async {
                     final now = DateTime.now();
-                    final firstDate = DateTime(now.year - 1, 1, 1);
                     final lastDate = DateTime(now.year + 1, 12, 31);
                     final date = await showDatePicker(
                       context: context,
                       initialDate: state.date,
-                      firstDate: firstDate,
+                      firstDate: now,
                       lastDate: lastDate,
                     );
                     if (date != null) {
