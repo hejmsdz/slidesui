@@ -204,10 +204,7 @@ class ListItem extends StatelessWidget {
         subtitle: subtitle == null
             ? null
             : Text(subtitle!, overflow: TextOverflow.ellipsis),
-        trailing: Padding(
-          padding: const EdgeInsets.only(right: kIsWeb ? 24 : 0),
-          child: isUnresolved ? const Icon(Icons.report) : null,
-        ),
+        trailing: isUnresolved ? const Icon(Icons.report) : null,
         onTap: onTap,
       ),
     );
