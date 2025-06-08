@@ -35,15 +35,15 @@ Future<bool> logInWithGoogle(BuildContext context,
       await state.setUser(authResponse.user);
 
       if (showSuccessMessage) {
-        if (state.currentTeam == null) {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              content: Text(strings['logInSuccessNoTeam']!
-                  .replaceAll('{}', authResponse.user.displayName))));
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              content: Text(strings['logInSuccess']!
-                  .replaceAll('{}', authResponse.user.displayName))));
-        }
+        final messageKey =
+            state.currentTeam == null ? 'logInSuccessNoTeam' : 'logInSuccess';
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(strings[messageKey]!
+                .replaceAll('{}', authResponse.user.displayName)),
+          ),
+        );
       }
     }
   } catch (e) {
