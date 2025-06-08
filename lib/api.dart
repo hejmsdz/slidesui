@@ -257,3 +257,9 @@ Future<TeamInvitation> postTeamInvite(String teamId) async {
   final response = await apiClient.post('v2/teams/$teamId/invite');
   return TeamInvitation.fromJson(response.data);
 }
+
+Future<Team> postJoinTeam(String invitationToken) async {
+  final response =
+      await apiClient.post('v2/teams/join', data: {'token': invitationToken});
+  return Team.fromJson(response.data);
+}

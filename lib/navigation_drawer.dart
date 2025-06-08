@@ -29,30 +29,9 @@ class _UserInfoState extends State<UserInfo> {
 
     setState(() => _isLoading = true);
     try {
-      final idToken = await getGoogleIdToken();
-      final authResponse = await postAuthGoogle(idToken);
-
-      if (mounted) {
-        final state = context.read<SlidesModel>();
-        await state.setUser(authResponse.user);
-
-        if (state.currentTeam == null) {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              content: Text(strings['logInSuccessNoTeam']!
-                  .replaceAll('{}', authResponse.user.displayName))));
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              content: Text(strings['logInSuccess']!
-                  .replaceAll('{}', authResponse.user.displayName))));
-        }
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text(strings['logInError']!)));
-      }
+      await logInWithGoogle(context);
     } finally {
-      if (mounted) {
+      if (context.mounted) {
         setState(() => _isLoading = false);
         Navigator.of(context).pop();
       }

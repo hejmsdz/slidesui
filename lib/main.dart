@@ -6,6 +6,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:slidesui/cast_service.dart';
 import 'package:slidesui/external_display.dart';
 import 'package:slidesui/external_display_singleton.dart';
+import 'package:slidesui/invitation.dart';
 import 'package:slidesui/presentation.dart';
 import 'package:slidesui/verse_order.dart';
 import 'package:slidesui/web_view.dart';
@@ -13,6 +14,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_settings_screens/flutter_settings_screens.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:go_router/go_router.dart';
 import './model.dart';
 import './api.dart';
 import './persistence.dart';
@@ -39,12 +41,12 @@ void main() async {
   externalDisplay.connect();
 
   runApp(
-    ChangeNotifierProvider(
-      create: (context) => state,
-      child: ChangeNotifierProvider(
-        create: (_) => CastService(),
-        child: const MyApp(),
-      ),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => state),
+        ChangeNotifierProvider(create: (_) => CastService()),
+      ],
+      child: const MyApp(),
     ),
   );
 }
@@ -55,7 +57,7 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MaterialApp.router(
       title: strings['appTitle']!,
       theme: ThemeData(
         colorSchemeSeed: Colors.orange,
@@ -67,14 +69,28 @@ class MyApp extends StatelessWidget {
         appBarTheme: const AppBarTheme(elevation: 1.0),
       ),
       themeMode: ThemeMode.system,
-      home: MyHomePage(title: strings['appTitle']!),
+      routerConfig: GoRouter(
+        routes: [
+          GoRoute(
+            path: '/',
+            builder: (context, state) => MyHomePage(),
+            routes: [
+              GoRoute(
+                path: 'invitation/:token',
+                builder: (context, state) {
+                  return InvitationPage(token: state.pathParameters['token']!);
+                },
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-  final String title;
+  const MyHomePage({super.key});
 
   @override
   _MyHomePageState createState() => _MyHomePageState();
@@ -338,7 +354,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
+        title: Text(strings['appTitle']!),
         actions: [
           IconButton(
             icon: const Icon(Icons.search),

@@ -146,4 +146,10 @@ const strings = {
       'Stuknij dwa razy na środku ekranu, aby ukryć lub pokazać przyciski.',
   'onboardingButtons':
       'Za pomocą przycisków możesz uruchomić prezentację na zewnętrznym ekranie,\na także udostępnić lub pobrać slajdy jako plik PDF.',
+  'joinTeamSuccess': 'Witaj w zespole {}!',
+  'joinTeamErrorNotFound':
+      'Nie znaleziono zaproszenia. Być może zostało już wykorzystane lub wygasło.',
+  'joinTeamErrorAlreadyMember': 'Już należysz do tego zespołu.',
+  'joinTeamError':
+      'Nie udało się dołączyć do zespołu. Spróbuj ponownie później.',
 };
