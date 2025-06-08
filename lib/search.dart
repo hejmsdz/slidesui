@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'dart:async';
 import './strings.dart';
 import './state.dart';
 import './model.dart';
@@ -60,26 +61,32 @@ slugify(String text) {
 
 class _SearchPageState extends State<SearchPage> {
   _SearchPageState();
+  static const itemsPerPage = 20;
+  static const debounceDuration = Duration(milliseconds: 500);
 
   TextEditingController controller = TextEditingController();
-  String query = "";
-  List<Song> _prefilteredItems = [];
-  List<Song> _items = [];
+  List<Future<List<Song>>> _items = [];
+  int _totalItems = 0;
+  Timer? _debounce;
+
   bool _isLoading = false;
-  bool _isQueryValid = false;
   int replaceIndex = -1;
 
   @override
   void initState() {
     super.initState();
 
-    query = widget.initialQuery;
     replaceIndex = widget.replaceIndex;
+    controller.text = widget.initialQuery;
 
-    controller.text = query;
-    if (query.isNotEmpty) {
-      updateQuery(query, forceUpdate: true);
-    }
+    updateQuery(immediate: true);
+  }
+
+  @override
+  void dispose() {
+    _debounce?.cancel();
+    controller.dispose();
+    super.dispose();
   }
 
   setIsLoading(bool isLoading) {
@@ -88,126 +95,148 @@ class _SearchPageState extends State<SearchPage> {
     });
   }
 
-  void updateQuery(String newQuery, {bool forceUpdate = false}) async {
-    final previousQuery = query;
-    setState(() {
-      query = newQuery;
-      _isQueryValid = query.length >= queryPrefixLength;
-    });
+  Future<void> _performSearch() async {
+    final query = controller.text;
 
-    if (!_isQueryValid) {
+    if (query.length < queryPrefixLength && query.isNotEmpty) {
       return;
     }
 
-    final queryPrefixChanged = previousQuery.length < queryPrefixLength ||
-        newQuery.substring(0, queryPrefixLength) !=
-            previousQuery.substring(0, queryPrefixLength);
+    setIsLoading(true);
 
-    if (forceUpdate || (queryPrefixChanged && !_isLoading)) {
-      setIsLoading(true);
-      try {
-        final state = context.read<SlidesModel>();
-        _prefilteredItems = await getSongs(
-          query.substring(0, queryPrefixLength),
-          teamId: state.currentTeam?.id,
-        );
-      } finally {
-        setIsLoading(false);
-      }
+    final response = await loadSongs(query, 0);
+    setState(() {
+      _totalItems = response.total;
+      _items = [Future.value(response.items)];
+    });
+
+    setIsLoading(false);
+  }
+
+  void updateQuery({bool immediate = false}) async {
+    if (_debounce?.isActive ?? false) {
+      _debounce!.cancel();
     }
 
-    final querySlug = slugify(query);
+    if (immediate) {
+      await _performSearch();
+      return;
+    }
 
-    setState(() {
-      _items = _prefilteredItems
-          .where((item) => item.slug.contains(querySlug))
-          .toList();
-    });
+    _debounce = Timer(debounceDuration, _performSearch);
+  }
+
+  Future<PaginatedResponse<Song>> loadSongs(String query, int page) async {
+    final state = context.read<SlidesModel>();
+    return getSongsPaginated(
+      query,
+      teamId: state.currentTeam?.id,
+      limit: itemsPerPage,
+      offset: page * itemsPerPage,
+    );
+  }
+
+  Future<List<Song>?> getPage(int page) async {
+    if (_items.length <= page) {
+      _items.add(
+          loadSongs(controller.text, page).then((response) => response.items));
+    }
+    return _items[page];
   }
 
   void resetQuery() {
-    setState(() {
-      query = "";
-      _prefilteredItems = [];
-      _items = [];
-    });
     controller.clear();
+    updateQuery();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: TextField(
-            controller: controller,
-            autofocus: true,
-            decoration: InputDecoration(
-              hintText: strings['searchSongs']!,
-              border: InputBorder.none,
-            ),
-            style: const TextStyle(fontSize: 16.0),
-            onChanged: updateQuery,
+      appBar: AppBar(
+        title: TextField(
+          controller: controller,
+          autofocus: true,
+          decoration: InputDecoration(
+            hintText: strings['searchSongs']!,
+            border: InputBorder.none,
           ),
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.clear),
-              onPressed: resetQuery,
-            ),
-          ],
-          bottom: PreferredSize(
-            preferredSize: const Size(double.infinity, 1.0),
-            child: Opacity(
-              opacity: _isLoading ? 1 : 0,
-              child: const LinearProgressIndicator(
-                value: null,
-              ),
+          style: const TextStyle(fontSize: 16.0),
+          onChanged: (value) => updateQuery(),
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.clear),
+            onPressed: resetQuery,
+          ),
+        ],
+        bottom: PreferredSize(
+          preferredSize: const Size(double.infinity, 1.0),
+          child: Opacity(
+            opacity: _isLoading ? 1 : 0,
+            child: const LinearProgressIndicator(
+              value: null,
             ),
           ),
         ),
-        body: Consumer<SlidesModel>(
-          builder: (context, state, child) {
-            if (!_isQueryValid) {
-              return Center(
-                child: Text(
-                  strings['searchStartTyping']!,
-                  style: Theme.of(context).textTheme.bodySmall,
-                ),
-              );
-            }
-            if (!_isLoading && _items.isEmpty) {
-              return Center(
-                child: Text(
-                  strings['searchNoResults']!,
-                  style: Theme.of(context).textTheme.bodySmall,
-                ),
-              );
-            }
-            return ListView.builder(
-              itemCount: _items.length,
-              itemBuilder: (BuildContext context, int index) {
-                final song = _items[index];
-                final isAdded = state.containsSong(song.id);
-                return SearchListItem(
-                  id: song.id,
-                  title: song.title,
-                  subtitle: song.subtitle,
-                  isChecked: isAdded,
-                  onTap: () {
-                    if (!isAdded) {
-                      if (replaceIndex > -1) {
-                        state.replaceItem(replaceIndex, SongDeckItem(song));
-                        Navigator.pop(context);
-                      } else {
-                        state.addItem(SongDeckItem(song));
-                      }
-                    } else {
-                      state.removeItemById(song.id);
-                    }
-                  },
-                );
-              },
+      ),
+      body: Builder(
+        builder: (context) {
+          if (!_isLoading && _totalItems == 0) {
+            return Center(
+              child: Text(
+                strings['searchNoResults']!,
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
             );
-          },
-        ));
+          }
+          return ListView.builder(
+            itemCount: _totalItems,
+            itemBuilder: (BuildContext context, int index) {
+              final page = index ~/ itemsPerPage;
+              final itemIndex = index % itemsPerPage;
+
+              return FutureBuilder(
+                future: getPage(page),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState != ConnectionState.done) {
+                    return const ListTile(
+                      title: Text(''),
+                    );
+                  }
+
+                  final items = snapshot.data as List<Song>;
+                  final song = items[itemIndex];
+
+                  return Consumer<SlidesModel>(
+                    builder: (context, state, child) {
+                      final isAdded = state.containsSong(song.id);
+                      return SearchListItem(
+                        id: song.id,
+                        title: song.title,
+                        subtitle: song.subtitle,
+                        isChecked: isAdded,
+                        onTap: () {
+                          if (!isAdded) {
+                            if (replaceIndex > -1) {
+                              state.replaceItem(
+                                  replaceIndex, SongDeckItem(song));
+                              Navigator.pop(context);
+                            } else {
+                              state.addItem(SongDeckItem(song));
+                            }
+                          } else {
+                            state.removeItemById(song.id);
+                          }
+                        },
+                      );
+                    },
+                  );
+                },
+              );
+            },
+          );
+        },
+      ),
+    );
   }
 }

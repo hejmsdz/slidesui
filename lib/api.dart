@@ -116,6 +116,34 @@ Future<List<Song>> getSongs(String query, {String? teamId}) async {
       .toList();
 }
 
+class PaginatedResponse<T> {
+  final List<T> items;
+  final int total;
+
+  PaginatedResponse({required this.items, required this.total});
+}
+
+Future<PaginatedResponse<Song>> getSongsPaginated(String query,
+    {required int limit, required int offset, String? teamId}) async {
+  final response = await apiClient.get('v2/songs', params: {
+    'query': query,
+    'limit': limit,
+    'offset': offset,
+    'teamId': teamId,
+  });
+
+  if (response.statusCode != 200) {
+    throw ApiError();
+  }
+
+  return PaginatedResponse(
+    items: (response.data['items'] as List)
+        .map((itemJson) => Song.fromJson(itemJson))
+        .toList(),
+    total: response.data['total'],
+  );
+}
+
 Future<Song> getSong(String id) async {
   final response = await apiClient.get("v2/songs/$id");
   return Song.fromJson(response.data);
