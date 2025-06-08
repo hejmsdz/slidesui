@@ -55,7 +55,7 @@ const strings = {
   'download': 'Pobierz',
   'notNow': 'Później',
   'skipVersion': 'Pomiń',
-  'addSong': 'Dodaj pieśń',
+  'addSong': 'Dodaj nową pieśń',
   'settings': 'Ustawienia',
   'settingsSectionSlides': 'Slajdy',
   'hints': 'Podpowiedzi',
