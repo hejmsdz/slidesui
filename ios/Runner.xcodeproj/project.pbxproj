@@ -136,6 +136,7 @@
 				97C146EA1CF9000F007C117D /* Sources */,
 				97C146EB1CF9000F007C117D /* Frameworks */,
 				97C146EC1CF9000F007C117D /* Resources */,
+				2E5731AC2DF5F52800E5ABDE /* ShellScript */,
 				9705A1C41CF9048500538489 /* Embed Frameworks */,
 				3B06AD1E1E4923F5004D2608 /* Thin Binary */,
 				6D9911EBDC845F43315D7859 /* [CP] Embed Pods Frameworks */,
@@ -198,6 +199,23 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		2E5731AC2DF5F52800E5ABDE /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/bash;
+			shellScript = "#!/bin/bash\n\nenv_path=\"../.env\"\nif [ -f $env_path ]; then\n  while IFS='=' read -r key value; do\n    if [[ ! $key =~ ^#.*$ ]] && [ ! -z \"$key\" ]; then\n      value=$(echo \"$value\" | sed -e 's/^\"//' -e 's/\"$//' -e \"s/^'//\" -e \"s/'$//\")\n      export \"ENV_$key=$value\"\n    fi\n  done < $env_path\nelse\n  echo \"$(realpath $env_path) file not found\"\n  exit 1\nfi\n\ninfo_plist=\"Runner/Info.plist\"\n/usr/libexec/PlistBuddy -c \"Set :CFBundleURLTypes:0:CFBundleURLSchemes:0 $ENV_GOOGLE_IOS_URL_SCHEME\" $info_plist\n/usr/libexec/PlistBuddy -c \"Set :GIDClientID $ENV_GOOGLE_IOS_CLIENT_ID\" $info_plist\n/usr/libexec/PlistBuddy -c \"Set :GIDServerClientID $ENV_GOOGLE_SERVER_CLIENT_ID\" $info_plist\n";
+		};
 		3B06AD1E1E4923F5004D2608 /* Thin Binary */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;
@@ -283,7 +301,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "/bin/sh \"$FLUTTER_ROOT/packages/flutter_tools/bin/xcode_backend.sh\" build";
+			shellScript = "/bin/sh \"$FLUTTER_ROOT/packages/flutter_tools/bin/xcode_backend.sh\" build\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
