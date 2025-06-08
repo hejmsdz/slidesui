@@ -66,6 +66,7 @@ class _SearchPageState extends State<SearchPage> {
 
   TextEditingController controller = TextEditingController();
   List<Future<List<Song>>> _items = [];
+  PaginatedResponse<Song>? _firstUnfilteredPage;
   int _totalItems = 0;
   Timer? _debounce;
 
@@ -102,6 +103,14 @@ class _SearchPageState extends State<SearchPage> {
       return;
     }
 
+    if (query.isEmpty && _firstUnfilteredPage != null) {
+      setState(() {
+        _items = [Future.value(_firstUnfilteredPage!.items)];
+        _totalItems = _firstUnfilteredPage!.total;
+      });
+      return;
+    }
+
     setIsLoading(true);
 
     final response = await loadSongs(query, 0);
@@ -111,6 +120,10 @@ class _SearchPageState extends State<SearchPage> {
     });
 
     setIsLoading(false);
+
+    if (query.isEmpty && _firstUnfilteredPage == null) {
+      _firstUnfilteredPage = response;
+    }
   }
 
   void updateQuery({bool immediate = false}) async {
@@ -146,7 +159,7 @@ class _SearchPageState extends State<SearchPage> {
 
   void resetQuery() {
     controller.clear();
-    updateQuery();
+    updateQuery(immediate: true);
   }
 
   @override
