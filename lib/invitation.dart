@@ -27,7 +27,8 @@ class _InvitationPageState extends State<InvitationPage> {
     final state = context.read<SlidesModel>();
 
     if (state.user == null) {
-      final loggedIn = await logInWithGoogle(context);
+      final loggedIn =
+          await logInWithGoogle(context, showSuccessMessage: false);
       if (!loggedIn) {
         _goToHome();
         return;
@@ -69,7 +70,7 @@ class _InvitationPageState extends State<InvitationPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Dołącz do zespołu')),
+      appBar: AppBar(title: Text(strings['joinTeam']!)),
       body: const Center(child: CircularProgressIndicator()),
     );
   }

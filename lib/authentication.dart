@@ -24,7 +24,8 @@ Future<String> getGoogleIdToken() async {
   return auth.idToken!;
 }
 
-Future<bool> logInWithGoogle(BuildContext context) async {
+Future<bool> logInWithGoogle(BuildContext context,
+    {bool showSuccessMessage = true}) async {
   try {
     final idToken = await getGoogleIdToken();
     final authResponse = await postAuthGoogle(idToken);
@@ -33,14 +34,16 @@ Future<bool> logInWithGoogle(BuildContext context) async {
       final state = context.read<SlidesModel>();
       await state.setUser(authResponse.user);
 
-      if (state.currentTeam == null) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text(strings['logInSuccessNoTeam']!
-                .replaceAll('{}', authResponse.user.displayName))));
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text(strings['logInSuccess']!
-                .replaceAll('{}', authResponse.user.displayName))));
+      if (showSuccessMessage) {
+        if (state.currentTeam == null) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              content: Text(strings['logInSuccessNoTeam']!
+                  .replaceAll('{}', authResponse.user.displayName))));
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              content: Text(strings['logInSuccess']!
+                  .replaceAll('{}', authResponse.user.displayName))));
+        }
       }
     }
   } catch (e) {
