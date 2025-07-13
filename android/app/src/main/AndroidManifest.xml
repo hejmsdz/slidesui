@@ -31,6 +31,8 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="https" android:host="psal.lt" android:pathPrefix="/invitation/" />
+                <data android:scheme="https" android:host="psal.lt"
+                    android:pathAdvancedPattern="/[0-9]{4}" />
             </intent-filter>
         </activity>
         <!-- Don't delete the meta-data below.

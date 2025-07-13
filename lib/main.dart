@@ -8,6 +8,7 @@ import 'package:slidesui/external_display.dart';
 import 'package:slidesui/external_display_singleton.dart';
 import 'package:slidesui/invitation.dart';
 import 'package:slidesui/presentation.dart';
+import 'package:slidesui/receiver.dart';
 import 'package:slidesui/verse_order.dart';
 import 'package:slidesui/web_view.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -79,6 +80,13 @@ class MyApp extends StatelessWidget {
                 path: 'invitation/:token',
                 builder: (context, state) {
                   return InvitationPage(token: state.pathParameters['token']!);
+                },
+              ),
+              GoRoute(
+                path: ':liveSessionKey([0-9]{4})',
+                builder: (context, state) {
+                  return PresentationReceiver(
+                      liveSessionKey: state.pathParameters['liveSessionKey']!);
                 },
               ),
             ],
