@@ -69,6 +69,7 @@ class _SearchPageState extends State<SearchPage> {
   PaginatedResponse<Song>? _firstUnfilteredPage;
   int _totalItems = 0;
   Timer? _debounce;
+  bool _isEmpty = true;
 
   bool _isLoading = false;
   int replaceIndex = -1;
@@ -127,6 +128,10 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   void updateQuery({bool immediate = false}) async {
+    setState(() {
+      _isEmpty = controller.text.isEmpty;
+    });
+
     if (_debounce?.isActive ?? false) {
       _debounce!.cancel();
     }
@@ -177,10 +182,11 @@ class _SearchPageState extends State<SearchPage> {
           onChanged: (value) => updateQuery(),
         ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.clear),
-            onPressed: resetQuery,
-          ),
+          if (!_isEmpty)
+            IconButton(
+              icon: const Icon(Icons.clear),
+              onPressed: resetQuery,
+            ),
         ],
         bottom: PreferredSize(
           preferredSize: const Size(double.infinity, 1.0),
