@@ -100,6 +100,7 @@ const strings = {
   'castDisconnect': 'Odłączenie',
   'castDisconnectMessage': 'Czy na pewno chcesz odłączyć Chromecasta?',
   'liveSession': 'Pokaz na żywo przez internet',
+  'liveSessionActive': 'Pokaz na żywo ({id})',
   'liveSessionStarted': 'Pokaz na żywo jest dostępny pod adresem {url}',
   'shareLink': 'UDOSTĘPNIJ LINK',
   'shareSlides': 'Udostępnij slajdy',
@@ -153,4 +154,9 @@ const strings = {
   'joinTeamErrorAlreadyMember': 'Już należysz do tego zespołu.',
   'joinTeamError':
       'Nie udało się dołączyć do zespołu. Spróbuj ponownie później.',
+  'presentationReceiver': 'Otwórz zdalną prezentację',
+  'enterLiveSessionKey': 'Podaj numer pokazu na żywo',
+  'enterLiveSessionKeyDescription':
+      'Są to 4 cyfry na końcu linku do aktywnej prezentacji, np. {}xxxx',
+  'presentationReceiverError': 'Nie udało się otworzyć prezentacji.',
 };

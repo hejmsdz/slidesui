@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:slidesui/api.dart';
 import 'package:slidesui/authentication.dart';
+import 'package:slidesui/receiver.dart';
 import 'package:slidesui/settings.dart';
 import 'package:slidesui/state.dart';
 import 'package:slidesui/strings.dart';
@@ -253,6 +254,52 @@ class _AppNavigationDrawerState extends State<AppNavigationDrawer> {
     );
   }
 
+  Future<String?> showLiveSessionKeyDialog(BuildContext context) async {
+    final state = context.read<SlidesModel>();
+    final frontendUrl = state.bootstrap?.frontendUrl.replaceAll('https://', '');
+
+    TextEditingController controller = TextEditingController();
+
+    return showDialog<String>(
+      context: context,
+      builder: (context) => AlertDialog(
+          title: Text(strings['enterLiveSessionKey']!),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (frontendUrl != null)
+                Text(strings['enterLiveSessionKeyDescription']!
+                    .replaceFirst('{}', frontendUrl)),
+              TextField(
+                controller: controller,
+                keyboardType: TextInputType.number,
+                maxLines: 1,
+                maxLength: 4,
+                autofocus: true,
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              child: Text(strings['cancel']!),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text(strings['ok']!),
+              onPressed: () {
+                if (controller.text.length != 4) {
+                  return;
+                }
+
+                Navigator.of(context).pop(controller.text);
+              },
+            ),
+          ]),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Drawer(
@@ -357,6 +404,23 @@ class _AppNavigationDrawerState extends State<AppNavigationDrawer> {
               onTap: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(builder: (context) => const SettingsPage()),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.slideshow),
+              title: Text(strings['presentationReceiver']!),
+              onTap: () async {
+                final liveSessionKey = await showLiveSessionKeyDialog(context);
+
+                if (liveSessionKey == null || !context.mounted) {
+                  return;
+                }
+
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          PresentationReceiver(liveSessionKey: liveSessionKey)),
                 );
               },
             ),

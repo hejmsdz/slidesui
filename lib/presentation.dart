@@ -11,10 +11,12 @@ import 'package:share_plus/share_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:slidesui/cast.dart';
+import 'package:slidesui/confirm_exit.dart';
 import 'package:slidesui/deck.dart';
 import 'package:slidesui/external_display_singleton.dart';
 import 'package:slidesui/live_session.dart';
 import 'package:slidesui/model.dart';
+import 'package:slidesui/overlay_app_bar.dart';
 import 'package:slidesui/presentation_onboarding.dart';
 import 'package:slidesui/state.dart';
 import 'package:slidesui/strings.dart';
@@ -93,11 +95,6 @@ class _PresentationPageState extends State<PresentationPage> {
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
 
     controller.internalListener = handleSlideChange;
-
-    externalDisplay.sendParameters(
-      action: "open",
-      value: "${widget.filePath}#0",
-    );
 
     SchedulerBinding.instance.addPostFrameCallback((_) {
       showOnboarding();
@@ -228,50 +225,16 @@ class _PresentationPageState extends State<PresentationPage> {
     }
   }
 
-  Future<bool?> _confirmExit() {
-    return showDialog<bool>(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(strings['confirmExitTitle']!),
-          content: Text(_isBroadcasting
-              ? strings['confirmExitBroadcasting']!
-              : strings['confirmExit']!),
-          actions: <Widget>[
-            TextButton(
-              child: Text(strings['no']!),
-              onPressed: () {
-                Navigator.pop(context, false);
-              },
-            ),
-            TextButton(
-              child: Text(strings['yes']!),
-              onPressed: () {
-                Navigator.pop(context, true);
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
       body: (_isLoading || _pdf == null || _pdf?.pagesCount == 0)
           ? Container()
-          : PopScope<Object?>(
-              canPop: false,
-              onPopInvokedWithResult: (didPop, result) async {
-                if (!didPop) {
-                  final shouldPop = await _confirmExit() ?? false;
-                  if (context.mounted && shouldPop) {
-                    Navigator.pop(context);
-                  }
-                }
-              },
+          : ConfirmExit(
+              message: _isBroadcasting
+                  ? strings['confirmExitBroadcasting']!
+                  : strings['confirmExit']!,
               child: Stack(children: [
                 PdfView(
                   controller: _pdf!,
@@ -313,67 +276,57 @@ class _PresentationPageState extends State<PresentationPage> {
                     ),
                   ],
                 ),
-                Positioned(
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  child: AnimatedOpacity(
-                    duration: Durations.medium1,
-                    opacity: _isUiVisible ? 1 : 0,
-                    child: AppBar(
-                      backgroundColor: Colors.transparent,
-                      foregroundColor: Colors.white54,
-                      actions: [
-                        _isBroadcasting
-                            ? IconButton(
-                                icon: Icon(controller.isPaused
-                                    ? Icons.play_arrow
-                                    : Icons.pause),
-                                tooltip: controller.isPaused
-                                    ? strings['resume']!
-                                    : strings['pause']!,
-                                onPressed: () {
-                                  setState(() {
-                                    controller.togglePause();
-                                  });
-                                },
-                              )
-                            : Container(),
-                        ExternalDisplayBroadcaster(
-                          controller: controller,
-                          filePath: widget.filePath,
-                          onStateChange: handleBroadcastChange,
-                        ),
-                        LiveSessionButton(
-                          controller: controller,
-                          onStateChange: handleBroadcastChange,
-                        ),
-                        CastButton(
-                          controller: controller,
-                          onStateChange: handleBroadcastChange,
-                        ),
-                        ContentsButton(
-                          controller: controller,
-                          contents: widget.contents!,
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.share),
-                          tooltip: strings['shareSlides'],
-                          onPressed: () {
-                            Share.shareXFiles([XFile(widget.filePath)]);
-                          },
-                        ),
-                        if (Platform.isAndroid)
-                          IconButton(
-                            icon: const Icon(Icons.save_alt),
-                            tooltip: strings['saveToFile'],
+                OverlayAppBar(
+                  isUiVisible: _isUiVisible,
+                  actions: [
+                    _isBroadcasting
+                        ? IconButton(
+                            icon: Icon(controller.isPaused
+                                ? Icons.play_arrow
+                                : Icons.pause),
+                            tooltip: controller.isPaused
+                                ? strings['resume']!
+                                : strings['pause']!,
                             onPressed: () {
-                              notifyOnDownloaded(context, widget.filePath);
+                              setState(() {
+                                controller.togglePause();
+                              });
                             },
-                          ),
-                      ],
+                          )
+                        : Container(),
+                    ExternalDisplayBroadcaster(
+                      controller: controller,
+                      filePath: widget.filePath,
+                      onStateChange: handleBroadcastChange,
                     ),
-                  ),
+                    LiveSessionButton(
+                      controller: controller,
+                      onStateChange: handleBroadcastChange,
+                    ),
+                    CastButton(
+                      controller: controller,
+                      onStateChange: handleBroadcastChange,
+                    ),
+                    ContentsButton(
+                      controller: controller,
+                      contents: widget.contents!,
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.share),
+                      tooltip: strings['shareSlides'],
+                      onPressed: () {
+                        Share.shareXFiles([XFile(widget.filePath)]);
+                      },
+                    ),
+                    if (Platform.isAndroid)
+                      IconButton(
+                        icon: const Icon(Icons.save_alt),
+                        tooltip: strings['saveToFile'],
+                        onPressed: () {
+                          notifyOnDownloaded(context, widget.filePath);
+                        },
+                      ),
+                  ],
                 ),
               ]),
             ),

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:external_display/transfer_parameters.dart';
-import 'package:pdfx/pdfx.dart';
+import 'package:slidesui/pdf_presentation.dart';
 
 class ExternalDisplayApp extends StatefulWidget {
   const ExternalDisplayApp({super.key});
@@ -10,11 +10,9 @@ class ExternalDisplayApp extends StatefulWidget {
 }
 
 class _ExternalDisplayAppState extends State<ExternalDisplayApp> {
-  PdfDocument? _pdf;
   bool _isPresenting = false;
-  MemoryImage? _buffer0;
-  MemoryImage? _buffer1;
-  int _currentBuffer = 0;
+  String? _pdfPath;
+  int _currentPage = 0;
 
   @override
   initState() {
@@ -36,61 +34,27 @@ class _ExternalDisplayAppState extends State<ExternalDisplayApp> {
     });
   }
 
-  handleOpen(String pdfPathWithPage) async {
+  handleOpen(String pdfPathWithPage) {
     final [pdfPath, pageStr] = pdfPathWithPage.split("#");
     final page = int.parse(pageStr);
 
-    _pdf = await PdfDocument.openFile(pdfPath);
-
     setState(() {
       _isPresenting = true;
-      _buffer0 = null;
-      _buffer1 = null;
+      _pdfPath = pdfPath;
+      _currentPage = page;
     });
-
-    handlePageChange(page);
   }
 
   handleClose() {
     setState(() {
       _isPresenting = false;
+      _pdfPath = null;
     });
-    _pdf?.close();
   }
 
-  double getRenderHeight() {
-    final height = MediaQuery.of(context).size.height;
-    final dpr = MediaQuery.of(context).devicePixelRatio;
-    return height * dpr;
-  }
-
-  Future<MemoryImage> renderPage(int pageIndex) async {
-    final page = await _pdf!.getPage(pageIndex + 1);
-    try {
-      final renderHeight = getRenderHeight();
-      final scale = renderHeight / page.height;
-      final imageData =
-          await page.render(height: renderHeight, width: page.width * scale);
-
-      return MemoryImage(imageData!.bytes);
-    } finally {
-      page.close();
-    }
-  }
-
-  handlePageChange(int pageIndex) async {
-    if (_pdf == null) {
-      return;
-    }
-
-    final image = await renderPage(pageIndex);
+  handlePageChange(int pageIndex) {
     setState(() {
-      if (_currentBuffer == 0) {
-        _buffer1 = image;
-      } else {
-        _buffer0 = image;
-      }
-      _currentBuffer = 1 - _currentBuffer;
+      _currentPage = pageIndex;
     });
   }
 
@@ -100,19 +64,13 @@ class _ExternalDisplayAppState extends State<ExternalDisplayApp> {
       debugShowCheckedModeBanner: false,
       home: Scaffold(
         backgroundColor: Colors.black,
-        body: Stack(children: [
-          buildBuffer(_buffer0, _isPresenting && _currentBuffer == 0),
-          buildBuffer(_buffer1, _isPresenting && _currentBuffer == 1),
-        ]),
+        body: _isPresenting && _pdfPath != null
+            ? PdfPresentation(
+                pdfPath: _pdfPath!,
+                currentPage: _currentPage,
+              )
+            : Container(),
       ),
-    );
-  }
-
-  Widget buildBuffer(MemoryImage? buffer, bool isVisible) {
-    return AnimatedOpacity(
-      opacity: isVisible ? 1.0 : 0.0,
-      duration: Duration(milliseconds: 500),
-      child: buffer == null ? Container() : Center(child: Image(image: buffer)),
     );
   }
 }

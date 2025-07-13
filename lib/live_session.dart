@@ -131,6 +131,7 @@ class _LiveSessionButtonState extends State<LiveSessionButton> {
             onPressed: () {
               Share.share(_live!.url);
             }),
+        duration: Duration(hours: 1),
       ));
   }
 
@@ -155,11 +156,15 @@ class _LiveSessionButtonState extends State<LiveSessionButton> {
   Widget build(BuildContext context) {
     final isConnected = _isConnected && _live != null;
 
+    final tooltip = isConnected && _live != null
+        ? strings['liveSessionActive']!.replaceFirst('{id}', _live!.id)
+        : strings['liveSession']!;
+
     return IconButton(
       icon: Icon(isConnected
           ? Icons.stop_screen_share_outlined
           : Icons.screen_share_outlined),
-      tooltip: strings['liveSession']!,
+      tooltip: tooltip,
       onPressed: () async {
         if (isConnected) {
           disconnect();
