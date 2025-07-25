@@ -77,6 +77,13 @@ Future<DeckResponse> createDeck(
   bool contents = false,
 }) async {
   final state = Provider.of<SlidesModel>(context, listen: false);
+
+  final now = DateTime.now();
+  final today = DateTime(now.year, now.month, now.day);
+  if (state.date.isBefore(today)) {
+    state.setDate(today);
+  }
+
   final deckRequest = buildDeckRequestFromState(
     state,
     format: format,
