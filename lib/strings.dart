@@ -157,6 +157,6 @@ const strings = {
   'presentationReceiver': 'Otwórz zdalną prezentację',
   'enterLiveSessionKey': 'Podaj numer pokazu na żywo',
   'enterLiveSessionKeyDescription':
-      'Są to 4 cyfry na końcu linku do aktywnej prezentacji, np. {}xxxx',
+      'Są to 4 cyfry na końcu linku do aktywnej prezentacji: {}xxxx',
   'presentationReceiverError': 'Nie udało się otworzyć prezentacji.',
 };
