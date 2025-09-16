@@ -8,14 +8,14 @@ function getVersion() {
     }
 
     const { version: currentVersion } = YAML.parse(fs.readFileSync('pubspec.yaml', 'utf-8'));
-    const [major, minor, patch] = currentVersion.split('.').map(Number);
+    const [major, minor, patch, build] = currentVersion.split(/[\.+]/).map(Number);
     switch (versionArg) {
         case 'major':
-            return `${major + 1}.0.0`;
+            return `${major + 1}.0.0+${build + 1}`;
         case 'minor':
-            return `${major}.${minor + 1}.0`;
+            return `${major}.${minor + 1}.0+${build + 1}`;
         case 'patch':
-            return `${major}.${minor}.${patch + 1}`;
+            return `${major}.${minor}.${patch + 1}+${build + 1}`;
         default:
             echo(chalk.red('Invalid version argument!'));
             echo(`USAGE: ./release.mjs [major|minor|patch|X.Y.Z]`);
