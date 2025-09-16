@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:slidesui/search.dart';
 import './strings.dart';
 import './state.dart';
 import './model.dart';
@@ -81,6 +82,14 @@ class _TextEditPageState extends State<TextEditPage> {
     return lines;
   }
 
+  normalizeTitle(item) {
+    String normalized = slugify(item.title);
+    if (item.subtitle != null) {
+      normalized = "$normalized|${slugify(item.subtitle!)}";
+    }
+    return normalized;
+  }
+
   applyText() async {
     final state = Provider.of<SlidesModel>(context, listen: false);
     final text = controller.text.trim();
@@ -91,7 +100,7 @@ class _TextEditPageState extends State<TextEditPage> {
     }
     final lines = splitLines(text);
     final Map<String, DeckItem> currentTitles = {
-      for (var item in state.items) item.title.toLowerCase(): item
+      for (var item in state.items) normalizeTitle(item): item
     };
 
     setIsLoading(true);
@@ -157,7 +166,7 @@ class _TextEditPageState extends State<TextEditPage> {
     if (title.isEmpty) {
       return null;
     }
-    final titleNormalized = title.toLowerCase();
+    final titleNormalized = title.split(' / ').map(slugify).join('|');
     if (currentTitles.containsKey(titleNormalized)) {
       return currentTitles[titleNormalized];
     }
