@@ -41,8 +41,10 @@ class _TextEditPageState extends State<TextEditPage> {
       final text = item is TextDeckItem
           ? "$textItemDelimiter${item.contents}$textItemDelimiter"
           : item.title +
-              (item.subtitle == null ? '' : (' / ${item.subtitle!}'));
-      return "${index + 1}. $text";
+              ((item.subtitle?.isEmpty ?? true)
+                  ? ''
+                  : (' / ${item.subtitle!}'));
+      return "${index + 1}. $text.";
     }).join("\n");
   }
 
@@ -166,7 +168,12 @@ class _TextEditPageState extends State<TextEditPage> {
     if (title.isEmpty) {
       return null;
     }
-    final titleNormalized = title.split(' / ').map(slugify).join('|');
+    final hasTrailingDot = title.endsWith('.');
+    final titleNormalized = title
+        .replaceFirst(RegExp(r"\.$"), "")
+        .split(' / ')
+        .map(slugify)
+        .join('|');
     if (currentTitles.containsKey(titleNormalized)) {
       return currentTitles[titleNormalized];
     }
@@ -176,10 +183,15 @@ class _TextEditPageState extends State<TextEditPage> {
     if (titleNormalized == strings['acclamation']!.toLowerCase()) {
       return AcclamationDeckItem(state);
     }
-    final songs =
-        await getSongs(titleNormalized, teamId: state.currentTeam?.id);
-    if (songs.length == 1) {
-      return SongDeckItem(songs[0]);
+    final songs = await getSongsPaginated(titleNormalized,
+        teamId: state.currentTeam?.id, limit: 1, offset: 0);
+    final hasOneResult = songs.total == 1;
+    final hasExactMatch = songs.total >= 1 &&
+        hasTrailingDot &&
+        songs.items[0].slug == "$titleNormalized|";
+
+    if (hasOneResult || hasExactMatch) {
+      return SongDeckItem(songs.items[0]);
     } else {
       return UnresolvedDeckItem(title);
     }
