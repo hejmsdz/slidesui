@@ -11,6 +11,8 @@ import 'dart:convert';
 import 'package:slidesui/state.dart';
 import 'package:slidesui/strings.dart';
 
+bool acceptAnyStatus(int? status) => true;
+
 class LiveSessionButton extends StatefulWidget {
   const LiveSessionButton({
     super.key,
@@ -65,13 +67,26 @@ class _LiveSessionButtonState extends State<LiveSessionButton> {
       return;
     }
 
-    await apiClient.post(
-      'v2/live/${_live?.id}/page',
-      params: {
-        'page': "${page ?? widget.controller.currentPage}",
-        'token': _live?.token,
-      },
-    );
+    try {
+      await apiClient.post(
+        'v2/live/${_live?.id}/page',
+        params: {
+          'page': "${page ?? widget.controller.currentPage}",
+          'token': _live?.token,
+        },
+      );
+    } catch (e) {
+      setState(() {
+        _isConnected = false;
+        _isDeckSubmitted = false;
+        _live = null;
+      });
+      storeState();
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).removeCurrentSnackBar();
+      }
+    }
   }
 
   Future<void> connect({bool isFirstConnection = false}) async {
@@ -93,6 +108,7 @@ class _LiveSessionButtonState extends State<LiveSessionButton> {
           'v2/live/${_live?.id}',
           params: {'token': _live?.token},
           data: body,
+          options: Options(validateStatus: acceptAnyStatus),
         );
       }
 
@@ -117,7 +133,7 @@ class _LiveSessionButtonState extends State<LiveSessionButton> {
 
     storeState();
 
-    if (!mounted) {
+    if (!mounted || _live == null) {
       return;
     }
 

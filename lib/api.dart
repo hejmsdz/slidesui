@@ -27,6 +27,7 @@ class ApiClient {
       },
       onError: (error, handler) async {
         if (error.response?.statusCode == 401 &&
+            error.response?.data['error'] == 'token expired' &&
             !_isRefreshing &&
             await _storage.containsKey(key: 'refreshToken')) {
           try {
@@ -68,6 +69,7 @@ class ApiClient {
     );
 
     if (response.statusCode != 200 && response.statusCode != 201) {
+      storeAuthResponse(null);
       throw ApiError();
     }
 
@@ -80,13 +82,15 @@ class ApiClient {
   }
 
   Future<Response> post(String path,
-      {Map<String, dynamic>? params, Object? data}) async {
-    return _dio.post(path, queryParameters: params, data: data);
+      {Map<String, dynamic>? params, Object? data, Options? options}) async {
+    return _dio.post(path,
+        queryParameters: params, data: data, options: options);
   }
 
   Future<Response> put(String path,
-      {Map<String, dynamic>? params, Object? data}) async {
-    return _dio.put(path, queryParameters: params, data: data);
+      {Map<String, dynamic>? params, Object? data, Options? options}) async {
+    return _dio.put(path,
+        queryParameters: params, data: data, options: options);
   }
 
   Future<Response> delete(String path,
