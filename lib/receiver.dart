@@ -1,7 +1,9 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
 import 'package:background_downloader/background_downloader.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:eventflux/eventflux.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -12,6 +14,12 @@ import 'package:slidesui/pdf_presentation.dart';
 import 'package:slidesui/presentation.dart';
 import 'package:slidesui/strings.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
+
+bool hasAnyConnection(List<ConnectivityResult> results) {
+  return results.any((conn) => conn != ConnectivityResult.none);
+}
+
+const int reconnectDelaySeconds = 5;
 
 class PresentationReceiver extends StatefulWidget {
   const PresentationReceiver({super.key, required this.liveSessionKey});
@@ -48,6 +56,10 @@ class _PresentationReceiverState extends State<PresentationReceiver> {
   String? pdfFilePath;
   PresentationController controller = PresentationController();
   bool _isUiVisible = true;
+  bool _isConnecting = false;
+  bool _didConnectAtLeastOnce = false;
+  StreamSubscription<List<ConnectivityResult>>? connectivitySubscription;
+  StreamSubscription<EventFluxData>? sseSubscription;
 
   @override
   void initState() {
@@ -61,28 +73,79 @@ class _PresentationReceiverState extends State<PresentationReceiver> {
     ]);
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
 
+    connectivitySubscription = Connectivity()
+        .onConnectivityChanged
+        .listen((List<ConnectivityResult> results) async {
+      final isOnline = hasAnyConnection(results);
+
+      if (!isOnline) {
+        goToPage(0);
+        if (!_isConnecting) {
+          await disconnect();
+        }
+      } else if (_didConnectAtLeastOnce) {
+        connect();
+      }
+    });
+
+    connect();
+  }
+
+  Future<bool> isOnline() async {
+    final results = await Connectivity().checkConnectivity();
+    return hasAnyConnection(results);
+  }
+
+  Future<void> connect() async {
+    if (_isConnecting) return;
+
+    _isConnecting = true;
+    await disconnect();
+
     EventFlux.instance.connect(
       EventFluxConnectionType.get,
       '${rootURL}v2/live/${widget.liveSessionKey}',
-      onSuccessCallback: (response) {
-        response?.stream?.listen(handleEvent);
+      onSuccessCallback: (response) async {
+        if (!mounted) return;
+
+        _isConnecting = false;
+        _didConnectAtLeastOnce = true;
+        sseSubscription = response?.stream?.listen(handleEvent);
       },
-      onError: (error) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(strings['presentationReceiverError']!),
-          ),
-        );
-        Navigator.of(context).pop();
+      onError: (error) async {
+        if (!mounted) return;
+
+        _isConnecting = false;
+
+        if (!_didConnectAtLeastOnce) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                  "${strings['presentationReceiverError']!} ${error.message ?? "???"}"),
+            ),
+          );
+          Navigator.of(context).pop();
+
+          return;
+        }
+
+        goToPage(0);
+
+        if (await isOnline()) {
+          Timer(Duration(seconds: reconnectDelaySeconds), () {
+            if (mounted) {
+              connect();
+            }
+          });
+        }
       },
-      autoReconnect: true,
-      reconnectConfig: ReconnectConfig(
-        mode: ReconnectMode.linear,
-      ),
+      autoReconnect: false,
     );
   }
 
   void handleEvent(EventFluxData data) async {
+    if (!mounted) return;
+
     switch (data.event) {
       case 'start':
         final startEvent = StartEvent.fromJson(jsonDecode(data.data));
@@ -94,14 +157,19 @@ class _PresentationReceiverState extends State<PresentationReceiver> {
 
       case 'changePage':
         final pageEvent = PageEvent.fromJson(jsonDecode(data.data));
-        controller.setCurrentPage(pageEvent.page);
-        setState(() {}); // to pass updated props to PdfPresentation
+        goToPage(pageEvent.page);
         break;
     }
   }
 
+  void goToPage(int page) {
+    setState(() {
+      controller.setCurrentPage(page);
+    });
+  }
+
   Future<void> downloadPdf(String url) async {
-    disposePdf();
+    await disposePdf();
 
     final task = DownloadTask(url: url);
     await FileDownloader().download(task);
@@ -112,9 +180,9 @@ class _PresentationReceiverState extends State<PresentationReceiver> {
     });
   }
 
-  void disposePdf() {
+  Future<void> disposePdf() async {
     if (pdfFilePath != null) {
-      File(pdfFilePath!).delete();
+      await File(pdfFilePath!).delete();
       pdfFilePath = null;
     }
   }
@@ -129,9 +197,17 @@ class _PresentationReceiverState extends State<PresentationReceiver> {
     Navigator.of(context).pop();
   }
 
+  Future<void> disconnect() async {
+    await sseSubscription?.cancel();
+    sseSubscription = null;
+
+    await EventFlux.instance.disconnect();
+  }
+
   @override
   void dispose() {
-    EventFlux.instance.disconnect();
+    connectivitySubscription?.cancel();
+    disconnect();
     disposePdf();
     WakelockPlus.disable();
 
