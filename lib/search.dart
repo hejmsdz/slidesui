@@ -69,7 +69,6 @@ class _SearchPageState extends State<SearchPage> {
   PaginatedResponse<Song>? _firstUnfilteredPage;
   int _totalItems = 0;
   Timer? _debounce;
-  bool _isEmpty = true;
 
   bool _isLoading = false;
   int replaceIndex = -1;
@@ -128,10 +127,6 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   void updateQuery({bool immediate = false}) async {
-    setState(() {
-      _isEmpty = controller.text.isEmpty;
-    });
-
     if (_debounce?.isActive ?? false) {
       _debounce!.cancel();
     }
@@ -169,6 +164,8 @@ class _SearchPageState extends State<SearchPage> {
 
   @override
   Widget build(BuildContext context) {
+    final isEmpty = controller.text.isEmpty;
+
     return Scaffold(
       appBar: AppBar(
         title: TextField(
@@ -182,7 +179,7 @@ class _SearchPageState extends State<SearchPage> {
           onChanged: (value) => updateQuery(),
         ),
         actions: [
-          if (!_isEmpty)
+          if (!isEmpty)
             IconButton(
               icon: const Icon(Icons.clear),
               onPressed: resetQuery,
