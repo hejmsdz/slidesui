@@ -120,8 +120,7 @@ class _PresentationReceiverState extends State<PresentationReceiver> {
         if (!_didConnectAtLeastOnce) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(
-                  "${strings['presentationReceiverError']!} ${error.message ?? "???"}"),
+              content: Text(strings['presentationReceiverError']!),
             ),
           );
           Navigator.of(context).pop();
