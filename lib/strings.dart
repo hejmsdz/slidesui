@@ -102,6 +102,10 @@ const strings = {
   'liveSession': 'Pokaz na żywo przez internet',
   'liveSessionActive': 'Pokaz na żywo ({id})',
   'liveSessionStarted': 'Pokaz na żywo jest dostępny pod adresem {url}',
+  'liveSessionStartError':
+      'Nie udało się uruchomić pokazu na żywo. Spróbuj jeszcze raz.',
+  'liveSessionDisconnected':
+      'Pokaz na żywo został rozłączony. Spróbuj połączyć się ponownie.',
   'shareLink': 'UDOSTĘPNIJ LINK',
   'shareSlides': 'Udostępnij slajdy',
   'contents': 'Spis treści',

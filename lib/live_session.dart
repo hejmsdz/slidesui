@@ -49,7 +49,12 @@ class _LiveSessionButtonState extends State<LiveSessionButton> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     final liveJson = prefs.getString('live.live');
     if (liveJson != null) {
-      _live = LiveResponse.fromJson(jsonDecode(liveJson));
+      try {
+        _live = LiveResponse.fromJson(jsonDecode(liveJson));
+      } catch (e) {
+        _live = null;
+        prefs.remove('live.live');
+      }
     }
     _isConnected = prefs.getBool('live.isConnected') ?? false;
   }
@@ -79,12 +84,22 @@ class _LiveSessionButtonState extends State<LiveSessionButton> {
       setState(() {
         _isConnected = false;
         _isDeckSubmitted = false;
-        _live = null;
+
+        if (e is DioException) {
+          final statusCode = e.response?.statusCode;
+          if (statusCode == 401 || statusCode == 403 || statusCode == 404) {
+            _live = null;
+          }
+        }
       });
       storeState();
 
       if (mounted) {
-        ScaffoldMessenger.of(context).removeCurrentSnackBar();
+        ScaffoldMessenger.of(context)
+          ..removeCurrentSnackBar()
+          ..showSnackBar(SnackBar(
+            content: Text(strings['liveSessionDisconnected']!),
+          ));
       }
     }
   }
@@ -112,14 +127,22 @@ class _LiveSessionButtonState extends State<LiveSessionButton> {
         );
       }
 
-      if (response == null || response.statusCode != 200) {
+      if (response == null ||
+          response.statusCode == 403 ||
+          response.statusCode == 404) {
         response = await apiClient.post(
           'v2/live',
           data: body,
         );
       }
 
-      if (response.statusCode != 200 || !mounted) {
+      if (!mounted) return;
+
+      if (response.statusCode != 200) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(strings['liveSessionStartError']!),
+        ));
+
         return;
       }
 
