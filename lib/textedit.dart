@@ -14,6 +14,13 @@ class TextEditPage extends StatefulWidget {
 }
 
 const String textItemDelimiter = "'''";
+const String itemTerminator = '.';
+
+String trimItemTerminator(String title) {
+  return title.endsWith(itemTerminator)
+      ? title.substring(0, title.length - itemTerminator.length)
+      : title;
+}
 
 class _TextEditPageState extends State<TextEditPage> {
   TextEditingController controller = TextEditingController();
@@ -44,7 +51,7 @@ class _TextEditPageState extends State<TextEditPage> {
               ((item.subtitle?.isEmpty ?? true)
                   ? ''
                   : (' / ${item.subtitle!}'));
-      return "${index + 1}. $text.";
+      return "${index + 1}. $text$itemTerminator";
     }).join("\n");
   }
 
@@ -118,10 +125,12 @@ class _TextEditPageState extends State<TextEditPage> {
             .trim();
 
         if (title.startsWith(textItemDelimiter) &&
-            title.endsWith(textItemDelimiter)) {
+                title.endsWith(textItemDelimiter) ||
+            title.endsWith(textItemDelimiter + itemTerminator)) {
           const trimChars = textItemDelimiter.length;
-          return TextDeckItem(
-              title.substring(trimChars, title.length - trimChars));
+          final titleTrimmed = trimItemTerminator(title);
+          return TextDeckItem(titleTrimmed.substring(
+              trimChars, titleTrimmed.length - trimChars));
         }
 
         final item = await createDeckItem(title, currentTitles);
@@ -168,8 +177,8 @@ class _TextEditPageState extends State<TextEditPage> {
     if (title.isEmpty) {
       return null;
     }
-    final hasTrailingDot = title.endsWith('.');
-    final titleNormalized = title
+    final hasTrailingDot = title.endsWith(itemTerminator);
+    final titleNormalized = trimItemTerminator(title)
         .replaceFirst(RegExp(r"\.$"), "")
         .split(' / ')
         .map(slugify)
