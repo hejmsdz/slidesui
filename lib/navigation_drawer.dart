@@ -244,7 +244,11 @@ class _AppNavigationDrawerState extends State<AppNavigationDrawer> {
             ),
             TextButton(
               onPressed: () async {
-                await Share.share(controller.text);
+                final uri = Uri.parse(controller.text);
+                await SharePlus.instance.share(ShareParams(
+                  uri: uri,
+                  sharePositionOrigin: Rect.fromLTWH(0, 0, 1, 1),
+                ));
               },
               child: Text(strings['share']!),
             ),

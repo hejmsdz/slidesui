@@ -571,7 +571,11 @@ class _MyHomePageState extends State<MyHomePage> {
                           );
                           break;
                         case 'share':
-                          Share.shareXFiles([XFile(result.url)]);
+                          final files = [XFile(result.url)];
+                          SharePlus.instance.share(ShareParams(
+                            files: files,
+                            sharePositionOrigin: Rect.fromLTWH(0, 0, 1, 1),
+                          ));
                           break;
                         case 'save':
                           notifyOnDownloaded(context, result.url);

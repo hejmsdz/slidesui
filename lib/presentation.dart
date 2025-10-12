@@ -315,7 +315,11 @@ class _PresentationPageState extends State<PresentationPage> {
                       icon: const Icon(Icons.share),
                       tooltip: strings['shareSlides'],
                       onPressed: () {
-                        Share.shareXFiles([XFile(widget.filePath)]);
+                        final files = [XFile(widget.filePath)];
+                        SharePlus.instance.share(ShareParams(
+                          files: files,
+                          sharePositionOrigin: Rect.fromLTWH(0, 0, 1, 1),
+                        ));
                       },
                     ),
                     if (Platform.isAndroid)

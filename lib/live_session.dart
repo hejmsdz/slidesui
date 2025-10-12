@@ -168,7 +168,11 @@ class _LiveSessionButtonState extends State<LiveSessionButton> {
         action: SnackBarAction(
             label: strings['shareLink']!,
             onPressed: () {
-              Share.share(_live!.url);
+              final uri = Uri.parse(_live!.url);
+              SharePlus.instance.share(ShareParams(
+                uri: uri,
+                sharePositionOrigin: Rect.fromLTWH(0, 0, 1, 1),
+              ));
             }),
         duration: Duration(hours: 1),
       ));
