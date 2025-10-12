@@ -1,15 +1,16 @@
 #!/usr/bin/env zx
 
-function getVersion() {
-    const [versionArg] = argv._;
+const pubspecPath = 'pubspec.yaml';
 
-    if (String(versionArg).match(/^\d+\.\d+\.\d+$/)) {
-        return versionArg;
-    }
+function getCurrentVersion() {
+    const { version: currentVersion } = YAML.parse(fs.readFileSync(pubspecPath, 'utf-8'));
 
-    const { version: currentVersion } = YAML.parse(fs.readFileSync('pubspec.yaml', 'utf-8'));
+    return currentVersion;
+}
+
+function bumpVersion(currentVersion, segmentToBump) {
     const [major, minor, patch, build] = currentVersion.split(/[\.+]/).map(Number);
-    switch (versionArg) {
+    switch (segmentToBump) {
         case 'major':
             return `${major + 1}.0.0+${build + 1}`;
         case 'minor':
@@ -18,14 +19,27 @@ function getVersion() {
             return `${major}.${minor}.${patch + 1}+${build + 1}`;
         default:
             echo(chalk.red('Invalid version argument!'));
-            echo(`USAGE: ./release.mjs [major|minor|patch|X.Y.Z]`);
+            echo(`USAGE: ./release.mjs [major|minor|patch]`);
             process.exit(1);
     }
 }
 
-const version = getVersion();
+function updateVersion(currentVersion, newVersion) {
+    const pubspecContent = fs.readFileSync(pubspecPath, 'utf-8');
+    const updatedPubspecContent = pubspecContent.replace(
+        `version: "${currentVersion}"`,
+        `version: "${newVersion}"`
+    );
+    fs.writeFileSync(pubspecPath, updatedPubspecContent);
+}
 
-await $`sed -i 's/^version: ".*"/version: "${version}"/' pubspec.yaml`;
+const prevVersion = getCurrentVersion();
+const [segmentToBump] = argv._;
+const versionWithBuild = bumpVersion(prevVersion, segmentToBump);
+updateVersion(prevVersion, versionWithBuild);
+
+const [version] = versionWithBuild.split('+');
+
 await $`git add pubspec.yaml`;
 await $`git commit -m "v${version}"`;
 await $`git push`;
@@ -37,4 +51,4 @@ const originalPath = path.join(apkDir, originalName);
 const newName = `slides-android-v${version}.apk`;
 const newPath = path.join(apkDir, newName);
 fs.renameSync(originalPath, newPath);
-await $`gh release create v${version} -t 'v${version}' ${newPath}`;
+await $`gh release create --draft v${version} -t 'v${version}' ${newPath}`;
