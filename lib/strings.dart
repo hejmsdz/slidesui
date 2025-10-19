@@ -30,6 +30,7 @@ const strings = {
   'editAsTextHint':
       'Na przykład:\nW: Pieśń o nadziei\nO: Gdzie miłość wzajemna i dobroć\nK: Zbliżam się w pokorze\nU: Niechaj Cię, Panie\nW: O Pani, ufność nasza',
   'menu': 'Pokaż menu',
+  'shareRepertoire': 'Udostępnij repertuar',
   'clearText': 'Wyczyść',
   'applyText': 'Wczytaj slajdy',
   'unresolvedOne':

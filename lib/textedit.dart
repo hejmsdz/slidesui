@@ -213,6 +213,16 @@ class _TextEditPageState extends State<TextEditPage> {
         title: Text(strings['editAsText']!),
         actions: [
           IconButton(
+            icon: const Icon(Icons.share),
+            tooltip: strings['shareRepertoire']!,
+            onPressed: () {
+              SharePlus.instance.share(ShareParams(
+                text: controller.text,
+                sharePositionOrigin: Rect.fromLTWH(0, 0, 1, 1),
+              ));
+            },
+          ),
+          IconButton(
             icon: const Icon(Icons.clear),
             tooltip: strings['clearText']!,
             onPressed: _isLoading ? null : clearText,
