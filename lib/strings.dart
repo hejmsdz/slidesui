@@ -33,6 +33,8 @@ const strings = {
   'shareRepertoire': 'Udostępnij repertuar',
   'clearText': 'Wyczyść',
   'applyText': 'Wczytaj slajdy',
+  'textEditConfirmExit':
+      'Masz niezapisane zmiany w liście pieśni. Czy na pewno chcesz wyjść i je odrzucić?',
   'unresolvedOne':
       'Nie udało się jednoznacznie dopasować jednej pieśni. Dotknij ją, aby wybrać odpowiednią.',
   'unresolvedMany':

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:slidesui/confirm_exit.dart';
 import 'package:slidesui/search.dart';
 import './strings.dart';
 import './state.dart';
@@ -25,12 +27,14 @@ String trimItemTerminator(String title) {
 class _TextEditPageState extends State<TextEditPage> {
   TextEditingController controller = TextEditingController();
   bool _isLoading = false;
+  String _initialText = '';
 
   @override
   void initState() {
     super.initState();
 
-    controller.text = getSlidesAsText();
+    _initialText = getSlidesAsText();
+    controller.text = _initialText;
   }
 
   setIsLoading(bool isLoading) {
@@ -51,7 +55,8 @@ class _TextEditPageState extends State<TextEditPage> {
               ((item.subtitle?.isEmpty ?? true)
                   ? ''
                   : (' / ${item.subtitle!}'));
-      return "${index + 1}. $text$itemTerminator";
+      final terminator = item is UnresolvedDeckItem ? '' : itemTerminator;
+      return "${index + 1}. $text$terminator";
     }).join("\n");
   }
 
@@ -168,6 +173,8 @@ class _TextEditPageState extends State<TextEditPage> {
     }
 
     state.setItems(parsedItems);
+    _initialText = getSlidesAsText();
+    controller.text = _initialText;
     Navigator.pop(context);
   }
 
@@ -208,51 +215,54 @@ class _TextEditPageState extends State<TextEditPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(strings['editAsText']!),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.share),
-            tooltip: strings['shareRepertoire']!,
-            onPressed: () {
-              SharePlus.instance.share(ShareParams(
-                text: controller.text,
-                sharePositionOrigin: Rect.fromLTWH(0, 0, 1, 1),
-              ));
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.clear),
-            tooltip: strings['clearText']!,
-            onPressed: _isLoading ? null : clearText,
-          ),
-          IconButton(
-            icon: const Icon(Icons.check),
-            tooltip: strings['applyText']!,
-            onPressed: _isLoading ? null : applyText,
-          ),
-        ],
-        bottom: PreferredSize(
-          preferredSize: const Size(double.infinity, 1.0),
-          child: Opacity(
-            opacity: _isLoading ? 1 : 0,
-            child: const LinearProgressIndicator(
-              value: null,
+    return ConfirmExit(
+        isActive: () => controller.text != _initialText,
+        message: strings['textEditConfirmExit']!,
+        child: Scaffold(
+          appBar: AppBar(
+            title: Text(strings['editAsText']!),
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.share),
+                tooltip: strings['shareRepertoire']!,
+                onPressed: () {
+                  SharePlus.instance.share(ShareParams(
+                    text: controller.text,
+                    sharePositionOrigin: Rect.fromLTWH(0, 0, 1, 1),
+                  ));
+                },
+              ),
+              IconButton(
+                icon: const Icon(Icons.clear),
+                tooltip: strings['clearText']!,
+                onPressed: _isLoading ? null : clearText,
+              ),
+              IconButton(
+                icon: const Icon(Icons.check),
+                tooltip: strings['applyText']!,
+                onPressed: _isLoading ? null : applyText,
+              ),
+            ],
+            bottom: PreferredSize(
+              preferredSize: const Size(double.infinity, 1.0),
+              child: Opacity(
+                opacity: _isLoading ? 1 : 0,
+                child: const LinearProgressIndicator(
+                  value: null,
+                ),
+              ),
             ),
           ),
-        ),
-      ),
-      body: TextField(
-        controller: controller,
-        keyboardType: TextInputType.multiline,
-        maxLines: null,
-        decoration: InputDecoration(
-          contentPadding: EdgeInsets.symmetric(vertical: 16, horizontal: 8),
-          hintText: strings['editAsTextHint']!,
-        ),
-        autofocus: true,
-      ),
-    );
+          body: TextField(
+            controller: controller,
+            keyboardType: TextInputType.multiline,
+            maxLines: null,
+            decoration: InputDecoration(
+              contentPadding: EdgeInsets.symmetric(vertical: 16, horizontal: 8),
+              hintText: strings['editAsTextHint']!,
+            ),
+            autofocus: true,
+          ),
+        ));
   }
 }

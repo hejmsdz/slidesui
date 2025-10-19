@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:slidesui/strings.dart';
 
+bool returnTrue() => true;
+
 class ConfirmExit extends StatelessWidget {
   final Widget child;
   final String message;
+  final bool Function() isActive;
 
   const ConfirmExit({
     super.key,
     required this.child,
     required this.message,
+    this.isActive = returnTrue,
   });
 
   Future<bool?> _confirmExit(BuildContext context) {
@@ -43,7 +47,8 @@ class ConfirmExit extends StatelessWidget {
       canPop: false,
       onPopInvokedWithResult: (didPop, result) async {
         if (!didPop) {
-          final shouldPop = await _confirmExit(context) ?? false;
+          final shouldPop =
+              !isActive() || (await _confirmExit(context) ?? false);
           if (context.mounted && shouldPop) {
             Navigator.pop(context);
           }
