@@ -15,7 +15,7 @@ class TextEditPage extends StatefulWidget {
   _TextEditPageState createState() => _TextEditPageState();
 }
 
-const String textItemDelimiter = "'''";
+const String textItemDelimiter = "```";
 const String itemTerminator = '.';
 
 String trimItemTerminator(String title) {
@@ -43,20 +43,34 @@ class _TextEditPageState extends State<TextEditPage> {
     });
   }
 
+  String getItemText(DeckItem item) {
+    if (item is UnresolvedDeckItem) {
+      return item.title; // unresolved items don't have the terminator
+    }
+
+    if (item is TextDeckItem) {
+      return "$textItemDelimiter${item.contents}$textItemDelimiter$itemTerminator";
+    }
+
+    if (item is PsalmDeckItem) {
+      return "[${strings['psalm']!}] ${trimItemTerminator(item.subtitle ?? '')}$itemTerminator";
+    }
+
+    if (item is AcclamationDeckItem) {
+      return "[${strings['acclamation']!}] ${item.title} / ${trimItemTerminator(item.subtitle ?? '')}$itemTerminator";
+    }
+
+    return "${item.title}${(item.subtitle?.isEmpty ?? true) ? '' : (' / ${item.subtitle!}')}$itemTerminator";
+  }
+
   String getSlidesAsText() {
     final state = Provider.of<SlidesModel>(context, listen: false);
 
     return state.items.asMap().entries.map((entry) {
       final item = entry.value;
       final index = entry.key;
-      final text = item is TextDeckItem
-          ? "$textItemDelimiter${item.contents}$textItemDelimiter"
-          : item.title +
-              ((item.subtitle?.isEmpty ?? true)
-                  ? ''
-                  : (' / ${item.subtitle!}'));
-      final terminator = item is UnresolvedDeckItem ? '' : itemTerminator;
-      return "${index + 1}. $text$terminator";
+      final text = getItemText(item);
+      return "${index + 1}. $text";
     }).join("\n");
   }
 
@@ -184,20 +198,21 @@ class _TextEditPageState extends State<TextEditPage> {
     if (title.isEmpty) {
       return null;
     }
-    final hasTrailingDot = title.endsWith(itemTerminator);
-    final titleNormalized = trimItemTerminator(title)
-        .replaceFirst(RegExp(r"\.$"), "")
-        .split(' / ')
-        .map(slugify)
-        .join('|');
-    if (currentTitles.containsKey(titleNormalized)) {
-      return currentTitles[titleNormalized];
-    }
-    if (titleNormalized == strings['psalm']!.toLowerCase()) {
+    final titleLower = title.toLowerCase();
+    final psalmTitle = strings['psalm']!.toLowerCase();
+    if (titleLower == psalmTitle || titleLower.startsWith("[$psalmTitle]")) {
       return PsalmDeckItem(state);
     }
-    if (titleNormalized == strings['acclamation']!.toLowerCase()) {
+    final acclamationTitle = strings['acclamation']!.toLowerCase();
+    if (titleLower == acclamationTitle ||
+        titleLower.startsWith("[$acclamationTitle]")) {
       return AcclamationDeckItem(state);
+    }
+    final hasTrailingDot = title.endsWith(itemTerminator);
+    final titleNormalized =
+        trimItemTerminator(titleLower).split(' / ').map(slugify).join('|');
+    if (currentTitles.containsKey(titleNormalized)) {
+      return currentTitles[titleNormalized];
     }
     final songs = await getSongsPaginated(titleNormalized,
         teamId: state.currentTeam?.id, limit: 1, offset: 0);
