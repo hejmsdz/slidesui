@@ -436,7 +436,7 @@ class _ExternalDisplayBroadcasterState
   }
 }
 
-class ContentsButton extends StatelessWidget {
+class ContentsButton extends StatefulWidget {
   final PresentationController controller;
   final List<ContentSlide> contents;
 
@@ -446,10 +446,41 @@ class ContentsButton extends StatelessWidget {
     required this.contents,
   });
 
-  goToItem(int index) {
-    final page = contents.indexWhere(
+  @override
+  State<ContentsButton> createState() => _ContentsButtonState();
+}
+
+class _ContentsButtonState extends State<ContentsButton> {
+  int _currentItemIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+
+    widget.controller.addListener(handlePageChange);
+  }
+
+  @override
+  void dispose() {
+    widget.controller.removeListener(handlePageChange);
+    super.dispose();
+  }
+
+  void handlePageChange() {
+    final page = widget.controller.currentPage;
+    final itemIndex = widget.contents[page].itemIndex;
+
+    if (itemIndex != _currentItemIndex) {
+      setState(() {
+        _currentItemIndex = itemIndex;
+      });
+    }
+  }
+
+  void goToItem(int index) {
+    final page = widget.contents.indexWhere(
         (slide) => slide.type == "verse" && slide.itemIndex == index);
-    controller.setCurrentPage(page);
+    widget.controller.setCurrentPage(page);
   }
 
   @override
@@ -461,6 +492,9 @@ class ContentsButton extends StatelessWidget {
             .map(
               (idxItem) => MenuItemButton(
                 onPressed: () => goToItem(idxItem.$1),
+                leadingIcon: idxItem.$1 == _currentItemIndex
+                    ? const Icon(Icons.check)
+                    : null,
                 child: Text(idxItem.$2.title),
               ),
             )
