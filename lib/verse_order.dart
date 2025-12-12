@@ -99,7 +99,9 @@ class _VerseOrderPageState extends State<VerseOrderPage> {
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
-                            color: isSelected ? null : Colors.black45,
+                            color: isSelected
+                                ? null
+                                : Theme.of(context).colorScheme.outline,
                             decoration: isSelected
                                 ? null
                                 : TextDecoration.lineThrough)),
