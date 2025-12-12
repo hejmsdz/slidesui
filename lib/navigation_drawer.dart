@@ -262,7 +262,8 @@ class _AppNavigationDrawerState extends State<AppNavigationDrawer> {
     final state = context.read<SlidesModel>();
     final frontendUrl = state.bootstrap?.frontendUrl.replaceAll('https://', '');
 
-    TextEditingController controller = TextEditingController();
+    TextEditingController controller =
+        TextEditingController(text: lastLiveSessionKey);
 
     return showDialog<String>(
       context: context,

@@ -20,6 +20,7 @@ bool hasAnyConnection(List<ConnectivityResult> results) {
 }
 
 const int reconnectDelaySeconds = 5;
+String? lastLiveSessionKey;
 
 class PresentationReceiver extends StatefulWidget {
   const PresentationReceiver({super.key, required this.liveSessionKey});
@@ -111,6 +112,7 @@ class _PresentationReceiverState extends State<PresentationReceiver> {
         _isConnecting = false;
         _didConnectAtLeastOnce = true;
         sseSubscription = response?.stream?.listen(handleEvent);
+        lastLiveSessionKey = widget.liveSessionKey;
       },
       onError: (error) async {
         if (!mounted) return;
@@ -123,6 +125,7 @@ class _PresentationReceiverState extends State<PresentationReceiver> {
               content: Text(strings['presentationReceiverError']!),
             ),
           );
+          lastLiveSessionKey = null;
           Navigator.of(context).pop();
 
           return;
