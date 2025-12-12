@@ -28,6 +28,7 @@ class _TextEditPageState extends State<TextEditPage> {
   TextEditingController controller = TextEditingController();
   bool _isLoading = false;
   String _initialText = '';
+  bool _isEmpty = true;
 
   @override
   void initState() {
@@ -35,6 +36,7 @@ class _TextEditPageState extends State<TextEditPage> {
 
     _initialText = getSlidesAsText();
     controller.text = _initialText;
+    _isEmpty = _initialText.isEmpty;
   }
 
   setIsLoading(bool isLoading) {
@@ -76,6 +78,9 @@ class _TextEditPageState extends State<TextEditPage> {
 
   clearText() {
     controller.clear();
+    setState(() {
+      _isEmpty = true;
+    });
   }
 
   List<String> splitLines(String text) {
@@ -228,6 +233,16 @@ class _TextEditPageState extends State<TextEditPage> {
     }
   }
 
+  handleTextChanged(String value) {
+    final isEmpty = value.isEmpty;
+
+    if (isEmpty != _isEmpty) {
+      setState(() {
+        _isEmpty = isEmpty;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return ConfirmExit(
@@ -237,21 +252,23 @@ class _TextEditPageState extends State<TextEditPage> {
           appBar: AppBar(
             title: Text(strings['editAsText']!),
             actions: [
-              IconButton(
-                icon: const Icon(Icons.share),
-                tooltip: strings['shareRepertoire']!,
-                onPressed: () {
-                  SharePlus.instance.share(ShareParams(
-                    text: controller.text,
-                    sharePositionOrigin: Rect.fromLTWH(0, 0, 1, 1),
-                  ));
-                },
-              ),
-              IconButton(
-                icon: const Icon(Icons.clear),
-                tooltip: strings['clearText']!,
-                onPressed: _isLoading ? null : clearText,
-              ),
+              if (!_isEmpty) ...[
+                IconButton(
+                  icon: const Icon(Icons.share),
+                  tooltip: strings['shareRepertoire']!,
+                  onPressed: () {
+                    SharePlus.instance.share(ShareParams(
+                      text: controller.text,
+                      sharePositionOrigin: Rect.fromLTWH(0, 0, 1, 1),
+                    ));
+                  },
+                ),
+                IconButton(
+                  icon: const Icon(Icons.clear),
+                  tooltip: strings['clearText']!,
+                  onPressed: _isLoading ? null : clearText,
+                ),
+              ],
               IconButton(
                 icon: const Icon(Icons.check),
                 tooltip: strings['applyText']!,
@@ -276,6 +293,7 @@ class _TextEditPageState extends State<TextEditPage> {
               contentPadding: EdgeInsets.symmetric(vertical: 16, horizontal: 8),
               hintText: strings['editAsTextHint']!,
             ),
+            onChanged: handleTextChanged,
             autofocus: true,
           ),
         ));
