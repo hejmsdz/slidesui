@@ -225,6 +225,20 @@ class _PresentationPageState extends State<PresentationPage> {
     }
   }
 
+  static PhotoViewGalleryPageOptions pageBuilder(
+      context, pageImage, index, document) {
+    return PhotoViewGalleryPageOptions(
+      imageProvider: PdfPageImageProvider(
+        pageImage,
+        index,
+        document.id,
+      ),
+      minScale: PhotoViewComputedScale.contained * 1,
+      maxScale: PhotoViewComputedScale.contained * 1,
+      disableGestures: true,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -244,6 +258,10 @@ class _PresentationPageState extends State<PresentationPage> {
                     }
                   },
                   scrollDirection: Axis.horizontal,
+                  builders: const PdfViewBuilders<DefaultBuilderOptions>(
+                    options: DefaultBuilderOptions(),
+                    pageBuilder: pageBuilder,
+                  ),
                 ),
                 if (_isOnboardingVisible)
                   PresentationOnboarding(onComplete: handleOnboardingComplete),
