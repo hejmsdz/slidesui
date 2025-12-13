@@ -47,7 +47,13 @@ abstract class DeckItem {
 }
 
 class SongDeckItem implements DeckItem {
-  SongDeckItem(this.song);
+  SongDeckItem(this.song, {this.selectedVerses});
+
+  SongDeckItem.fromJson(Map<String, dynamic> json)
+      : song = Song.fromJson(json),
+        selectedVerses = json['selectedVerses'] != null
+            ? List<bool>.from(json['selectedVerses'].map((e) => e as bool))
+            : null;
 
   Song song;
   @override
@@ -84,7 +90,8 @@ class SongDeckItem implements DeckItem {
   @override
   Map<String, dynamic> toJson() => {'id': id, 'order': order};
   @override
-  Map<String, dynamic> toFullJson() => {'type': 'SONG'}..addAll(song.toJson());
+  Map<String, dynamic> toFullJson() =>
+      {'type': 'SONG', 'selectedVerses': selectedVerses}..addAll(song.toJson());
 }
 
 abstract class LiturgyHolder {

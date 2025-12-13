@@ -58,7 +58,7 @@ class SlidesModel extends ChangeNotifier implements LiturgyHolder {
         .map((itemJson) {
           switch (itemJson['type']) {
             case 'SONG':
-              return SongDeckItem(Song.fromJson(itemJson));
+              return SongDeckItem.fromJson(itemJson);
             case 'PSALM':
               return PsalmDeckItem(this);
             case 'ACCLAMATION':
@@ -72,7 +72,8 @@ class SlidesModel extends ChangeNotifier implements LiturgyHolder {
         .whereType<DeckItem>()
         .toList();
 
-    _currentTeam = Team.fromJson(json['currentTeam']);
+    _currentTeam =
+        json['currentTeam'] != null ? Team.fromJson(json['currentTeam']) : null;
 
     notifyListeners();
   }
