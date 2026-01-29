@@ -361,10 +361,12 @@ class ExternalDisplayBroadcaster extends StatefulWidget {
       {super.key,
       required this.controller,
       required this.filePath,
+      this.backgroundColor,
       this.onStateChange});
 
   final PresentationController controller;
   final String filePath;
+  final Color? backgroundColor;
   final void Function(String, bool)? onStateChange;
 
   @override
@@ -389,11 +391,20 @@ class _ExternalDisplayBroadcasterState
     });
   }
 
+  @override
+  void didUpdateWidget(ExternalDisplayBroadcaster oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.filePath != widget.filePath) {
+      handleOpen();
+    }
+  }
+
   void handleOpen() async {
     if (externalDisplay.isPlugging) {
       externalDisplay.sendParameters(
         action: "open",
-        value: "${widget.filePath}#${widget.controller.currentPage}",
+        value:
+            "${widget.filePath}#${widget.controller.currentPage}#${widget.backgroundColor?.toARGB32()}",
       );
     }
   }

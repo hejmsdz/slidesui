@@ -12,6 +12,7 @@ class ExternalDisplayApp extends StatefulWidget {
 class _ExternalDisplayAppState extends State<ExternalDisplayApp> {
   bool _isPresenting = false;
   String? _pdfPath;
+  Color? _backgroundColor;
   int _currentPage = 0;
 
   @override
@@ -35,13 +36,14 @@ class _ExternalDisplayAppState extends State<ExternalDisplayApp> {
   }
 
   handleOpen(String pdfPathWithPage) {
-    final [pdfPath, pageStr] = pdfPathWithPage.split("#");
+    final [pdfPath, pageStr, backgroundColorStr] = pdfPathWithPage.split("#");
     final page = int.parse(pageStr);
 
     setState(() {
       _isPresenting = true;
       _pdfPath = pdfPath;
       _currentPage = page;
+      _backgroundColor = Color(int.parse(backgroundColorStr, radix: 16));
     });
   }
 
@@ -63,7 +65,7 @@ class _ExternalDisplayAppState extends State<ExternalDisplayApp> {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
-        backgroundColor: Colors.black,
+        backgroundColor: _backgroundColor ?? Colors.black,
         body: _isPresenting && _pdfPath != null
             ? PdfPresentation(
                 pdfPath: _pdfPath!,

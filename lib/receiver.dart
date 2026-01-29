@@ -34,11 +34,17 @@ class PresentationReceiver extends StatefulWidget {
 class StartEvent {
   final String url;
   final int currentPage;
+  final String? backgroundColor;
 
-  StartEvent({required this.url, required this.currentPage});
+  StartEvent(
+      {required this.url, required this.currentPage, this.backgroundColor});
 
   factory StartEvent.fromJson(Map<String, dynamic> json) {
-    return StartEvent(url: json['url'], currentPage: json['currentPage']);
+    return StartEvent(
+      url: json['url'],
+      currentPage: json['currentPage'],
+      backgroundColor: json['backgroundColor'],
+    );
   }
 }
 
@@ -55,6 +61,8 @@ class PageEvent {
 class _PresentationReceiverState extends State<PresentationReceiver> {
   EventFluxData? data;
   String? pdfFilePath;
+  Color? _backgroundColor;
+  bool _isLightBackground = false;
   PresentationController controller = PresentationController();
   bool _isUiVisible = true;
   bool _isConnecting = false;
@@ -151,9 +159,18 @@ class _PresentationReceiverState extends State<PresentationReceiver> {
     switch (data.event) {
       case 'start':
         final startEvent = StartEvent.fromJson(jsonDecode(data.data));
+        setState(() {
+          if (startEvent.backgroundColor == null) {
+            _backgroundColor = Colors.black;
+          } else {
+            String hexColor = startEvent.backgroundColor!.replaceFirst("#", "");
+            _backgroundColor = Color(int.parse("FF$hexColor", radix: 16));
+          }
 
-        controller.setCurrentPage(startEvent.currentPage);
+          _isLightBackground = isLightBackground(_backgroundColor);
+        });
         await downloadPdf(startEvent.url);
+        controller.setCurrentPage(startEvent.currentPage);
 
         break;
 
@@ -228,7 +245,7 @@ class _PresentationReceiverState extends State<PresentationReceiver> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: _backgroundColor ?? Colors.black,
       body: pdfFilePath == null
           ? Container()
           : ConfirmExit(
@@ -242,6 +259,7 @@ class _PresentationReceiverState extends State<PresentationReceiver> {
                   ExternalDisplayBroadcaster(
                     controller: controller,
                     filePath: pdfFilePath!,
+                    backgroundColor: _backgroundColor,
                   ),
                   GestureDetector(onDoubleTap: () {
                     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
@@ -252,6 +270,7 @@ class _PresentationReceiverState extends State<PresentationReceiver> {
                   OverlayAppBar(
                     isUiVisible: _isUiVisible,
                     actions: [],
+                    isLightBackground: _isLightBackground,
                   ),
                 ],
               )),
