@@ -2,11 +2,11 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:flutter_settings_screens/flutter_settings_screens.dart';
+import 'package:provider/provider.dart';
 
-import './strings.dart';
 import './state.dart';
+import './strings.dart';
 
 const defaultFontSize = 52.0;
 
@@ -27,11 +27,24 @@ final behaviors = <String, String>{
   'share': strings['behaviorShare']!,
 };
 
+final customColorKey = 'CUSTOM';
+final whiteColorKey = '#ffffff';
+final defaultColorKey = whiteColorKey;
+
+final colors = <String, String>{
+  whiteColorKey: strings['white']!,
+  '#ff0000': strings['red']!,
+  '#ffff00': strings['yellow']!,
+  '#ff8000': strings['orange']!,
+  customColorKey: strings['customColor']!
+};
+
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    print(colors);
     return SettingsScreen(title: strings['settings']!, children: [
       Consumer<SlidesModel>(
         builder: (context, state, child) => Column(
@@ -54,6 +67,7 @@ class SettingsPage extends StatelessWidget {
                   values: aspectRatios,
                   selected: "16:9",
                 ),
+                const TextColorSettingsTile(),
                 const VerticalAlignmentSettingsTile(),
                 kIsWeb
                     ? Container()
@@ -126,6 +140,49 @@ class _FontSizeSettingsTileState extends State<FontSizeSettingsTile> {
         });
       },
     );
+  }
+}
+
+class TextColorSettingsTile extends StatefulWidget {
+  const TextColorSettingsTile({super.key});
+
+  @override
+  State<TextColorSettingsTile> createState() => _TextColorSettingsTileState();
+}
+
+class _TextColorSettingsTileState extends State<TextColorSettingsTile> {
+  bool isCustom = false;
+
+  @override
+  void initState() {
+    super.initState();
+
+    isCustom = Settings.getValue<String>("slides.textColor") == customColorKey;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(children: [
+      DropDownSettingsTile<String>(
+        leading: const Icon(Icons.palette),
+        title: strings['textColor']!,
+        settingKey: "slides.textColor",
+        values: colors,
+        selected: colors.keys.first,
+        onChange: (newValue) {
+          setState(() {
+            isCustom = newValue == customColorKey;
+          });
+        },
+      ),
+      if (isCustom)
+        ColorPickerSettingsTile(
+          leading: const Icon(Icons.colorize),
+          title: strings['customTextColor']!,
+          settingKey: "slides.customTextColor",
+          defaultStringValue: "#ffffffff",
+        ),
+    ]);
   }
 }
 

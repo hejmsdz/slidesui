@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:slidesui/model.dart';
+import 'package:slidesui/settings.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter_settings_screens/flutter_settings_screens.dart';
@@ -54,6 +55,28 @@ Future<String> getDownloadDirectory() async {
   return directory.path;
 }
 
+String getTextColor() {
+  final textColor =
+      Settings.getValue<String>('slides.textColor') ?? defaultColorKey;
+
+  if (textColor == customColorKey) {
+    final customColor =
+        Settings.getValue<String>('slides.customTextColor') ?? defaultColorKey;
+
+    if (customColor.length == 7 && customColor.startsWith("#")) {
+      return customColor;
+    }
+
+    if (customColor.length == 9 && customColor.startsWith("#")) {
+      return "#${customColor.substring(3)}";
+    }
+
+    return defaultColorKey;
+  }
+
+  return textColor;
+}
+
 DeckRequest buildDeckRequestFromState(
   SlidesModel state, {
   String format = "pdf",
@@ -63,6 +86,7 @@ DeckRequest buildDeckRequestFromState(
     date: state.date,
     items: state.items,
     ratio: Settings.getValue<String>('slides.aspectRatio') ?? "16:9",
+    textColor: getTextColor(),
     fontSize: Settings.getValue<double>('slides.fontSize')?.toInt(),
     verticalAlign: Settings.getValue<String>('slides.verticalAlign'),
     hints: Settings.getValue<bool>('slides.hints'),

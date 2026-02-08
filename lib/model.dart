@@ -207,6 +207,7 @@ class DeckRequest {
   final bool? hints;
   final String? format;
   final bool? contents;
+  final String? textColor;
 
   DeckRequest({
     required this.date,
@@ -217,6 +218,7 @@ class DeckRequest {
     this.hints,
     this.format,
     this.contents,
+    this.textColor,
   });
 
   Map<String, dynamic> toJson() => {
@@ -228,6 +230,7 @@ class DeckRequest {
         'hints': hints,
         'format': format,
         'contents': contents,
+        'textColor': textColor,
       };
 }
 
