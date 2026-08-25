@@ -5,10 +5,10 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_settings_screens/flutter_settings_screens.dart';
 import 'package:pdfx/pdfx.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:slidesui/cast.dart';
 import 'package:slidesui/confirm_exit.dart';
@@ -103,9 +103,9 @@ class _PresentationPageState extends State<PresentationPage> {
     WakelockPlus.enable();
   }
 
-  showOnboarding() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    if (prefs.getBool("presentationModeOnboardingSeen") ?? false) {
+  showOnboarding() {
+    if (Settings.getValue<bool>('showOnboardingNextTime', defaultValue: true) !=
+        true) {
       return;
     }
 
@@ -123,8 +123,7 @@ class _PresentationPageState extends State<PresentationPage> {
       _isOnboardingVisible = false;
     });
 
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setBool("presentationModeOnboardingSeen", true);
+    await Settings.setValue<bool>('showOnboardingNextTime', false);
   }
 
   handleBroadcastChange(String channel, bool isBroadcasting) {

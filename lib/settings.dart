@@ -69,6 +69,11 @@ class SettingsPage extends StatelessWidget {
                 ),
                 const TextColorSettingsTile(),
                 const VerticalAlignmentSettingsTile(),
+              ],
+            ),
+            SettingsGroup(
+              title: strings['settingsSectionApp']!,
+              children: <Widget>[
                 kIsWeb
                     ? Container()
                     : DropDownSettingsTile<String>(
@@ -78,6 +83,13 @@ class SettingsPage extends StatelessWidget {
                         values: behaviors,
                         selected: 'display',
                       ),
+                CheckboxSettingsTile(
+                  settingKey: 'showOnboardingNextTime',
+                  title: strings['onboarding']!,
+                  subtitle: strings['onboardingDescription']!,
+                  leading: const Icon(Icons.touch_app),
+                  defaultValue: true,
+                ),
               ],
             ),
           ],

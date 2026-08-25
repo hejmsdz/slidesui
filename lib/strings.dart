@@ -61,6 +61,7 @@ const strings = {
   'addSong': 'Dodaj nową pieśń',
   'settings': 'Ustawienia',
   'settingsSectionSlides': 'Slajdy',
+  'settingsSectionApp': 'Aplikacja',
   'hints': 'Podpowiedzi',
   'hintsDescription': 'Wyświetl skrót tytułu przed każdą pieśnią',
   'fontSize': 'Rozmiar tekstu',
@@ -83,6 +84,8 @@ const strings = {
   'behaviorDisplay': 'Wyświetl',
   'behaviorSave': 'Zapisz do pliku',
   'behaviorShare': 'Udostępnij',
+  'onboarding': 'Instrukcja sterowania prezentacją',
+  'onboardingDescription': 'Zaznacz, żeby zobaczyć ją jeszcze raz',
   'confirmExitTitle': 'Potwierdź',
   'confirmExit': 'Czy na pewno chcesz zakończyć prezentację?',
   'confirmExitBroadcasting':
