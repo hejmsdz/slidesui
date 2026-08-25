@@ -39,7 +39,7 @@ Future<void> notifyOnDownloaded(
   }
 }
 
-notifyOnMoved(BuildContext context) {
+void notifyOnMoved(BuildContext context) {
   final snackBar = SnackBar(
     content: Text(strings['slidesMoved']!),
   );

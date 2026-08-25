@@ -2,7 +2,6 @@ import 'dart:collection';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import './api.dart';
 import './model.dart';
@@ -41,7 +40,7 @@ class SlidesModel extends ChangeNotifier implements LiturgyHolder {
         'currentTeam': _currentTeam?.toJson(),
       };
 
-  loadFromJson(Map<String, dynamic> json) {
+  void loadFromJson(Map<String, dynamic> json) {
     final date = DateTime.parse(json['date'] as String);
 
     final now = DateTime.now();
@@ -78,7 +77,7 @@ class SlidesModel extends ChangeNotifier implements LiturgyHolder {
     notifyListeners();
   }
 
-  loadUser() async {
+  Future<void> loadUser() async {
     final storage = FlutterSecureStorage();
     final hasToken = await storage.containsKey(key: 'accessToken');
     if (hasToken) {
@@ -92,35 +91,35 @@ class SlidesModel extends ChangeNotifier implements LiturgyHolder {
     }
   }
 
-  addItem(DeckItem item) {
+  void addItem(DeckItem item) {
     _items.add(item);
     notifyListeners();
   }
 
-  replaceItem(int index, DeckItem item) {
+  void replaceItem(int index, DeckItem item) {
     _items[index] = item;
     notifyListeners();
   }
 
-  removeItem(int index) {
+  void removeItem(int index) {
     _lastRemovedIndex = index;
     _lastRemovedItem = _items.removeAt(index);
     notifyListeners();
   }
 
-  removeItemById(String id) {
+  void removeItemById(String id) {
     final index = _items.indexWhere((item) => item.id == id);
     if (index >= 0) {
       removeItem(index);
     }
   }
 
-  removeAllItems() {
+  void removeAllItems() {
     _items.clear();
     notifyListeners();
   }
 
-  undoRemoveItem() {
+  void undoRemoveItem() {
     if (_lastRemovedIndex == null || _lastRemovedItem == null) {
       return;
     }
@@ -131,7 +130,7 @@ class SlidesModel extends ChangeNotifier implements LiturgyHolder {
     notifyListeners();
   }
 
-  reorderItems(int oldIndex, int newIndex) {
+  void reorderItems(int oldIndex, int newIndex) {
     if (newIndex > oldIndex) {
       newIndex -= 1;
     }
@@ -148,7 +147,7 @@ class SlidesModel extends ChangeNotifier implements LiturgyHolder {
     return _items.any((item) => item is LiturgyDeckItem);
   }
 
-  addLiturgy() {
+  void addLiturgy() {
     final kyrieIndex =
         _items.indexWhere((item) => item.id == OrdinaryItems.kyrie.id);
     final index = min(
@@ -159,7 +158,7 @@ class SlidesModel extends ChangeNotifier implements LiturgyHolder {
     notifyListeners();
   }
 
-  removeLiturgy() {
+  void removeLiturgy() {
     _items.removeWhere((item) => item is LiturgyDeckItem);
     notifyListeners();
   }
@@ -168,7 +167,7 @@ class SlidesModel extends ChangeNotifier implements LiturgyHolder {
     return _items.any((item) => item is SongDeckItem && item.song.isOrdinary);
   }
 
-  addOrdinary() {
+  void addOrdinary() {
     final kyrieItem = SongDeckItem(OrdinaryItems.kyrie);
     final sanctusItem = SongDeckItem(OrdinaryItems.sanctus);
     final agnusItem = SongDeckItem(OrdinaryItems.agnus);
@@ -187,17 +186,17 @@ class SlidesModel extends ChangeNotifier implements LiturgyHolder {
     notifyListeners();
   }
 
-  removeOrdinary() {
+  void removeOrdinary() {
     _items.removeWhere((item) => item is SongDeckItem && item.song.isOrdinary);
     notifyListeners();
   }
 
-  addText(String contents) {
+  void addText(String contents) {
     _items.add(TextDeckItem(contents));
     notifyListeners();
   }
 
-  updateText(int index, String newContents) {
+  void updateText(int index, String newContents) {
     final item = _items[index];
     if (item is TextDeckItem) {
       item.contents = newContents;
@@ -205,13 +204,13 @@ class SlidesModel extends ChangeNotifier implements LiturgyHolder {
     notifyListeners();
   }
 
-  setItems(List<DeckItem> items) {
+  void setItems(List<DeckItem> items) {
     _items.clear();
     _items.addAll(items);
     notifyListeners();
   }
 
-  setBootstrap(BootstrapResponse bootstrap) {
+  void setBootstrap(BootstrapResponse bootstrap) {
     _bootstrap = bootstrap;
   }
 
@@ -231,12 +230,12 @@ class SlidesModel extends ChangeNotifier implements LiturgyHolder {
     return true;
   }
 
-  updateLiturgy() async {
+  Future<void> updateLiturgy() async {
     liturgy = await getLiturgy(date);
     notifyListeners();
   }
 
-  setRawVerses(int index, List<String> verses) {
+  void setRawVerses(int index, List<String> verses) {
     final item = _items[index];
     if (item is SongDeckItem) {
       item.rawVerses = verses;
@@ -244,7 +243,7 @@ class SlidesModel extends ChangeNotifier implements LiturgyHolder {
     notifyListeners();
   }
 
-  setSelectedVerses(int index, List<bool> selectedVerses) {
+  void setSelectedVerses(int index, List<bool> selectedVerses) {
     final item = _items[index];
     if (item is SongDeckItem) {
       item.selectedVerses = selectedVerses;
@@ -252,7 +251,7 @@ class SlidesModel extends ChangeNotifier implements LiturgyHolder {
     notifyListeners();
   }
 
-  updateSelectedVerses(int index, int verseIndex, bool value) {
+  void updateSelectedVerses(int index, int verseIndex, bool value) {
     final item = _items[index];
     if (item is SongDeckItem) {
       item.selectedVerses![verseIndex] = value;
@@ -260,7 +259,7 @@ class SlidesModel extends ChangeNotifier implements LiturgyHolder {
     notifyListeners();
   }
 
-  reloadSong(String id, String? newId) async {
+  Future<void> reloadSong(String id, String? newId) async {
     final index = _items.indexWhere((item) => item.id == id);
     if (index >= 0) {
       final song = await getSong(newId ?? id);
@@ -275,12 +274,12 @@ class SlidesModel extends ChangeNotifier implements LiturgyHolder {
   }
 
   // TODO
-  setIsLiveConnected(bool isConnected) {
+  void setIsLiveConnected(bool isConnected) {
     isLiveConnected = isConnected;
     notifyListeners();
   }
 
-  setUser(User? user) async {
+  Future<void> setUser(User? user) async {
     _user = user;
     notifyListeners();
 
@@ -296,7 +295,7 @@ class SlidesModel extends ChangeNotifier implements LiturgyHolder {
     }
   }
 
-  setCurrentTeam(Team? team) {
+  void setCurrentTeam(Team? team) {
     _currentTeam = team;
     notifyListeners();
   }

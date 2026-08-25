@@ -59,7 +59,7 @@ class _LiveSessionButtonState extends State<LiveSessionButton> {
     _isConnected = prefs.getBool('live.isConnected') ?? false;
   }
 
-  storeState() async {
+  Future<void> storeState() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setBool('live.isConnected', _isConnected);
     prefs.setString('live.live', jsonEncode(_live));

@@ -127,7 +127,7 @@ class ListItem extends StatelessWidget {
   final void Function() onTap;
   final int index;
 
-  edit(BuildContext context, SlidesModel state) {
+  void edit(BuildContext context, SlidesModel state) {
     final id = itemKey.value;
     Navigator.of(context).push(
       MaterialPageRoute(
@@ -268,13 +268,13 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  setIsWorking(bool isWorking) {
+  void setIsWorking(bool isWorking) {
     setState(() {
       _isWorking = isWorking;
     });
   }
 
-  showTextDialog(Function(String) callback, [String initialValue = ""]) {
+  void showTextDialog(Function(String) callback, [String initialValue = ""]) {
     TextEditingController controller =
         TextEditingController(text: initialValue);
 
@@ -310,7 +310,7 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  showDateErrorDialog() {
+  void showDateErrorDialog() {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -327,7 +327,7 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  showNewVersionDialog(
+  void showNewVersionDialog(
       String latestVersion, String yourVersion, String appDownloadUrl) {
     showDialog(
       context: context,

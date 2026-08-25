@@ -19,7 +19,7 @@ class _VerseOrderPageState extends State<VerseOrderPage> {
 
   bool _isLoading = false;
 
-  fetchVerses() async {
+  Future<void> fetchVerses() async {
     final int itemIndex = widget.itemIndex;
     final state = Provider.of<SlidesModel>(context, listen: false);
     final item = state.items[itemIndex] as SongDeckItem;
@@ -48,7 +48,7 @@ class _VerseOrderPageState extends State<VerseOrderPage> {
     }
   }
 
-  setIsLoading(bool isLoading) {
+  void setIsLoading(bool isLoading) {
     setState(() {
       _isLoading = isLoading;
     });

@@ -37,7 +37,7 @@ class _InvitationPageState extends State<InvitationPage> {
 
     try {
       final team = await postJoinTeam(widget.token);
-      await state.setCurrentTeam(team);
+      state.setCurrentTeam(team);
 
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(

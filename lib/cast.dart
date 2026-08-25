@@ -208,7 +208,7 @@ class _CastButtonState extends State<CastButton> {
     );
   }
 
-  showConnectionErrorDialog() {
+  void showConnectionErrorDialog() {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -225,7 +225,7 @@ class _CastButtonState extends State<CastButton> {
     );
   }
 
-  handleSlideChange() {
+  void handleSlideChange() {
     _castService?.requestSlideChange(widget.controller.currentPage);
   }
 
@@ -237,7 +237,7 @@ class _CastButtonState extends State<CastButton> {
     widget.controller.addListener(handleSlideChange);
   }
 
-  endPresentation() {
+  void endPresentation() {
     widget.controller.removeListener(handleSlideChange);
     _castService?.endPresentation();
   }

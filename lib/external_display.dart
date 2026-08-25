@@ -35,7 +35,7 @@ class _ExternalDisplayAppState extends State<ExternalDisplayApp> {
     });
   }
 
-  handleOpen(String pdfPathWithPage) {
+  void handleOpen(String pdfPathWithPage) {
     final [pdfPath, pageStr, backgroundColorStr] = pdfPathWithPage.split("#");
     final page = int.parse(pageStr);
 
@@ -47,14 +47,14 @@ class _ExternalDisplayAppState extends State<ExternalDisplayApp> {
     });
   }
 
-  handleClose() {
+  void handleClose() {
     setState(() {
       _isPresenting = false;
       _pdfPath = null;
     });
   }
 
-  handlePageChange(int pageIndex) {
+  void handlePageChange(int pageIndex) {
     setState(() {
       _currentPage = pageIndex;
     });

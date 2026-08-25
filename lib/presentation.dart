@@ -103,7 +103,7 @@ class _PresentationPageState extends State<PresentationPage> {
     WakelockPlus.enable();
   }
 
-  showOnboarding() {
+  void showOnboarding() {
     if (Settings.getValue<bool>('showOnboardingNextTime', defaultValue: true) !=
         true) {
       return;
@@ -118,7 +118,7 @@ class _PresentationPageState extends State<PresentationPage> {
     });
   }
 
-  handleOnboardingComplete() async {
+  Future<void> handleOnboardingComplete() async {
     setState(() {
       _isOnboardingVisible = false;
     });
@@ -126,7 +126,7 @@ class _PresentationPageState extends State<PresentationPage> {
     await Settings.setValue<bool>('showOnboardingNextTime', false);
   }
 
-  handleBroadcastChange(String channel, bool isBroadcasting) {
+  void handleBroadcastChange(String channel, bool isBroadcasting) {
     setState(() {
       controller.resume();
       _broadcastingState[channel] = isBroadcasting;
@@ -134,7 +134,7 @@ class _PresentationPageState extends State<PresentationPage> {
     });
   }
 
-  handleSlideChange() async {
+  Future<void> handleSlideChange() async {
     _isPageViewAnimating = true;
     await _pdf!.animateToPage(
       controller.currentPage + 1,
@@ -165,7 +165,7 @@ class _PresentationPageState extends State<PresentationPage> {
     await File(widget.filePath).delete();
   }
 
-  loadFile() async {
+  Future<void> loadFile() async {
     setIsLoading(true);
     try {
       final document = PdfDocument.openFile(widget.filePath);
@@ -185,13 +185,13 @@ class _PresentationPageState extends State<PresentationPage> {
     return widget.contents?[pageIndex].type == "blank";
   }
 
-  setIsLoading(bool isLoading) {
+  void setIsLoading(bool isLoading) {
     setState(() {
       _isLoading = isLoading;
     });
   }
 
-  jumpToFirstSlideOfCurrentItem() {
+  void jumpToFirstSlideOfCurrentItem() {
     if (widget.contents == null) {
       return;
     }
@@ -209,7 +209,7 @@ class _PresentationPageState extends State<PresentationPage> {
     }
   }
 
-  jumpToLastSlideOfCurrentItem() {
+  void jumpToLastSlideOfCurrentItem() {
     if (widget.contents == null) {
       return;
     }

@@ -75,7 +75,7 @@ class _SearchPageState extends State<SearchPage> {
     super.dispose();
   }
 
-  setIsLoading(bool isLoading) {
+  void setIsLoading(bool isLoading) {
     setState(() {
       _isLoading = isLoading;
     });

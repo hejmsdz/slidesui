@@ -5,23 +5,36 @@ import 'package:slidesui/api.dart';
 import 'package:slidesui/state.dart';
 import 'package:slidesui/strings.dart';
 
-Future<String> getGoogleIdToken() async {
-  final GoogleSignIn googleSignIn = GoogleSignIn(
-    scopes: ['openid', 'profile', 'email'],
-  );
+bool _googleSignInInitialized = false;
 
-  final GoogleSignInAccount? account = await googleSignIn.signIn();
-  if (account == null) {
-    throw Exception('No Google account');
+Future<void> _ensureGoogleSignInInitialized() async {
+  if (!_googleSignInInitialized) {
+    await GoogleSignIn.instance.initialize();
+    _googleSignInInitialized = true;
+  }
+}
+
+Future<String> getGoogleIdToken() async {
+  await _ensureGoogleSignInInitialized();
+
+  final GoogleSignInAccount account;
+  try {
+    account = await GoogleSignIn.instance.authenticate();
+  } on GoogleSignInException catch (e) {
+    if (e.code == GoogleSignInExceptionCode.canceled) {
+      throw Exception('No Google account');
+    }
+    rethrow;
   }
 
-  final GoogleSignInAuthentication auth = await account.authentication;
+  final GoogleSignInAuthentication auth = account.authentication;
+  final String? idToken = auth.idToken;
 
-  if (auth.idToken == null) {
+  if (idToken == null) {
     throw Exception('No ID token');
   }
 
-  return auth.idToken!;
+  return idToken;
 }
 
 Future<bool> logInWithGoogle(BuildContext context,

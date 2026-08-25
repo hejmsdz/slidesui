@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:slidesui/confirm_exit.dart';
-import 'package:slidesui/search.dart';
 import './strings.dart';
 import './state.dart';
 import './model.dart';
@@ -24,7 +23,7 @@ String trimItemTerminator(String title) {
       : title;
 }
 
-slugify(String text) {
+String slugify(String text) {
   return text
       .toLowerCase()
       .replaceAll('ą', 'a')
@@ -54,7 +53,7 @@ class _TextEditPageState extends State<TextEditPage> {
     _isEmpty = _initialText.isEmpty;
   }
 
-  setIsLoading(bool isLoading) {
+  void setIsLoading(bool isLoading) {
     setState(() {
       _isLoading = isLoading;
     });
@@ -91,7 +90,7 @@ class _TextEditPageState extends State<TextEditPage> {
     }).join("\n");
   }
 
-  clearText() {
+  void clearText() {
     controller.clear();
     setState(() {
       _isEmpty = true;
@@ -130,7 +129,7 @@ class _TextEditPageState extends State<TextEditPage> {
     return lines;
   }
 
-  normalizeTitle(item) {
+  String normalizeTitle(item) {
     String normalized = slugify(item.title);
     if (item.subtitle != null) {
       normalized = "$normalized|${slugify(item.subtitle!)}";
@@ -138,7 +137,7 @@ class _TextEditPageState extends State<TextEditPage> {
     return normalized;
   }
 
-  applyText() async {
+  Future<void> applyText() async {
     final state = Provider.of<SlidesModel>(context, listen: false);
     final text = controller.text.trim();
     if (text.isEmpty) {
@@ -248,7 +247,7 @@ class _TextEditPageState extends State<TextEditPage> {
     }
   }
 
-  handleTextChanged(String value) {
+  void handleTextChanged(String value) {
     final isEmpty = value.isEmpty;
 
     if (isEmpty != _isEmpty) {

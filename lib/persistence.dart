@@ -12,7 +12,7 @@ Future<File?> getStateFile() async {
   }
 }
 
-saveStateChanges(SlidesModel state) async {
+Future<void> saveStateChanges(SlidesModel state) async {
   final file = await getStateFile();
   if (file == null) {
     return;
