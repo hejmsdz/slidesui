@@ -44,21 +44,6 @@ class SearchListItem extends StatelessWidget {
 
 const queryPrefixLength = 3;
 
-slugify(String text) {
-  return text
-      .toLowerCase()
-      .replaceAll('ą', 'a')
-      .replaceAll('ć', 'c')
-      .replaceAll('ę', 'e')
-      .replaceAll('ł', 'l')
-      .replaceAll('ń', 'n')
-      .replaceAll('ó', 'o')
-      .replaceAll('ś', 's')
-      .replaceAll('ź', 'z')
-      .replaceAll('ż', 'z')
-      .replaceAll(RegExp('[^a-zA-Z0-9\\. ]+'), '');
-}
-
 class _SearchPageState extends State<SearchPage> {
   _SearchPageState();
   static const itemsPerPage = 20;

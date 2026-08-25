@@ -24,6 +24,21 @@ String trimItemTerminator(String title) {
       : title;
 }
 
+slugify(String text) {
+  return text
+      .toLowerCase()
+      .replaceAll('ą', 'a')
+      .replaceAll('ć', 'c')
+      .replaceAll('ę', 'e')
+      .replaceAll('ł', 'l')
+      .replaceAll('ń', 'n')
+      .replaceAll('ó', 'o')
+      .replaceAll('ś', 's')
+      .replaceAll('ź', 'z')
+      .replaceAll('ż', 'z')
+      .replaceAll(RegExp('[^a-zA-Z0-9\\. ]+'), '');
+}
+
 class _TextEditPageState extends State<TextEditPage> {
   TextEditingController controller = TextEditingController();
   bool _isLoading = false;
@@ -224,7 +239,7 @@ class _TextEditPageState extends State<TextEditPage> {
     final hasOneResult = songs.total == 1;
     final hasExactMatch = songs.total >= 1 &&
         hasTrailingDot &&
-        songs.items[0].slug == "$titleNormalized|";
+        normalizeTitle(songs.items[0]) == titleNormalized;
 
     if (hasOneResult || hasExactMatch) {
       return SongDeckItem(songs.items[0]);
